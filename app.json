@@ -1,47 +1,49 @@
 {
   "expo": {
-    "name": "aKro",
-    "slug": "aKro",
-    "version": "1.0.0",
-    "orientation": "portrait",
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff",
+        "foregroundImage": "./assets/images/adaptive-icon.png"
+      }
+    },
+    "experiments": {
+      "typedRoutes": true
+    },
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
-    "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true
     },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
-      }
-    },
-    "web": {
-      "bundler": "metro",
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
-    },
+    "name": "aKro",
+    "newArchEnabled": true,
+    "orientation": "portrait",
     "plugins": [
       "expo-router",
       [
         "expo-splash-screen",
         {
+          "backgroundColor": "#ffffff",
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
-          "resizeMode": "contain",
-          "backgroundColor": "#ffffff"
+          "resizeMode": "contain"
         }
       ],
       [
         "expo-font",
         {
-          "fonts": ["node_modules/@expo-google-fonts/plus-jakarta-sans"]
+          "fonts": [
+            "node_modules/@expo-google-fonts/plus-jakarta-sans"
+          ]
         }
       ]
     ],
-    "experiments": {
-      "typedRoutes": true
+    "scheme": "akro",
+    "slug": "aKro",
+    "userInterfaceStyle": "automatic",
+    "version": "1.0.0",
+    "web": {
+      "bundler": "metro",
+      "favicon": "./assets/images/favicon.png",
+      "output": "static"
     }
   }
 }

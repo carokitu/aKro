@@ -1,38 +1,40 @@
 {
   "compilerOptions": {
-    "allowJs": true,
-    "allowSyntheticDefaultImports": true,
-    "baseUrl": "./src",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "jsx": "react-jsx",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "ES2022"
+    "allowJs": true,                           // Allow JavaScript files to be compiled
+    "allowSyntheticDefaultImports": true,      // Allow default imports from modules with no default export
+    "baseUrl": "./app",                        // Base directory to resolve non-relative module names
+    "esModuleInterop": true,                   // Enables emit interoperability between CommonJS and ES Modules
+    "forceConsistentCasingInFileNames": true,  // Ensure case sensitivity when referencing file names
+    "jsx": "react-jsx",                        // Support JSX in .tsx files
+    "lib": [                                   // List of library files to be included in the compilation
+      "dom",                                   // DOM definitions
+      "dom.iterable",                          // DOM iterable definitions
+      "ES2022"                                 // ECMAScript 2022 definitions
     ],
-    "module": "ES2022",
-    "moduleResolution": "node",
-    "noEmit": true,
-    "noFallthroughCasesInSwitch": true,
-    "paths": {
-      "@/*": [
+    "module": "ES2022",                        // Specify module code generation method
+    "moduleResolution": "node",                // Determine how modules get resolved
+    "noEmit": true,                           // Do not emit outputs (Expo handles this)
+    "noFallthroughCasesInSwitch": true,       // Report errors for fallthrough cases in switch statement
+    "paths": {                                // Configure module path aliases
+      "@/*": [                               // Map '@/' to src directory
         "./*"
       ]
     },
-    "resolveJsonModule": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "target": "ES2022"
+    "resolveJsonModule": true,                // Allow importing .json files
+    "skipLibCheck": true,                     // Skip type checking of declaration files
+    "strict": true,                          // Enable all strict type checking options
+    "target": "ES2022"                       // Specify ECMAScript target version
   },
-  "exclude": [
-    "node_modules",
-    "build",
-    "**/*.test.ts*"
+  "exclude": [                               // Files to exclude from compilation
+    "node_modules",                          // Exclude node_modules directory
+    "build",                                 // Exclude build directory
+    "**/*.test.ts*"                         // Exclude test files
   ],
-  "extends": "expo/tsconfig.base",
-  "include": [
-    "**/*.cy.ts*",
-    "**/*.ts*"
+  "extends": "expo/tsconfig.base",           // Extend Expo's base TypeScript configuration
+  "include": [                               // Files to include in compilation
+    "**/*.cy.ts*",                          // Include Cypress test files
+    "**/*.ts*",                             // Include all TypeScript files
+    ".expo/types/**/*.ts",                  // Include Expo type definitions
+    "expo-env.d.ts"                         // Include Expo environment type definitions
   ]
 }

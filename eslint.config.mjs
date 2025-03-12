@@ -196,4 +196,11 @@ export default [
       'virtual-module': 0,
     },
   },
+  {
+    settings: {
+      react: {
+        version: 'detect'
+      }
+    }
+  }
 ];

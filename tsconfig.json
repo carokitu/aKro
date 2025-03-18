@@ -35,6 +35,7 @@
     "**/*.cy.ts*",                          // Include Cypress test files
     "**/*.ts*",                             // Include all TypeScript files
     ".expo/types/**/*.ts",                  // Include Expo type definitions
-    "expo-env.d.ts"                         // Include Expo environment type definitions
+    "expo-env.d.ts",                         // Include Expo environment type definitions
+    "env.d.ts"                               // Include environment type definitions
   ]
 }

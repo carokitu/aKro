@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
 
-export const Index = () => {
+export default function Index() {
   return (
     <View style={styles.container}>
       <Text>Edit app/index.tsx to edit this screen.</Text>

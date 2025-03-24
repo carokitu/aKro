@@ -1,17 +1,23 @@
-import { StyleSheet, Text, View } from 'react-native'
+import React from 'react'
+import { Button, Text, View } from 'react-native'
 
-export default function Index() {
+import { useSpotifyAuth } from '../hooks'
+
+const SpotifyLogin = () => {
+  const { login, logout, token } = useSpotifyAuth()
+
   return (
-    <View style={styles.container}>
-      <Text>Edit app/index.tsx to edit this screen.</Text>
+    <View>
+      {token ? (
+        <>
+          <Text>🎵 Logged in to Spotify!</Text>
+          <Button onPress={logout} title="Logout" />
+        </>
+      ) : (
+        <Button onPress={login} title="Login with Spotify" />
+      )}
     </View>
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
-  },
-})
+export default SpotifyLogin

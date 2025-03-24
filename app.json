@@ -9,13 +9,26 @@
     "experiments": {
       "typedRoutes": true
     },
+    "extra": {
+      "eas": {
+        "projectId": "eeb912f0-fd9e-4842-af4f-8a2dd703d700"
+      },
+      "router": {
+        "origin": false
+      }
+    },
     "icon": "./assets/images/icon.png",
     "ios": {
+      "bundleIdentifier": "com.kro.aKro",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      },
       "supportsTablet": true
     },
     "name": "aKro",
     "newArchEnabled": true,
     "orientation": "portrait",
+    "owner": "kro",
     "plugins": [
       "expo-router",
       [
@@ -25,14 +38,6 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain"
-        }
-      ],
-      [
-        "expo-font",
-        {
-          "fonts": [
-            "node_modules/@expo-google-fonts/plus-jakarta-sans"
-          ]
         }
       ]
     ],

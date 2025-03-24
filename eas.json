@@ -1,0 +1,22 @@
+{
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal"
+    },
+    "preview": {
+      "distribution": "internal"
+    },
+    "production": {
+      "autoIncrement": true,
+      "distribution": "store"
+    }
+  },
+  "cli": {
+    "appVersionSource": "remote",
+    "version": ">= 15.0.14"
+  },
+  "submit": {
+    "production": {}
+  }
+}

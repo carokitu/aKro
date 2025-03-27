@@ -1,39 +1,53 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { type AccessToken } from '@spotify/web-api-ts-sdk'
-import { exchangeCodeAsync, makeRedirectUri, useAuthRequest } from 'expo-auth-session'
+import { exchangeCodeAsync, makeRedirectUri, refreshAsync, useAuthRequest } from 'expo-auth-session'
 import * as SecureStore from 'expo-secure-store'
 
-import { TOKEN_STORAGE_KEY } from '../constants'
+import { ACCESS_TOKEN_KEY } from '../constants'
 
-const CLIENT_ID = process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID as string
-const CLIENT_SECRET = process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_SECRET as string
-
-export const spotifyDiscovery = {
-  authorizationEndpoint: 'https://accounts.spotify.com/authorize',
-  tokenEndpoint: 'https://accounts.spotify.com/api/token',
-}
-
+type AccessTokenWithExpiry = AccessToken & { expires_at: number }
 export const useSpotifyAuth = () => {
-  const [token, setToken] = useState<AccessToken | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
+  const [accessToken, setAccessToken] = useState<AccessTokenWithExpiry | null>(null)
+
+  const CLIENT_ID = process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID as string
+  const CLIENT_SECRET = process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_SECRET as string
+
   const redirectURI = makeRedirectUri({ scheme: 'akro' })
 
-  // Configure Spotify Auth Request
+  const storeTokens = async (token: AccessToken) => {
+    const expiresAt = Date.now() / 1000 + token.expires_in
+    const tokenWithExpiry: AccessTokenWithExpiry = { ...token, expires_at: expiresAt }
+    await SecureStore.setItemAsync(ACCESS_TOKEN_KEY, JSON.stringify(tokenWithExpiry))
+
+    setAccessToken(tokenWithExpiry)
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [_request, response, promptAsync] = useAuthRequest(
     {
       clientId: CLIENT_ID,
       redirectUri: redirectURI,
       scopes: ['user-read-email', 'playlist-modify-public', 'user-read-recently-played'],
-      usePKCE: false, // PKCE is not needed for implicit grant flow
+      usePKCE: false,
     },
-    spotifyDiscovery,
+    {
+      authorizationEndpoint: 'https://accounts.spotify.com/authorize',
+      tokenEndpoint: 'https://accounts.spotify.com/api/token',
+    },
   )
 
   // Handle Authentication Response
   useEffect(() => {
     const handleAuthResponse = async () => {
+      console.log(accessToken?.expires_at)
+      const now = Date.now() / 1000
+
+      if (accessToken && accessToken?.expires_at > now) {
+        return
+      }
+
       if (response?.type === 'success' && response.params.code) {
         try {
           const tokenResponse = await exchangeCodeAsync(
@@ -46,16 +60,16 @@ export const useSpotifyAuth = () => {
             },
             { tokenEndpoint: 'https://accounts.spotify.com/api/token' },
           )
-          if (tokenResponse.accessToken) {
-            const accessToken: AccessToken = {
-              access_token: response.params.access_token,
-              expires_in: Number.parseInt(response.params.expires_in, 10),
-              refresh_token: response.params.refresh_token,
-              token_type: response.params.token_type,
+
+          if (tokenResponse.accessToken && tokenResponse.expiresIn && tokenResponse.refreshToken) {
+            const newAccessToken: AccessToken = {
+              access_token: tokenResponse.accessToken,
+              expires_in: tokenResponse.expiresIn,
+              refresh_token: tokenResponse.refreshToken,
+              token_type: tokenResponse.tokenType,
             }
 
-            setToken(accessToken)
-            SecureStore.setItemAsync(TOKEN_STORAGE_KEY, JSON.stringify(accessToken))
+            await storeTokens(newAccessToken)
           }
         } catch (error) {
           console.error('Error exchanging code for token:', error)
@@ -66,31 +80,80 @@ export const useSpotifyAuth = () => {
     handleAuthResponse()
   }, [response])
 
-  // Load Token from Secure Storage on App Start
-  useEffect(() => {
-    const loadStoredToken = async () => {
-      const storedToken = await SecureStore.getItemAsync(TOKEN_STORAGE_KEY)
+  const refreshTokenAsync = async (token: AccessTokenWithExpiry) => {
+    try {
+      const refreshedTokens = await refreshAsync(
+        {
+          clientId: CLIENT_ID,
+          clientSecret: CLIENT_SECRET,
+          extraParams: { grant_type: 'refresh_token' },
+          refreshToken: token.refresh_token,
+        },
+        {
+          tokenEndpoint: 'https://accounts.spotify.com/api/token',
+        },
+      )
 
-      if (storedToken) {
-        setToken(JSON.parse(storedToken) as AccessToken)
+      if (refreshedTokens.accessToken && refreshedTokens.expiresIn) {
+        const newAccessToken: AccessTokenWithExpiry = {
+          access_token: refreshedTokens.accessToken,
+          expires_at: Date.now() / 1000 + refreshedTokens.expiresIn,
+          expires_in: refreshedTokens.expiresIn,
+          refresh_token: token.refresh_token,
+          token_type: refreshedTokens.tokenType,
+        }
+
+        await storeTokens(newAccessToken)
+      } else {
+        console.error('Failed to refresh token. No valid access token or expiration time returned.')
+        logout()
       }
-
-      setIsLoading(false)
+    } catch (error) {
+      console.error('Failed to refresh token:', error)
+      logout()
     }
-
-    loadStoredToken()
-  }, [])
-
-  // Logout Function
-  const logout = async () => {
-    await SecureStore.deleteItemAsync(TOKEN_STORAGE_KEY)
-    setToken(null)
   }
 
+  useEffect(() => {
+    const loadTokens = async () => {
+      try {
+        const tokenString = await SecureStore.getItemAsync(ACCESS_TOKEN_KEY)
+
+        if (tokenString) {
+          const token: AccessTokenWithExpiry = JSON.parse(tokenString)
+          const now = Date.now() / 1000
+
+          if (token.expires_at > now) {
+            setAccessToken(token)
+          } else {
+            await refreshTokenAsync(token)
+          }
+        }
+      } catch (error) {
+        console.error('Error loading tokens:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadTokens()
+  }, [])
+
+  const login = async () => {
+    setIsLoading(true)
+    await promptAsync()
+    setIsLoading(false)
+  }
+
+  const logout = useCallback(async () => {
+    await SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY)
+    setAccessToken(null)
+  }, [])
+
   return {
+    accessToken,
     isLoading,
-    login: () => promptAsync(),
+    login,
     logout,
-    token,
   }
 }

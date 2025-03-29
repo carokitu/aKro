@@ -36,12 +36,12 @@ const RecentTracks = () => {
   useEffect(() => {
     const fetchData = async () => {
       await Promise.all([fetchCurrentTrack(), fetchRecentTracks()])
+      setLoading(false)
     }
 
     // Initial fetch
     setLoading(true)
     fetchData()
-    setLoading(false)
 
     // Set up interval for periodic refresh
     const intervalId = setInterval(fetchData, REFRESH_INTERVAL)

@@ -1,17 +1,30 @@
-import { StyleSheet, Text, View } from 'react-native'
+import React from 'react'
+import { Button, Text, View } from 'react-native'
 
-export default function Index() {
+import { Link } from 'expo-router'
+
+import { useSpotifyAuth } from '../hooks'
+
+const SpotifyLogin = () => {
+  const { accessToken, login, logout } = useSpotifyAuth()
+
+  if (!accessToken) {
+    return (
+      <View>
+        <Button onPress={login} title="Login with Spotify" />
+      </View>
+    )
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Edit app/index.tsx to edit this screen.</Text>
+    <View>
+      <Text>🎵 Logged in to Spotify!</Text>
+      <Link asChild href="/recent">
+        <Button title="Go to Recently Played Tracks" />
+      </Link>
+      <Button onPress={logout} title="Logout" />
     </View>
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
-  },
-})
+export default SpotifyLogin

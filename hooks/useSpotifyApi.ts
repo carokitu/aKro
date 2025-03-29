@@ -1,43 +1,35 @@
 import { useEffect, useState } from 'react'
 
-import { type PlayHistory, SpotifyApi } from '@spotify/web-api-ts-sdk'
-import * as SecureStore from 'expo-secure-store'
+import { SpotifyApi } from '@spotify/web-api-ts-sdk'
 
-import { ACCESS_TOKEN_KEY } from '../constants'
-
-const getToken = async () => {
-  const tokenString = await SecureStore.getItemAsync(ACCESS_TOKEN_KEY)
-  return JSON.parse(tokenString || '')
-}
+import { useSpotifyAuth } from './useSpotifyAuth'
 
 export const useSpotifyApi = () => {
-  const [tracks, setTracks] = useState<PlayHistory[]>([])
   const [loading, setLoading] = useState(true)
+  const [useApi, setApi] = useState<null | SpotifyApi>(null)
+  const { accessToken } = useSpotifyAuth()
 
   useEffect(() => {
-    const fetchRecentTracks = async () => {
+    const prepareRequest = async () => {
       setLoading(true)
 
-      const token = await getToken()
-
-      if (!token) {
+      if (!accessToken) {
         setLoading(false)
         return
       }
 
       try {
-        const sdk = SpotifyApi.withAccessToken(process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID as string, token)
-        const recentTracks = await sdk.player.getRecentlyPlayedTracks()
-        setTracks(recentTracks.items)
+        const sdk = SpotifyApi.withAccessToken(process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID as string, accessToken)
+        setApi(sdk)
       } catch (error) {
-        console.error('Error fetching recently played tracks:', error)
+        console.error('Error initializing Spotify API:', error)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchRecentTracks()
-  }, [])
+    prepareRequest()
+  }, [accessToken])
 
-  return { loading, tracks }
+  return { loading, useApi }
 }

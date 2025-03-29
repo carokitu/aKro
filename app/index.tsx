@@ -8,20 +8,23 @@ import { useSpotifyAuth } from '../hooks'
 const SpotifyLogin = () => {
   const { accessToken, login, logout } = useSpotifyAuth()
 
+  if (!accessToken) {
+    return (
+      <View>
+        <Button onPress={login} title="Login with Spotify" />
+      </View>
+    )
+  }
+
   return (
     <View>
-      {accessToken ? (
-        <>
-          <Text>🎵 Logged in to Spotify!</Text>
-          {/* Navigate to RecentTracks */}
-          <Link asChild href="/recent">
-            <Button title="Go to Recently Played Tracks" />
-          </Link>
-          <Button onPress={logout} title="Logout" />
-        </>
-      ) : (
-        <Button onPress={login} title="Login with Spotify" />
-      )}
+      <>
+        <Text>🎵 Logged in to Spotify!</Text>
+        <Link asChild href="/recent">
+          <Button title="Go to Recently Played Tracks" />
+        </Link>
+        <Button onPress={logout} title="Logout" />
+      </>
     </View>
   )
 }

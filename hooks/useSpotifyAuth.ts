@@ -41,7 +41,6 @@ export const useSpotifyAuth = () => {
   // Handle Authentication Response
   useEffect(() => {
     const handleAuthResponse = async () => {
-      console.log(accessToken?.expires_at)
       const now = Date.now() / 1000
 
       if (accessToken && accessToken?.expires_at > now) {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { ActivityIndicator, FlatList, Image, StyleSheet, Text, View } from 'react-native'
 
 import { type SavedTrack } from '@spotify/web-api-ts-sdk'
@@ -12,8 +12,21 @@ const LoadingFooter = () => <ActivityIndicator size="small" />
 
 export const AllTracks = () => {
   const [offset, setOffset] = useState(0)
-  const { fetchSavedTracks, loading, tracks: fetchedTracks } = useSavedTracks(ITEMS_PER_PAGE)
+  const { fetchSavedTracks, loading, refreshSavedTracks, tracks: fetchedTracks } = useSavedTracks(ITEMS_PER_PAGE)
   const [allTracks, setAllTracks] = useState<SavedTrack[]>([])
+  const [refreshing, setRefreshing] = useState(false)
+
+  const onRefresh = useCallback(async () => {
+    console.log('onRefresh')
+    setRefreshing(true)
+
+    setAllTracks([])
+    setOffset(0)
+
+    await refreshSavedTracks()
+
+    setRefreshing(false)
+  }, [refreshSavedTracks])
 
   useEffect(() => {
     if (fetchedTracks) {
@@ -51,6 +64,8 @@ export const AllTracks = () => {
       ListHeaderComponent={<Header />}
       onEndReached={handleLoadMore}
       onEndReachedThreshold={0.5}
+      onRefresh={onRefresh}
+      refreshing={refreshing}
       renderItem={renderItem}
     />
   )

@@ -24,16 +24,15 @@ export const useSavedTracks = (baseLimit?: MaxInt<50>) => {
     [useApi],
   )
 
-  useEffect(() => {
-    const fetchData = async () => {
-      await fetchSavedTracks(baseLimit)
-      setLoading(false)
-    }
-
-    // Initial fetch
+  const refreshSavedTracks = useCallback(async () => {
     setLoading(true)
-    fetchData()
+    await fetchSavedTracks(baseLimit)
+    setLoading(false)
+  }, [fetchSavedTracks, baseLimit])
+
+  useEffect(() => {
+    refreshSavedTracks()
   }, [fetchSavedTracks])
 
-  return { fetchSavedTracks, loading, setTracks, tracks }
+  return { fetchSavedTracks, loading, refreshSavedTracks, setTracks, tracks }
 }

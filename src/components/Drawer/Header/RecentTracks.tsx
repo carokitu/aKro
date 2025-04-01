@@ -1,6 +1,6 @@
 import { Image, StyleSheet, Text, View } from 'react-native'
 
-import { useRecentTracks } from '../../../hooks'
+import { useRecentTracks } from '../../../../hooks'
 
 export const RecentTracks = () => {
   const { tracks } = useRecentTracks(5)

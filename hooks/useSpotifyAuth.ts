@@ -29,7 +29,14 @@ export const useSpotifyAuth = () => {
     {
       clientId: CLIENT_ID,
       redirectUri: redirectURI,
-      scopes: ['user-read-email', 'playlist-modify-public', 'user-read-recently-played', 'user-read-currently-playing'],
+      scopes: [
+        'user-read-email',
+        'playlist-modify-public',
+        'user-read-recently-played',
+        'user-top-read',
+        'user-read-currently-playing',
+        'user-library-read',
+      ],
       usePKCE: false,
     },
     {

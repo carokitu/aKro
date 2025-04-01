@@ -1,38 +1,28 @@
-import { useCallback, useRef } from 'react'
-import { ScrollView, StyleSheet, Text } from 'react-native'
+import { useMemo, useRef } from 'react'
+import { StyleSheet, Text } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
 
-import { CurrentTrack } from './CurrentTrack'
-import { RecentTracks } from './RecentTracks'
+import { AllTracks } from './AllTracks'
 
 export const Drawer = () => {
-  // ref
+  const snapPoints = useMemo(() => ['10%', '40%', '100%'], [])
   const bottomSheetRef = useRef<BottomSheet>(null)
 
-  // callbacks
-  const handleSheetChanges = useCallback((index: number) => {
-    console.log('handleSheetChanges', index)
-  }, [])
-
-  // renders
   return (
     <GestureHandlerRootView style={styles.container}>
       <BottomSheet
+        backgroundStyle={styles.background}
         enableDynamicSizing={false}
-        enablePanDownToClose={false}
+        handleIndicatorStyle={styles.onHandleIndicator}
         index={1}
-        onChange={handleSheetChanges}
         ref={bottomSheetRef}
-        snapPoints={['10%', '40%', '95%']}
+        snapPoints={snapPoints}
       >
         <BottomSheetView style={styles.bottomSheetContainer}>
-          <Text style={styles.sectionTitle}>Partager un son</Text>
-          <ScrollView>
-            <CurrentTrack />
-            <RecentTracks />
-          </ScrollView>
+          <Text style={styles.sectionTitle}>Faire découvrir un son</Text>
+          <AllTracks />
         </BottomSheetView>
       </BottomSheet>
     </GestureHandlerRootView>
@@ -40,16 +30,27 @@ export const Drawer = () => {
 }
 
 const styles = StyleSheet.create({
+  // eslint-disable-next-line react-native/no-color-literals
+  background: {
+    backgroundColor: '#EDECE7',
+    borderRadius: '6%',
+  },
   bottomSheetContainer: {
     flex: 1,
   },
   container: {
     flex: 1,
   },
+  // eslint-disable-next-line react-native/no-color-literals
+  onHandleIndicator: {
+    backgroundColor: '#DEDED8',
+    height: 7,
+    width: 40,
+  },
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: 20,
     marginLeft: 10,
   },
 })

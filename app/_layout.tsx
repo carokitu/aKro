@@ -16,14 +16,7 @@ const RootLayout = () => {
       <Stack.Screen
         name="feed"
         options={{
-          // gestureEnabled: false,
           headerShown: false,
-        }}
-      />
-      <Stack.Screen
-        name="recent"
-        options={{
-          gestureEnabled: false,
         }}
       />
       <Stack.Screen

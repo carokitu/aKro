@@ -1,6 +1,6 @@
 import { Image, StyleSheet, Text, View } from 'react-native'
 
-import { useCurrentTrack } from '../../../hooks'
+import { useCurrentTrack } from '../../../../hooks'
 
 export const CurrentTrack = () => {
   const { currentTrack } = useCurrentTrack()

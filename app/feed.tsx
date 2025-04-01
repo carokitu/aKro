@@ -1,8 +1,11 @@
-import { ActivityIndicator, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, ScrollView, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
+
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet'
 
 import { useSpotifyApi } from '../hooks'
 import { Drawer } from '../src'
+import { RecentTracks } from '../src/components/Drawer/Header/RecentTracks'
 
 const Feed = () => {
   const { loading } = useSpotifyApi()
@@ -12,11 +15,21 @@ const Feed = () => {
   }
 
   return (
-    <SafeAreaView edges={['top', 'bottom']} style={styles.container}>
-      <View style={styles.content}>
+    <BottomSheetModalProvider>
+      <SafeAreaView edges={['top']} style={styles.container}>
+        <ScrollView style={styles.content}>
+          <RecentTracks />
+          <RecentTracks />
+          <RecentTracks />
+          <RecentTracks />
+          <RecentTracks />
+          <RecentTracks />
+          <RecentTracks />
+          <RecentTracks />
+        </ScrollView>
         <Drawer />
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </BottomSheetModalProvider>
   )
 }
 

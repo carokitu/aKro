@@ -18,8 +18,8 @@ const SpotifyLogin = () => {
 
   return (
     <View>
-      <Text>🎵 Logged in to Spotify!</Text>
-      <Link asChild href="/recent">
+      <Text>🎵 Logged in to Spotify! 🎵</Text>
+      <Link asChild href="/feed">
         <Button title="Go to Recently Played Tracks" />
       </Link>
       <Button onPress={logout} title="Logout" />

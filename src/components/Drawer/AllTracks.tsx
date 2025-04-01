@@ -17,7 +17,6 @@ export const AllTracks = () => {
   const [refreshing, setRefreshing] = useState(false)
 
   const onRefresh = useCallback(async () => {
-    console.log('onRefresh')
     setRefreshing(true)
 
     setAllTracks([])

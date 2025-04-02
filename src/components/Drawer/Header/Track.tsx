@@ -10,11 +10,13 @@ export const Track = (track: TTrack) => (
   <View style={styles.section}>
     <View style={styles.trackContainer}>
       <Image source={{ uri: track.album.images[0].url }} style={styles.albumCover} />
-      <View>
-        <Label style={styles.trackName} variant="large">
+      <View style={styles.textContainer}>
+        <Label ellipsizeMode="tail" numberOfLines={1} style={styles.trackName} variant="large">
           {track.name}
         </Label>
-        <Label color="secondary">{track.artists.map((artist) => artist.name).join(', ')}</Label>
+        <Label color="secondary" ellipsizeMode="tail" numberOfLines={1}>
+          {track.artists.map((artist) => artist.name).join(', ')}
+        </Label>
       </View>
     </View>
   </View>
@@ -30,10 +32,13 @@ const styles = StyleSheet.create({
   section: {
     marginBottom: 15,
   },
+  textContainer: {
+    flex: 1,
+  },
   trackContainer: {
     alignItems: 'center',
     flexDirection: 'row',
-    marginLeft: padding['400'],
+    marginHorizontal: padding['400'],
   },
   trackName: {
     marginBottom: spacing['50'],

@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { useSpotifyApi } from '../hooks'
 import { Drawer } from '../src'
 import { RecentTracks } from '../src/components/Drawer/Header/RecentTracks'
+import { Text } from '../src/system'
 
 const Feed = () => {
   const { loading } = useSpotifyApi()
@@ -16,6 +17,7 @@ const Feed = () => {
     <SafeAreaView edges={['top']} style={styles.container}>
       <ScrollView style={styles.content}>
         <RecentTracks />
+        <Text>BOILER PLATE</Text>
         <RecentTracks />
         <RecentTracks />
         <RecentTracks />

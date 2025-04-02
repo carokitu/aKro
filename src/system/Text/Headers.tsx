@@ -11,12 +11,12 @@ type Props = TextProps & {
 
 const Heading = ({ children, color = 'default', level, style, ...props }: Props) => {
   const headingStyles = [
-    styles.text,
+    colorStyles[color],
     level === 1 && styles.h1,
     level === 2 && styles.h2,
     level === 3 && styles.h3,
     style,
-    colorStyles[color],
+    styles.text,
   ]
 
   return (

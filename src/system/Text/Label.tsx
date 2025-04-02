@@ -11,12 +11,12 @@ type Props = TextProps & {
 
 export const Label = ({ children, color = 'default', style, variant = 'medium', ...props }: Props) => {
   const labelStyles = [
+    colorStyles[color],
+    style,
     styles.text,
     variant === 'large' && styles.large,
     variant === 'medium' && styles.medium,
     variant === 'small' && styles.small,
-    colorStyles[color],
-    style,
   ]
 
   return (

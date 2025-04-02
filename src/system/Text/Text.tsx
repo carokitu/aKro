@@ -11,12 +11,12 @@ type Props = TextProps & {
 
 export const Text = ({ children, color = 'default', variant = 'medium', ...props }: Props) => {
   const textStyles = [
+    colorStyles[color],
     styles.text,
     variant === 'extraSmall' && styles.extraSmall,
     variant === 'large' && styles.large,
     variant === 'medium' && styles.medium,
     variant === 'small' && styles.small,
-    colorStyles[color],
   ]
 
   return (

@@ -31,7 +31,7 @@
         "expo-font",
         {
           "fonts": [
-            "node_modules/@expo-google-fonts/plus-jakarta-sans"
+            "node_modules/@expo-google-fonts/outfit"
           ]
         }
       ]

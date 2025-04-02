@@ -9,7 +9,7 @@ type Props = TextProps & {
   variant?: 'extraSmall' | 'large' | 'medium' | 'small'
 }
 
-export const Text = ({ children, color = 'default', variant = 'medium', ...props }: Props) => {
+export const Text = ({ children, color = 'default', style, variant = 'medium', ...props }: Props) => {
   const textStyles = [
     colorStyles[color],
     styles.text,
@@ -17,6 +17,7 @@ export const Text = ({ children, color = 'default', variant = 'medium', ...props
     variant === 'large' && styles.large,
     variant === 'medium' && styles.medium,
     variant === 'small' && styles.small,
+    style,
   ]
 
   return (

@@ -1,9 +1,11 @@
 import { useMemo, useRef } from 'react'
-import { StyleSheet, Text } from 'react-native'
+import { StyleSheet } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
 
+import { Title } from '../../system'
+import { padding } from '../../theme/spacing'
 import { AllTracks } from './AllTracks'
 
 export const Drawer = () => {
@@ -21,7 +23,9 @@ export const Drawer = () => {
         snapPoints={snapPoints}
       >
         <BottomSheetView style={styles.bottomSheetContainer}>
-          <Text style={styles.sectionTitle}>Faire découvrir un son</Text>
+          <Title style={styles.sectionTitle} variant="large">
+            Faire découvrir un son
+          </Title>
           <AllTracks />
         </BottomSheetView>
       </BottomSheet>
@@ -48,9 +52,7 @@ const styles = StyleSheet.create({
     width: 40,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    marginLeft: 10,
+    marginBottom: padding['400'],
+    marginLeft: padding['400'],
   },
 })

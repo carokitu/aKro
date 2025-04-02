@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
-import { ActivityIndicator, FlatList, Image, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, FlatList } from 'react-native'
 
 import { type SavedTrack } from '@spotify/web-api-ts-sdk'
 
 import { useSavedTracks } from '../../../hooks'
 import { Header } from './Header'
+import { Track } from './Header/Track'
 
 const ITEMS_PER_PAGE = 50
 
@@ -45,15 +46,7 @@ export const AllTracks = () => {
     return null
   }
 
-  const renderItem = ({ item }: { item: SavedTrack }) => (
-    <View style={styles.trackContainer}>
-      <Image source={{ uri: item.track.album.images[0].url }} style={styles.albumCover} />
-      <View>
-        <Text style={styles.trackName}>{item.track.name}</Text>
-        <Text>{item.track.artists.map((artist) => artist.name).join(', ')}</Text>
-      </View>
-    </View>
-  )
+  const renderItem = ({ item }: { item: SavedTrack }) => <Track {...item.track} />
 
   return (
     <FlatList
@@ -69,21 +62,3 @@ export const AllTracks = () => {
     />
   )
 }
-
-const styles = StyleSheet.create({
-  albumCover: {
-    borderRadius: 5,
-    height: 50,
-    marginRight: 10,
-    width: 50,
-  },
-  trackContainer: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    marginBottom: 10,
-    marginLeft: 10,
-  },
-  trackName: {
-    fontWeight: 'bold',
-  },
-})

@@ -11,4 +11,7 @@ export const colorStyles: Record<TextColor, { color: string }> = {
   secondary: {
     color: text.base.secondary,
   },
+  tertiary: {
+    color: text.base.tertiary,
+  },
 }

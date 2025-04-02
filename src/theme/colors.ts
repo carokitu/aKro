@@ -67,6 +67,7 @@ export const text = {
     default: colors.brand[900],
     invert: colors.neutral[50],
     secondary: colors.brand[600],
+    tertiary: colors.neutral[500],
   },
   brand: {
     default: colors.brand[900],

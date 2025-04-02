@@ -1,5 +1,7 @@
-import { StyleSheet, Text } from 'react-native'
+import { StyleSheet } from 'react-native'
 
+import { Label } from '../../../system'
+import { theme } from '../../../theme'
 import { CurrentTrack } from './CurrentTrack'
 import { RecentTracks } from './RecentTracks'
 
@@ -8,16 +10,16 @@ export const Header = () => {
     <>
       <CurrentTrack />
       <RecentTracks />
-      <Text style={styles.sectionTitle}>Titres likés</Text>
+      <Label color="tertiary" style={styles.sectionTitle} variant="large">
+        Titres likés
+      </Label>
     </>
   )
 }
 
 const styles = StyleSheet.create({
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    marginLeft: 10,
+    marginBottom: theme.padding['400'],
+    marginLeft: theme.padding['400'],
   },
 })

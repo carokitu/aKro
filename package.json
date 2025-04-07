@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@expo-google-fonts/outfit": "^0.3.0",
     "@expo/vector-icons": "^14.0.4",
     "@gorhom/bottom-sheet": "^5.1.2",
     "@react-navigation/bottom-tabs": "^7.2.1",

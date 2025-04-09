@@ -1,10 +1,10 @@
 import { ActivityIndicator, ScrollView, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-import { useSpotifyApi } from '../hooks'
-import { Drawer } from '../src'
-import { RecentTracks } from '../src/components/Drawer/Header/RecentTracks'
-import { Text } from '../src/system'
+import { useSpotifyApi } from '../../hooks'
+import { Drawer } from '../../src'
+import { RecentTracks } from '../../src/components/Drawer/Header/RecentTracks'
+import { Text } from '../../src/system'
 
 const Feed = () => {
   const { loading } = useSpotifyApi()

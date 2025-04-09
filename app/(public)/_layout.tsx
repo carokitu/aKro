@@ -7,7 +7,7 @@ export const PublicLayout = () => {
   const { accessToken } = useSpotifyAuth()
 
   if (user && accessToken) {
-    return <Redirect href="/(private)/feed" />
+    return <Redirect href="/(private)" />
   }
 
   return <Slot />

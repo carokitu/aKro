@@ -56,6 +56,7 @@ export const surface = {
     default: colors.green[800],
     secondary: colors.green[50],
   },
+  transparent: 'transparent',
   warning: {
     default: colors.yellow[800],
     secondary: colors.yellow[50],

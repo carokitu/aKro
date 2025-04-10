@@ -11,7 +11,7 @@ export const Track = (track: TTrack) => (
     <View style={styles.trackContainer}>
       <Image source={{ uri: track.album.images[0].url }} style={styles.albumCover} />
       <View style={styles.textContainer}>
-        <Label ellipsizeMode="tail" numberOfLines={1} style={styles.trackName} variant="large">
+        <Label ellipsizeMode="tail" numberOfLines={1} style={styles.trackName} size="large">
           {track.name}
         </Label>
         <Label color="secondary" ellipsizeMode="tail" numberOfLines={1}>

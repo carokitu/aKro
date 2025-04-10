@@ -2,17 +2,14 @@ import React from 'react'
 import { Button, SafeAreaView } from 'react-native'
 
 import { useSpotifyAuth, useUser } from '../../hooks'
+import ProviderSignIn from './provider-sign-in'
 
 export const Index = () => {
-  const { accessToken, login } = useSpotifyAuth()
+  const { accessToken } = useSpotifyAuth()
   const { login: loginWithEmailAndPassword } = useUser()
 
   if (!accessToken) {
-    return (
-      <SafeAreaView>
-        <Button onPress={login} title="Login with Spotify" />
-      </SafeAreaView>
-    )
+    return <ProviderSignIn />
   }
 
   return (

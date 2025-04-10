@@ -14,7 +14,7 @@ export const RecentTracks = () => {
 
   return (
     <>
-      <Label color="tertiary" style={styles.sectionTitle} variant="large">
+      <Label color="tertiary" style={styles.sectionTitle} size="large">
         Écoutés récemment
       </Label>
       {tracks.map((item) => (

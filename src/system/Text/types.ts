@@ -1,1 +1,1 @@
-export type TextColor = 'default' | 'invert' | 'secondary' | 'tertiary'
+export type TextColor = 'danger' | 'default' | 'invert' | 'secondary' | 'tertiary'

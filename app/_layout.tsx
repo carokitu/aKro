@@ -1,8 +1,9 @@
-import { Outfit_400Regular, Outfit_700Bold } from '@expo-google-fonts/outfit'
+import { Outfit_400Regular, Outfit_600SemiBold } from '@expo-google-fonts/outfit'
 import { useFonts } from 'expo-font'
 import { Stack } from 'expo-router'
 
 import { SpotifyAuthProvider, UserProvider, useSpotifyAuth, useUser } from '../hooks'
+import { theme } from '../src/theme'
 
 const Layout = () => {
   const { user } = useUser()
@@ -14,6 +15,7 @@ const Layout = () => {
     <Stack
       screenOptions={{
         contentStyle: {
+          backgroundColor: theme.surface.base.default,
           flex: 1,
         },
         headerTitleStyle: {
@@ -43,7 +45,7 @@ const Layout = () => {
 export const RootLayout = () => {
   const [fontsLoaded] = useFonts({
     Outfit: Outfit_400Regular,
-    'Outfit-Bold': Outfit_700Bold,
+    'Outfit-Bold': Outfit_600SemiBold,
   })
 
   if (!fontsLoaded) {

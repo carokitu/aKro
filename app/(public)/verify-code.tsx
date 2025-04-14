@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, TextInput } from 'react-native'
 
-import { useLocalSearchParams } from 'expo-router'
+import { router, useLocalSearchParams } from 'expo-router'
 import { parsePhoneNumberFromString } from 'libphonenumber-js'
 
 import { Button, H1 } from '../../src/system'
@@ -24,7 +24,9 @@ const VerifyCode = () => {
 
     if (parsed?.isValid()) {
       try {
-        await client.auth.signInWithOtp({ phone: formattedPhoneNumber })
+        // await client.auth.signInWithOtp({
+        //   phone: formattedPhoneNumber,
+        // })
         setIsTimerActive(true)
         setTimer(RESEND_DELAY)
       } catch (error) {
@@ -53,11 +55,12 @@ const VerifyCode = () => {
 
   const handleVerify = async () => {
     try {
-      await client.auth.verifyOtp({
-        phone: phoneNumber?.toString(),
-        token: code.trim(),
-        type: 'sms',
-      })
+      // await client.auth.verifyOtp({
+      //   phone: phoneNumber?.toString(),
+      //   token: code.trim(),
+      //   type: 'sms',
+      // })
+      console.log('Code vérifié')
     } catch (error) {
       console.error('Échec de la vérification :', error)
     }

@@ -28,8 +28,6 @@ export const SpotifyAuthProvider = ({ children }: { children: React.ReactNode })
 
   const CLIENT_ID = process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID as string
   const CLIENT_SECRET = process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_SECRET as string
-
-  // Vérification que les variables d'environnement sont définies
   if (!CLIENT_ID || !CLIENT_SECRET) {
     throw new Error('[SpotifyAuth] Missing CLIENT_ID or CLIENT_SECRET in env')
   }
@@ -57,14 +55,12 @@ export const SpotifyAuthProvider = ({ children }: { children: React.ReactNode })
     },
   )
 
-  // Fonction de logout
   const logout = useCallback(async () => {
     await SecureStore.deleteItemAsync(ACCESS_TOKEN_KEY)
     setAccessToken(null)
     setLoginError(null)
   }, [])
 
-  // Fonction pour stocker le token dans SecureStore
   const storeTokens = async (token: AccessToken) => {
     const expiresAt = Date.now() / 1000 + token.expires_in
     const tokenWithExpiry: AccessTokenWithExpiry = { ...token, expires_at: expiresAt }
@@ -72,7 +68,6 @@ export const SpotifyAuthProvider = ({ children }: { children: React.ReactNode })
     setAccessToken(tokenWithExpiry)
   }
 
-  // Fonction de rafraîchissement des tokens
   const refreshTokenAsync = useCallback(
     async (token: AccessTokenWithExpiry) => {
       try {

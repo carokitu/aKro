@@ -1,13 +1,24 @@
-import { Redirect, Slot } from 'expo-router'
+import { useEffect } from 'react'
+import { View } from 'react-native'
 
-import { useSpotifyAuth, useUser } from '../../hooks'
+import { router, Slot } from 'expo-router'
+
+import { useUser } from '../../hooks'
 
 export const PublicLayout = () => {
-  const { user } = useUser()
-  const { accessToken } = useSpotifyAuth()
+  const { isLoggedIn, loading, user } = useUser()
 
-  if (user && accessToken) {
-    return <Redirect href="/(private)/feed" />
+  // const shouldCreateUser = useMemo(() => isLoggedIn && !user, [isLoggedIn, user])
+  const shouldCreateUser = true
+
+  useEffect(() => {
+    if (!loading && shouldCreateUser) {
+      router.replace('/(public)/CreateUser/name')
+    }
+  }, [loading, shouldCreateUser])
+
+  if (loading) {
+    return <View />
   }
 
   return <Slot />

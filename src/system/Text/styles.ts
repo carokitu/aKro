@@ -8,11 +8,17 @@ export const colorStyles: Record<TextColor, { color: string }> = {
   default: {
     color: text.base.default,
   },
+  informal: {
+    color: text.informal.default,
+  },
   invert: {
     color: text.base.invert,
   },
   secondary: {
     color: text.base.secondary,
+  },
+  success: {
+    color: text.success.default,
   },
   tertiary: {
     color: text.base.tertiary,

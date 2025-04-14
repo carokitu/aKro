@@ -2,8 +2,8 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 
 import { type User as AuthUser } from '@supabase/supabase-js'
 
-import { type User } from '../../models'
-import { client } from '../../supabase'
+import { type User } from '../models'
+import { client } from '../supabase'
 
 type LoginInput = {
   email: string

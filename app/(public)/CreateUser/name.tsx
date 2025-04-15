@@ -8,7 +8,8 @@ import { useUserRegistration } from '../../../hooks'
 import { Button, H1, Text } from '../../../src/system'
 import { theme } from '../../../src/theme'
 
-const NAME_REGEX = /^[\s'A-Za-z-]+$/
+// eslint-disable-next-line regexp/no-obscure-range, unicorn/better-regex
+const NAME_REGEX = /^[A-Za-zÀ-ÖØ-öø-ÿ'’ -]{2,50}$/
 
 const validateNameFormat = (value: string) => NAME_REGEX.test(value)
 
@@ -38,7 +39,7 @@ const Name = () => {
       <TextInput
         autoFocus
         keyboardType="default"
-        maxLength={30}
+        maxLength={50}
         onChangeText={onChangeText}
         placeholder="Paul Dupont"
         placeholderTextColor={theme.text.disabled}
@@ -53,7 +54,7 @@ const Name = () => {
       )}
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.buttonContainer}>
         <Button
-          disabled={name.length < 3}
+          disabled={name.length < 3 || !!error}
           fullWidth
           onPress={handleNext}
           size="lg"

@@ -2,7 +2,7 @@ import React, { createContext, useContext, useState } from 'react'
 
 import { type User } from '../models'
 
-type UserRegistrationData = Pick<User, 'avatar_url' | 'description' | 'name' | 'username'>
+type UserRegistrationData = Pick<User, 'avatar_url' | 'birthday' | 'description' | 'name' | 'username'>
 
 type UserRegistrationContextType = {
   resetUserData: () => void
@@ -12,8 +12,8 @@ type UserRegistrationContextType = {
 
 const initialUserData: UserRegistrationData = {
   avatar_url: null,
+  birthday: null,
   description: null,
-  // birthday: null,
   name: '',
   username: '',
 }

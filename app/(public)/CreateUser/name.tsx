@@ -37,6 +37,7 @@ const Name = () => {
     <SafeAreaView style={styles.container}>
       <H1 style={styles.title}>Comment t'appelles-tu ?</H1>
       <TextInput
+        autoComplete="name"
         autoFocus
         keyboardType="default"
         maxLength={50}

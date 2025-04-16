@@ -19,14 +19,14 @@ const CreateUserLayout = () => {
             headerShown: false,
           }}
         />
-        {/* <Stack.Screen
+        <Stack.Screen
           name="birthday"
           options={{
             headerShown: false,
             title: 'Date of Birth',
           }}
         />
-        <Stack.Screen
+        {/* <Stack.Screen
           name="avatar"
           options={{
             headerShown: false,

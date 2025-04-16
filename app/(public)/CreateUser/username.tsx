@@ -2,13 +2,15 @@ import { CircleCheck, CircleX, Loader } from 'lucide-react-native'
 import React, { useEffect, useState } from 'react'
 import { KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, TextInput, View } from 'react-native'
 
+import { router } from 'expo-router'
+
 import { useUserRegistration } from '../../../hooks'
 import { Button, H1, Text } from '../../../src/system'
 import { theme } from '../../../src/theme'
 import { client } from '../../../supabase'
 
 const USERNAME_REGEX = /^\w{3,20}$/
-const DEBOUNCE_DELAY = 500
+const DEBOUNCE_DELAY = 300
 
 const validateUsernameFormat = (value: string) => USERNAME_REGEX.test(value)
 
@@ -63,7 +65,7 @@ const UserName = () => {
 
   const handleNext = () => {
     updateUserData({ username })
-    // router.push('/(public)/CreateUser/birthday')
+    router.push('/(public)/CreateUser/birthday')
   }
 
   const isDisabled = username.length === 0 || !!error || checking
@@ -72,6 +74,7 @@ const UserName = () => {
     <SafeAreaView style={styles.container}>
       <H1 style={styles.title}>Choisis un nom d’utilisateur</H1>
       <TextInput
+        autoComplete="username"
         autoFocus
         maxLength={30}
         onChangeText={setUsername}

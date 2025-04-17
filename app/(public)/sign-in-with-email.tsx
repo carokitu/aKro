@@ -1,66 +1,58 @@
 import { CircleX } from 'lucide-react-native'
-import React, { useEffect, useRef, useState } from 'react'
-import { KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native'
-import PhoneInput from 'react-native-phone-number-input'
+import React, { useEffect, useState } from 'react'
+import { KeyboardAvoidingView, Platform, StyleSheet, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
+import { validate } from 'email-validator'
 import { useRouter } from 'expo-router'
-import { parsePhoneNumberFromString } from 'libphonenumber-js'
 
 import { Button, H1, Text } from '../../src/system'
 import { theme } from '../../src/theme'
 
-const isPhoneValid = (phone: string): boolean => {
-  const parsed = parsePhoneNumberFromString(phone)
-  return parsed?.isValid() ?? false
-}
-
-const SignIn = () => {
-  const phoneInput = useRef<PhoneInput>(null)
-  const [value, setValue] = useState('')
+const SignInWithEmail = () => {
+  const [email, setEmail] = useState('')
   const [isValid, setIsValid] = useState(true)
 
-  const showError = !isValid && value.length > 0
+  const showError = !isValid && email.length > 0
   const router = useRouter()
 
   const handleNext = () => {
     if (isValid) {
-      router.push({ params: { phoneNumber: value }, pathname: '/(public)/verify-code' })
+      router.push({ params: { email }, pathname: '/(public)/password' })
     }
   }
 
   useEffect(() => {
-    setIsValid(isPhoneValid(value))
-  }, [value])
+    setIsValid(validate(email))
+  }, [email])
 
   return (
     <SafeAreaView style={styles.container}>
-      <H1 style={styles.title}>Quel est ton numéro de téléphone ?</H1>
-      <PhoneInput
+      <H1 style={styles.title}>Quel est ton mail ?</H1>
+      <TextInput
+        autoComplete="email"
         autoFocus
-        containerStyle={styles.input}
-        defaultCode="FR"
-        defaultValue={value}
-        flagButtonStyle={styles.flagButton}
-        layout="first"
-        onChangeFormattedText={(text) => setValue(text)}
-        ref={phoneInput}
-        textContainerStyle={styles.textContainer}
-        withShadow
+        keyboardType="email-address"
+        maxLength={150}
+        onChangeText={setEmail}
+        placeholder="exemple@email.com"
+        placeholderTextColor={theme.text.disabled}
+        style={styles.input}
+        value={email}
       />
       {showError && (
         <View style={styles.errorContainer}>
           <CircleX color={theme.text.danger.default} size={theme.fontSize.sm} />
-          <Text color="danger">Numéro invalide</Text>
+          <Text color="danger">Adresse mail invalide</Text>
         </View>
       )}
       <Text color="tertiary" style={styles.text}>
         En continuant, vous acceptez nos Conditions d'utilisation et notre Politique de confidentialité.
       </Text>
       <Button
-        onPress={() => router.push('/(public)/sign-in-with-email')}
+        onPress={() => router.push('/(public)/sign-in')}
         size="sm"
-        title="Continuer avec un e-mail"
+        title="Continuer avec un numéro de téléphone"
         variant="tertiary"
       />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.buttonContainer}>
@@ -77,7 +69,7 @@ const SignIn = () => {
   )
 }
 
-export default SignIn
+export default SignInWithEmail
 
 const styles = StyleSheet.create({
   buttonContainer: {
@@ -98,28 +90,20 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     verticalAlign: 'middle',
   },
-  flagButton: {
+  input: {
     backgroundColor: theme.surface.base.secondary,
     borderRadius: theme.radius.base,
-    marginRight: theme.spacing['200'],
-  },
-  input: {
-    backgroundColor: theme.surface.transparent,
-    borderRadius: theme.radius.base,
-    marginBottom: theme.spacing['300'],
-    marginTop: theme.spacing['600'],
-    shadowColor: theme.surface.transparent,
+    fontSize: theme.fontSize.lg,
+    fontWeight: theme.weight.medium,
+    marginBottom: theme.spacing[300],
+    marginTop: theme.spacing[600],
+    paddingHorizontal: theme.padding[600],
+    paddingVertical: theme.padding[400],
     width: '100%',
   },
   text: {
     marginVertical: theme.spacing['300'],
     textAlign: 'center',
-  },
-  textContainer: {
-    backgroundColor: theme.surface.base.secondary,
-    borderRadius: theme.radius.base,
-    boxShadow: 'none',
-    shadowColor: theme.surface.transparent,
   },
   title: {
     marginTop: theme.spacing['1400'],

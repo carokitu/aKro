@@ -1,10 +1,11 @@
+import { CircleX } from 'lucide-react-native'
 import React, { useCallback, useEffect, useState } from 'react'
-import { KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, TextInput } from 'react-native'
+import { KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, TextInput, View } from 'react-native'
 
-import { router, useLocalSearchParams } from 'expo-router'
+import { useLocalSearchParams } from 'expo-router'
 import { parsePhoneNumberFromString } from 'libphonenumber-js'
 
-import { Button, H1 } from '../../src/system'
+import { Button, H1, Text } from '../../src/system'
 import { theme } from '../../src/theme'
 import { client } from '../../supabase'
 
@@ -14,6 +15,7 @@ const VerifyCode = () => {
   const { phoneNumber } = useLocalSearchParams<{ phoneNumber: string }>()
   const [code, setCode] = useState('')
   const [timer, setTimer] = useState(RESEND_DELAY)
+  const [error, setError] = useState<null | string>(null)
   const [isTimerActive, setIsTimerActive] = useState(true)
 
   const isValidCode = code.trim().length === 6
@@ -24,16 +26,16 @@ const VerifyCode = () => {
 
     if (parsed?.isValid()) {
       try {
-        // await client.auth.signInWithOtp({
-        //   phone: formattedPhoneNumber,
-        // })
+        await client.auth.signInWithOtp({
+          phone: formattedPhoneNumber,
+        })
         setIsTimerActive(true)
         setTimer(RESEND_DELAY)
-      } catch (error) {
-        console.error('Erreur lors de l’envoi du code :', error)
+      } catch {
+        setError('Erreur lors de l’envoi du code')
       }
     } else {
-      console.warn('Numéro invalide :', formattedPhoneNumber)
+      setError(`Numéro invalide : ${formattedPhoneNumber}`)
     }
   }, [phoneNumber])
 
@@ -55,14 +57,15 @@ const VerifyCode = () => {
 
   const handleVerify = async () => {
     try {
-      // await client.auth.verifyOtp({
-      //   phone: phoneNumber?.toString(),
-      //   token: code.trim(),
-      //   type: 'sms',
-      // })
+      await client.auth.verifyOtp({
+        phone: phoneNumber?.toString(),
+        token: code.trim(),
+        type: 'sms',
+      })
       console.log('Code vérifié')
-    } catch (error) {
-      console.error('Échec de la vérification :', error)
+    } catch (err) {
+      console.error('Échec de la vérification :', err)
+      setError('Code invalide')
     }
   }
 
@@ -81,6 +84,14 @@ const VerifyCode = () => {
         style={styles.input}
         value={code}
       />
+      {error && (
+        <View style={styles.feedback}>
+          <CircleX color={theme.text.danger.default} size={theme.fontSize.sm} style={styles.icon} />
+          <Text color="danger" style={styles.feedbackText}>
+            {error}
+          </Text>
+        </View>
+      )}
       <Button disabled={isTimerActive} onPress={sendCode} title={resendTitle} variant="tertiary" />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.buttonContainer}>
         <Button
@@ -107,6 +118,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     marginHorizontal: theme.spacing['400'],
+  },
+  feedback: {
+    alignItems: 'flex-start',
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    gap: theme.spacing['100'],
+    textAlign: 'center',
+    verticalAlign: 'middle',
+    width: '100%',
+  },
+  feedbackText: {
+    flexShrink: 1,
+    flexWrap: 'wrap',
+  },
+  icon: {
+    marginTop: theme.spacing[50],
   },
   input: {
     backgroundColor: theme.surface.base.secondary,

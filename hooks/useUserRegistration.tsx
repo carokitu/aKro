@@ -1,19 +1,20 @@
 import React, { createContext, useContext, useState } from 'react'
 
 import { type User } from '../models'
+import { client } from '../supabase'
 
-type UserRegistrationData = Pick<User, 'avatar_url' | 'birthday' | 'description' | 'name' | 'username'>
+type UserRegistrationData = Pick<User, 'avatar_url' | 'bio' | 'birthday' | 'name' | 'username'>
 
 type UserRegistrationContextType = {
-  resetUserData: () => void
+  createUser: () => Promise<void>
   updateUserData: (data: Partial<UserRegistrationData>) => void
   userData: UserRegistrationData
 }
 
 const initialUserData: UserRegistrationData = {
   avatar_url: null,
+  bio: null,
   birthday: null,
-  description: null,
   name: '',
   username: '',
 }
@@ -27,12 +28,16 @@ export const UserRegistrationProvider = ({ children }: { children: React.ReactNo
     setUserData((prevData) => ({ ...prevData, ...data }))
   }
 
-  const resetUserData = () => {
-    setUserData(initialUserData)
+  const createUser = async () => {
+    const { error } = await client.from('users').insert(userData)
+
+    if (error) {
+      throw new Error(error.message)
+    }
   }
 
   return (
-    <UserRegistrationContext.Provider value={{ resetUserData, updateUserData, userData }}>
+    <UserRegistrationContext.Provider value={{ createUser, updateUserData, userData }}>
       {children}
     </UserRegistrationContext.Provider>
   )

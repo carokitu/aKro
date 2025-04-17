@@ -1,4 +1,3 @@
-// app/(public)/CreateUser/_layout.tsx
 import { Stack } from 'expo-router'
 
 import { UserRegistrationProvider } from '../../../hooks/useUserRegistration'
@@ -23,16 +22,14 @@ const CreateUserLayout = () => {
           name="birthday"
           options={{
             headerShown: false,
-            title: 'Date of Birth',
           }}
         />
-        {/* <Stack.Screen
+        <Stack.Screen
           name="avatar"
           options={{
             headerShown: false,
-            title: 'Profile Picture',
           }}
-        />  */}
+        />
       </Stack>
     </UserRegistrationProvider>
   )

@@ -8,17 +8,14 @@ import { theme } from '../../src/theme'
 
 const disabledProviders = [
   {
-    handlePress: () => console.log('log in with deezer'),
     icon: require('../../assets/images/icons/deezer-disabled.png'),
     title: 'Se connecter à Deezer',
   },
   {
-    handlePress: () => console.log('log in with apple'),
     icon: require('../../assets/images/icons/apple-disabled.png'),
     title: 'Se connecter à Apple Music',
   },
   {
-    handlePress: () => console.log('log in with youtube'),
     icon: require('../../assets/images/icons/youtube-disabled.png'),
     title: 'Se connecter à YouTube Music',
   },
@@ -56,7 +53,6 @@ const ProviderSignIn = () => {
             disabled
             iconPath={provider.icon}
             key={provider.title}
-            onPress={provider.handlePress}
             size="lg"
             style={styles.button}
             title={provider.title}

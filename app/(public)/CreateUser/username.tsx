@@ -18,7 +18,6 @@ const checkUsernameAvailability = async (value: string): Promise<boolean> => {
   const { data, error } = await client.from('users').select('id').eq('username', value).maybeSingle()
 
   if (error) {
-    console.error('Error checking username:', error.message)
     return false
   }
 
@@ -28,7 +27,6 @@ const checkUsernameAvailability = async (value: string): Promise<boolean> => {
 const UserName = () => {
   const [username, setUsername] = useState('')
   const [error, setError] = useState<null | string>(null)
-  const [isAvailable, setIsAvailable] = useState(false)
   const [checking, setChecking] = useState(false)
 
   const { updateUserData } = useUserRegistration()
@@ -36,7 +34,6 @@ const UserName = () => {
   useEffect(() => {
     if (username.trim().length === 0) {
       setError(null)
-      setIsAvailable(false)
       setChecking(false)
       return
     }
@@ -48,14 +45,12 @@ const UserName = () => {
 
       if (!isFormatValid) {
         setError('Format invalide. Utilise 3 à 20 caractères : lettres, chiffres et tirets bas (_) uniquement')
-        setIsAvailable(false)
         setChecking(false)
         return
       }
 
       const available = await checkUsernameAvailability(username)
 
-      setIsAvailable(available)
       setError(available ? null : "Ce nom d'utilisateur n'est pas disponible")
       setChecking(false)
     }, DEBOUNCE_DELAY)
@@ -74,7 +69,6 @@ const UserName = () => {
     <SafeAreaView style={styles.container}>
       <H1 style={styles.title}>Choisis un nom d’utilisateur</H1>
       <TextInput
-        autoComplete="username"
         autoFocus
         maxLength={30}
         onChangeText={setUsername}
@@ -100,7 +94,7 @@ const UserName = () => {
             </Text>
           </>
         )}
-        {!checking && isAvailable && !error && (
+        {!checking && !error && (
           <>
             <CircleCheck color={theme.text.success.default} size={theme.fontSize.sm} style={styles.icon} />
             <Text color="success" style={styles.feedbackText}>

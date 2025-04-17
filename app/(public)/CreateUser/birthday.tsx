@@ -59,7 +59,7 @@ const Birthday = () => {
   const handleNext = () => {
     if (isOldEnough) {
       updateUserData({ birthday })
-      // router.push('/(public)/CreateUser/avatar')
+      router.push('/(public)/CreateUser/avatar')
     }
   }
 

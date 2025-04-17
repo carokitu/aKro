@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState } from 'react'
 
 import { type User } from '../models'
 import { client } from '../supabase'
+import { useUser } from './useUser'
 
 type UserRegistrationData = Pick<User, 'avatar_url' | 'bio' | 'birthday' | 'name' | 'username'>
 
@@ -23,13 +24,25 @@ const UserRegistrationContext = createContext<undefined | UserRegistrationContex
 
 export const UserRegistrationProvider = ({ children }: { children: React.ReactNode }) => {
   const [userData, setUserData] = useState<UserRegistrationData>(initialUserData)
+  const { refetchUser } = useUser()
 
   const updateUserData = (data: Partial<UserRegistrationData>) => {
     setUserData((prevData) => ({ ...prevData, ...data }))
   }
 
   const createUser = async () => {
-    const { error } = await client.from('users').insert(userData)
+    const {
+      data: { session },
+    } = await client.auth.getSession()
+
+    const input = {
+      ...userData,
+      auth_id: session?.user.id,
+      email: session?.user.email,
+      phone: session?.user.phone,
+    }
+    const { error } = await client.from('users').insert(input)
+    await refetchUser()
 
     if (error) {
       throw new Error(error.message)

@@ -16,6 +16,7 @@ type UserContextType = {
   loading: boolean
   login: (input: LoginInput) => Promise<void>
   logout: () => Promise<void>
+  refetchUser: () => Promise<void>
   user: null | User
 }
 
@@ -78,6 +79,19 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [])
 
+  const refetchUser = useCallback(async () => {
+    setLoading(true)
+    const {
+      data: { session },
+    } = await client.auth.getSession()
+
+    if (session?.user) {
+      await checkIfUserExists(session.user)
+    }
+
+    setLoading(false)
+  }, [])
+
   const login = useCallback(async (input: LoginInput) => {
     try {
       setLoading(true)
@@ -105,8 +119,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   }, [])
 
   const value = useMemo(
-    () => ({ error, isLoggedIn, loading, login, logout, user }),
-    [error, isLoggedIn, loading, login, logout, user],
+    () => ({ error, isLoggedIn, loading, login, logout, refetchUser, user }),
+    [error, isLoggedIn, loading, login, logout, refetchUser, user],
   )
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>

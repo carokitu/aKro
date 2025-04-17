@@ -62,9 +62,7 @@ const VerifyCode = () => {
         token: code.trim(),
         type: 'sms',
       })
-      console.log('Code vérifié')
-    } catch (err) {
-      console.error('Échec de la vérification :', err)
+    } catch {
       setError('Code invalide')
     }
   }

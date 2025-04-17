@@ -23,7 +23,7 @@ export const Drawer = () => {
         snapPoints={snapPoints}
       >
         <BottomSheetView style={styles.bottomSheetContainer}>
-          <Title style={styles.sectionTitle} variant="large">
+          <Title style={styles.sectionTitle} size="large">
             Faire découvrir un son
           </Title>
           <AllTracks />

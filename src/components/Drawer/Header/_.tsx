@@ -10,7 +10,7 @@ export const Header = () => {
     <>
       <CurrentTrack />
       <RecentTracks />
-      <Label color="tertiary" style={styles.sectionTitle} variant="large">
+      <Label color="tertiary" style={styles.sectionTitle} size="large">
         Titres likés
       </Label>
     </>

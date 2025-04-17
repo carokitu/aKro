@@ -6,17 +6,17 @@ import { type TextColor } from './types'
 
 type Props = TextProps & {
   color?: TextColor
-  variant?: 'extraSmall' | 'large' | 'medium' | 'small'
+  size?: 'extraSmall' | 'large' | 'medium' | 'small'
 }
 
-export const Text = ({ children, color = 'default', style, variant = 'medium', ...props }: Props) => {
+export const Text = ({ children, color = 'default', size = 'medium', style, ...props }: Props) => {
   const textStyles = [
     colorStyles[color],
     styles.text,
-    variant === 'extraSmall' && styles.extraSmall,
-    variant === 'large' && styles.large,
-    variant === 'medium' && styles.medium,
-    variant === 'small' && styles.small,
+    size === 'extraSmall' && styles.extraSmall,
+    size === 'large' && styles.large,
+    size === 'medium' && styles.medium,
+    size === 'small' && styles.small,
     style,
   ]
 

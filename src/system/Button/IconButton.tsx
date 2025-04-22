@@ -35,12 +35,14 @@ const VARIANT_STYLES = {
 
 const SIZE_STYLES: Record<string, StyleProp<ViewStyle>> = {
   lg: {
+    borderRadius: theme.radius.base,
     height: theme.spacing[1200],
     width: theme.spacing[1200],
   },
   md: {
-    height: theme.spacing[1200],
-    width: theme.spacing[1200],
+    borderRadius: theme.radius.base,
+    height: theme.spacing[1000],
+    width: theme.spacing[1000],
   },
   sm: {
     borderRadius: theme.radius.full,

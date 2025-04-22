@@ -19,77 +19,60 @@ import { client } from '../../supabase'
 
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!$%&*?@])[\d!$%&*?@A-Za-z]{8,}$/
 
-const validatePasswordFormat = (value: string) => PASSWORD_REGEX.test(value)
-
 const Password = () => {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<null | string>(null)
-  const [userExists, setUserExists] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [hasAccount, setHasAccount] = useState(true)
 
   const { email } = useLocalSearchParams<{ email: string }>()
 
+  // Redirect if email is invalid
   useEffect(() => {
-    const checkUserExists = async () => {
-      const { data } = await client.from('users').select('*').eq('email', email)
-      setUserExists(!!data)
+    if (!validate(email)) {
+      router.replace('/(public)/sign-in-with-email')
     }
-
-    checkUserExists()
   }, [email])
 
-  if (!validate(email)) {
-    router.navigate({ pathname: '/(public)/sign-in-with-email' })
-  }
-
+  // Validate password on change
   useEffect(() => {
     if (password.length === 0) {
-      setError(null)
-      return
+      return setError(null)
     }
 
-    const isFormatValid = validatePasswordFormat(password)
-
-    if (isFormatValid) {
-      setError(null)
-    } else {
-      setError(
-        'Le mot de passe doit contenir au moins 8 caractères, incluant au moins une lettre minuscule, une lettre majuscule, un chiffre et un caractère spécial parmi !, $, %, &, *, ?, @',
-      )
-    }
+    const isValid = PASSWORD_REGEX.test(password)
+    setError(
+      isValid
+        ? null
+        : 'Le mot de passe doit contenir au moins 8 caractères avec majuscules, minuscules, chiffres et caractères spéciaux.',
+    )
   }, [password])
 
   const handleNext = async () => {
-    if (userExists) {
-      const { error: errorSignUp } = await client.auth.signInWithPassword({
-        email,
-        password,
-      })
+    setError(null)
 
-      if (errorSignUp) {
-        setError('Mot de passe erroné')
+    if (hasAccount) {
+      const { error: err } = await client.auth.signInWithPassword({ email, password })
+
+      if (err) {
+        setError('Mot de passe incorrect ou compte inexistant.')
       }
     } else {
-      const { error: errorSignIn } = await client.auth.signUp({
-        email,
-        password,
-      })
+      const { error: err } = await client.auth.signUp({ email, password })
 
-      if (errorSignIn) {
-        setError('Il y a eu une erreur lors de la création de ton compte')
+      if (err) {
+        setError('Erreur lors de la création du compte.')
       }
     }
   }
 
   const isDisabled = password.length === 0 || !!error
-  const title = userExists ? 'Entre ton mot de passe' : 'Choisis un mot de passe'
 
   return (
     <SafeAreaView style={styles.container}>
-      <H1 style={styles.title}>{title}</H1>
+      <H1 style={styles.title}>{hasAccount ? 'Entre ton mot de passe' : 'Choisis un mot de passe'}</H1>
       <View style={styles.inputContainer}>
         <TextInput
-          autoComplete="password"
           autoFocus
           maxLength={30}
           onChangeText={setPassword}
@@ -125,6 +108,12 @@ const Password = () => {
           </>
         )}
       </View>
+      <Button
+        onPress={() => setHasAccount(!hasAccount)}
+        size="sm"
+        title={hasAccount ? 'Pas encore de compte ?' : 'Tu as déjà un compte ?'}
+        variant="tertiary"
+      />
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.buttonContainer}>
         <Button disabled={isDisabled} fullWidth onPress={handleNext} size="lg" style={styles.button} title="Suivant" />
       </KeyboardAvoidingView>

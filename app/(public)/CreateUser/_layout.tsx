@@ -5,31 +5,11 @@ import { UserRegistrationProvider } from '../../../hooks/useUserRegistration'
 const CreateUserLayout = () => {
   return (
     <UserRegistrationProvider>
-      <Stack>
-        <Stack.Screen
-          name="name"
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="username"
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="birthday"
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="avatar"
-          options={{
-            headerShown: false,
-          }}
-        />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="avatar" />
+        <Stack.Screen name="birthday" />
+        <Stack.Screen name="name" />
+        <Stack.Screen name="username" />
       </Stack>
     </UserRegistrationProvider>
   )

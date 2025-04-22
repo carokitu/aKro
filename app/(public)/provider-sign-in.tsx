@@ -39,7 +39,7 @@ const ProviderSignIn = () => {
           onPress={login}
           size="lg"
           style={styles.button}
-          title="Se connecter a Spotify"
+          title="Se connecter à Spotify"
         />
         <View style={styles.separator}>
           <View style={styles.separatorLine} />

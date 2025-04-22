@@ -25,6 +25,7 @@ const VerifyCode = () => {
     const parsed = parsePhoneNumberFromString(phoneNumber?.toString())
 
     if (parsed?.isValid()) {
+      setError(null)
       try {
         await client.auth.signInWithOtp({
           phone: formattedPhoneNumber,
@@ -57,11 +58,14 @@ const VerifyCode = () => {
 
   const handleVerify = async () => {
     try {
-      await client.auth.verifyOtp({
+      const { error: err } = await client.auth.verifyOtp({
         phone: phoneNumber?.toString(),
         token: code.trim(),
         type: 'sms',
       })
+      if (err) {
+        setError('Code invalide')
+      }
     } catch {
       setError('Code invalide')
     }

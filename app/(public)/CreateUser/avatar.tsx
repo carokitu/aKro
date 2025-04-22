@@ -17,28 +17,32 @@ import { useUserRegistration } from '../../../hooks'
 import { Button, H1, Label, Text } from '../../../src/system'
 import { theme } from '../../../src/theme'
 
-const handleDismiss = () => {
-  Keyboard.dismiss()
-}
+const MAX_LINES = 4
+const MAX_BIO_LENGTH = 150
+
+const handleDismiss = () => Keyboard.dismiss()
 
 const Avatar = () => {
   const [avatarUrl, setAvatarUrl] = useState<null | string>(null)
-  const [bio, setBio] = useState<null | string>(null)
+  const [bio, setBio] = useState<string>('')
   const [error, setError] = useState<null | string>(null)
-  const { createUser, updateUserData } = useUserRegistration()
+  const { createUser } = useUserRegistration()
 
-  const pickImage = useCallback(async () => {
+  const handleImagePermissions = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
 
     if (status !== 'granted') {
-      setError('Désolé, nous avons besoin des permissions pour accéder à votre bibliothèque !')
+      setError('Nous avons besoin de votre permission pour accéder à votre bibliothèque.')
+      return false
+    }
 
-      const { status: newStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync()
+    return true
+  }
 
-      if (newStatus === 'granted') {
-        setError(null)
-      }
+  const pickImage = useCallback(async () => {
+    const granted = await handleImagePermissions()
 
+    if (!granted) {
       return
     }
 
@@ -47,18 +51,28 @@ const Avatar = () => {
       aspect: [1, 1],
     })
 
-    if (!result.canceled && result.assets && result.assets.length > 0) {
+    if (!result.canceled && result.assets.length > 0) {
       setAvatarUrl(result.assets[0].uri)
+      setError(null)
     }
   }, [])
 
-  const handleNext = async () => {
-    updateUserData({ avatar_url: avatarUrl, bio: bio ?? null })
+  const handleBioChange = (text: string) => {
+    const lineCount = text.split('\n').length
 
+    if (lineCount <= MAX_LINES) {
+      setBio(text)
+    }
+  }
+
+  const handleNext = async () => {
     try {
-      await createUser()
+      await createUser({
+        avatar_url: avatarUrl,
+        bio: bio.trim().slice(0, MAX_BIO_LENGTH) || null,
+      })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Une erreur est survenue lors de la création du compte')
+      setError(err instanceof Error ? err.message : 'Une erreur est survenue lors de la création du compte.')
     }
   }
 
@@ -88,13 +102,14 @@ const Avatar = () => {
           Bio
         </Label>
         <TextInput
-          maxLength={150}
+          maxLength={MAX_BIO_LENGTH}
           multiline
-          numberOfLines={4}
-          onChangeText={setBio}
+          numberOfLines={MAX_LINES}
+          onChangeText={handleBioChange}
           placeholder="Mon algorithme de recommandation préféré ? Mes amis"
           placeholderTextColor={theme.text.disabled}
           style={styles.input}
+          value={bio}
         />
         <View style={styles.buttonContainer}>
           <Button fullWidth onPress={handleNext} size="lg" style={styles.button} title="Suivant" />
@@ -103,6 +118,8 @@ const Avatar = () => {
     </TouchableWithoutFeedback>
   )
 }
+
+export default Avatar
 
 const styles = StyleSheet.create({
   avatarContainer: {
@@ -141,7 +158,6 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     flexDirection: 'row',
     gap: theme.spacing['100'],
-    marginTop: theme.spacing[400],
     textAlign: 'center',
     verticalAlign: 'middle',
     width: '100%',
@@ -162,7 +178,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   label: {
-    marginTop: theme.spacing[400],
+    marginVertical: theme.spacing[400],
   },
   optionContainer: {
     alignItems: 'center',
@@ -173,5 +189,3 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 })
-
-export default Avatar

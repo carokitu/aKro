@@ -7,7 +7,7 @@ import { useUser } from './useUser'
 type UserRegistrationData = Pick<User, 'avatar_url' | 'bio' | 'birthday' | 'name' | 'username'>
 
 type UserRegistrationContextType = {
-  createUser: () => Promise<void>
+  createUser: (data?: Partial<UserRegistrationData>) => Promise<void>
   updateUserData: (data: Partial<UserRegistrationData>) => void
   userData: UserRegistrationData
 }
@@ -30,13 +30,14 @@ export const UserRegistrationProvider = ({ children }: { children: React.ReactNo
     setUserData((prevData) => ({ ...prevData, ...data }))
   }
 
-  const createUser = async () => {
+  const createUser = async (data?: Partial<UserRegistrationData>) => {
     const {
       data: { session },
     } = await client.auth.getSession()
 
     const input = {
       ...userData,
+      ...data,
       auth_id: session?.user.id,
       email: session?.user.email,
       phone: session?.user.phone,

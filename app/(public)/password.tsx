@@ -116,7 +116,7 @@ const Password = () => {
             </Text>
           </>
         )}
-        {!error && (
+        {!error && password.length > 0 && (
           <>
             <CircleCheck color={theme.text.success.default} size={theme.fontSize.sm} style={styles.icon} />
             <Text color="success" style={styles.feedbackText}>
@@ -178,7 +178,6 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing[600],
     paddingHorizontal: theme.padding[600],
     paddingVertical: theme.padding[400],
-    // width: '100%',
   },
   title: {
     marginTop: theme.spacing[1400],

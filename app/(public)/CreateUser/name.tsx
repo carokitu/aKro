@@ -19,8 +19,10 @@ const Name = () => {
   const { updateUserData } = useUserRegistration()
 
   const handleNext = () => {
-    updateUserData({ name })
-    router.push('/(public)/CreateUser/username')
+    if (validateNameFormat(name)) {
+      updateUserData({ name })
+      router.push('/(public)/CreateUser/username')
+    }
   }
 
   const onChangeText = (text: string) => {

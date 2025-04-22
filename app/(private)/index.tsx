@@ -10,6 +10,11 @@ const Index = () => {
   const { logout: logoutFromSpotify } = useSpotifyAuth()
   const { logout: logoutFromUser } = useUser()
 
+  const logoutFromBoth = () => {
+    logoutFromSpotify()
+    logoutFromUser()
+  }
+
   return (
     <SafeAreaView>
       <Text>🎵 Logged in to Spotify! 🎵</Text>
@@ -18,6 +23,7 @@ const Index = () => {
       </Link>
       <Button onPress={logoutFromSpotify} title="Logout from Spotify" />
       <Button onPress={logoutFromUser} title="Logout from Supabase" />
+      <Button onPress={logoutFromBoth} title="Logout from both" />
     </SafeAreaView>
   )
 }

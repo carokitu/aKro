@@ -59,8 +59,11 @@ const UserName = () => {
   }, [username])
 
   const handleNext = () => {
-    updateUserData({ username })
-    router.push('/(public)/CreateUser/birthday')
+    const isFormatValid = validateUsernameFormat(username)
+    if (isFormatValid) {
+      updateUserData({ username })
+      router.push('/(public)/CreateUser/birthday')
+    }
   }
 
   const isDisabled = username.length === 0 || !!error || checking

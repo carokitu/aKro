@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react'
 import { View } from 'react-native'
 
-import { router, Slot } from 'expo-router'
+import { router, Stack } from 'expo-router'
 
 import { useUser } from '../../hooks'
 
@@ -27,7 +27,16 @@ export const PublicLayout = () => {
     return <View />
   }
 
-  return <Slot />
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="index" />
+      <Stack.Screen name="password" />
+      <Stack.Screen name="provider-sign-in" />
+      <Stack.Screen name="sign-in" />
+      <Stack.Screen name="sign-in-with-email" />
+      <Stack.Screen name="verify-code" />
+    </Stack>
+  )
 }
 
 export default PublicLayout

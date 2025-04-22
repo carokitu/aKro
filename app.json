@@ -34,6 +34,22 @@
             "node_modules/@expo-google-fonts/outfit"
           ]
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "android": {
+            "permissions": [
+              "android.permission.CAMERA",
+              "android.permission.READ_EXTERNAL_STORAGE"
+            ]
+          },
+          "cameraPermission": "akro souhaite accéder à votre appareil photo",
+          "ios": {
+            "NSPhotoLibraryUsageDescription": "akro souhaite accéder à vos photos pour créer votre profil"
+          },
+          "photosPermission": "akro souhaite accéder à vos photos"
+        }
       ]
     ],
     "scheme": "akro",

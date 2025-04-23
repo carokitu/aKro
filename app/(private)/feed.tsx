@@ -3,6 +3,8 @@ import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
+import { router } from 'expo-router'
+
 import { useRecentTracks, useSpotifyApi, useUser } from '../../hooks'
 import { Drawer } from '../../src'
 import { Track } from '../../src/components/Drawer/Header/Track'
@@ -19,7 +21,7 @@ const Header = () => {
   return (
     <View style={styles.header}>
       <Avatar avatar={user?.avatar_url} />
-      <IconButton Icon={UserPlus} size="sm" variant="tertiary" />
+      <IconButton Icon={UserPlus} onPress={() => router.push('/search-users')} size="sm" variant="tertiary" />
     </View>
   )
 }
@@ -38,7 +40,7 @@ const Feed = () => {
         <View style={styles.listContainer}>
           <FlatList
             data={tracks}
-            keyExtractor={(item) => item.track.id}
+            keyExtractor={(item) => `${item.track.id}-${item.played_at}`}
             ListHeaderComponent={<Header />}
             renderItem={({ item }) => <Track {...item.track} />}
             stickyHeaderIndices={[0]}
@@ -52,6 +54,7 @@ const Feed = () => {
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: theme.surface.base.default,
     flex: 1,
   },
   header: {

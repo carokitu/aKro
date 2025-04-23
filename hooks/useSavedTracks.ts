@@ -32,7 +32,7 @@ export const useSavedTracks = (baseLimit?: MaxInt<50>) => {
 
   useEffect(() => {
     refreshSavedTracks()
-  }, [fetchSavedTracks])
+  }, [])
 
   return { fetchSavedTracks, loading, refreshSavedTracks, setTracks, tracks }
 }

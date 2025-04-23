@@ -3,13 +3,14 @@ import { View } from 'react-native'
 
 import { router, Stack } from 'expo-router'
 
-import { useUser } from '../../hooks'
+import { useSpotifyAuth, useUser } from '../../hooks'
 
 export const PublicLayout = () => {
   const { isLoggedIn, loading, user } = useUser()
+  const { accessToken } = useSpotifyAuth()
 
   const shouldCreateUser = useMemo(() => isLoggedIn && !user, [isLoggedIn, user])
-  const shouldRedirect = useMemo(() => isLoggedIn && user, [isLoggedIn, user])
+  const shouldRedirect = useMemo(() => isLoggedIn && user && accessToken, [accessToken, isLoggedIn, user])
 
   useEffect(() => {
     if (!loading && shouldCreateUser) {

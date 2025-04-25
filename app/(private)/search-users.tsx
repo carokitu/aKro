@@ -1,49 +1,183 @@
-import { useEffect, useState } from 'react'
-import { FlatList, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
+import { Search } from 'lucide-react-native'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { Alert, FlatList, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-import { type User } from '../../models'
-import { Avatar, H1, Label, Text } from '../../src/system'
+import { debounce } from 'lodash'
+
+import { useUser } from '../../hooks'
+import { type User as TUser } from '../../models'
+import { Avatar, Button, H1, Label, Text } from '../../src/system'
 import { theme } from '../../src/theme'
 import { client } from '../../supabase'
 
-const SearchUsers = () => {
-  const [query, setQuery] = useState('')
-  const [results, setResults] = useState<User[]>([])
+type UserWithStats = Pick<TUser, 'avatar_url' | 'id' | 'name' | 'username'> & {
+  is_followed: boolean
+  mutual_count: number
+}
+
+type UserListProps = {
+  query: string
+}
+
+const UserList = ({ query }: UserListProps) => {
+  const { user: currentUser } = useUser()
+  const [results, setResults] = useState<UserWithStats[]>([])
   const [loading, setLoading] = useState(false)
+  const [followLoading, setFollowLoading] = useState<null | string>(null)
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      setLoading(true)
-
-      const { data, error } = await client
-        .from('users')
-        .select('id, username, name, avatar_url')
-        .ilike('username', `%${query}%`)
-        .limit(20)
-
-      if (!error && data) {
-        setResults(data as User[])
-      }
-
-      setLoading(false)
+  const fetchUsers = useCallback(async () => {
+    if (!currentUser) {
+      return
     }
 
-    const delayDebounce = setTimeout(fetchUsers, 300) // debounce
-    return () => clearTimeout(delayDebounce)
-  }, [query])
+    setLoading(true)
 
-  const renderItem = ({ item }: { item: User }) => (
+    try {
+      const { data: usersData, error: usersError } = await client.rpc('search_users_with_stats', {
+        p_query: query,
+        p_user_id: currentUser.id,
+      })
+
+      if (usersError) {
+        console.error('Erreur lors de la recherche utilisateurs:', usersError)
+        setLoading(false)
+        return
+      }
+
+      setResults(usersData as UserWithStats[])
+    } catch (error) {
+      console.error('Erreur:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [currentUser, query])
+
+  useEffect(() => {
+    fetchUsers()
+  }, [fetchUsers, query])
+
+  const handleFollow = async (userId: string) => {
+    if (!currentUser) {
+      return
+    }
+
+    setFollowLoading(userId)
+
+    try {
+      const { error } = await client.from('follows').insert({
+        created_at: new Date().toISOString(),
+        followed_id: userId,
+        follower_id: currentUser.id,
+      })
+
+      if (error) {
+        console.error('Erreur lors du suivi:', error)
+        return
+      }
+
+      setResults((prevResults) =>
+        prevResults.map((user) => (user.id === userId ? { ...user, is_followed: true } : user)),
+      )
+    } catch (error) {
+      console.error('Erreur lors du suivi:', error)
+    } finally {
+      setFollowLoading(null)
+    }
+  }
+
+  const handleUnfollow = async (userId: string) => {
+    if (!currentUser) {
+      return
+    }
+
+    const unfollow = async () => {
+      setFollowLoading(userId)
+
+      try {
+        const { error } = await client
+          .from('follows')
+          .delete()
+          .match({ followed_id: userId, follower_id: currentUser.id })
+
+        if (error) {
+          console.error('Erreur lors du désabonnement:', error)
+          return
+        }
+
+        setResults((prevResults) =>
+          prevResults.map((user) => (user.id === userId ? { ...user, is_followed: false } : user)),
+        )
+      } catch (error) {
+        console.error('Erreur lors du désabonnement:', error)
+      } finally {
+        setFollowLoading(null)
+      }
+    }
+
+    Alert.alert('Voulez-vous vraiment désabonner cet utilisateur ?', '', [
+      { style: 'cancel', text: 'Annuler' },
+      {
+        onPress: () => {
+          unfollow()
+        },
+        style: 'destructive',
+        text: 'Se désabonner',
+      },
+    ])
+  }
+
+  const renderItem = ({ item }: { item: UserWithStats }) => (
     <TouchableOpacity style={styles.userCard}>
-      <Avatar avatar={item.avatar_url} />
-      <View style={styles.info}>
-        <Label>{item.username}</Label>
-        <Text color="tertiary" size="small">
-          {item.name}
-        </Text>
+      <View style={styles.userCardContent}>
+        <Avatar avatar={item.avatar_url} size="lg" />
+        <View style={styles.info}>
+          <Label>{item.username}</Label>
+          <Text color="tertiary" size="small">
+            {item.name}
+          </Text>
+        </View>
       </View>
+      {item.is_followed ? (
+        <Button
+          disabled={followLoading === item.id}
+          onPress={() => handleUnfollow(item.id)}
+          size="sm"
+          title="Ne plus suivre"
+          variant="secondary"
+        />
+      ) : (
+        <Button disabled={followLoading === item.id} onPress={() => handleFollow(item.id)} size="sm" title="Suivre" />
+      )}
     </TouchableOpacity>
   )
+
+  return (
+    <FlatList
+      data={results}
+      keyExtractor={(item) => item.id}
+      ListEmptyComponent={loading ? null : <Text style={styles.emptyText}>Aucun utilisateur trouvé</Text>}
+      renderItem={renderItem}
+      style={styles.list}
+    />
+  )
+}
+
+const SearchUsers = () => {
+  const [query, setQuery] = useState('')
+  const [debouncedQuery, setDebouncedQuery] = useState('')
+  const debounceRef = useRef<(val: string) => void>()
+
+  useEffect(() => {
+    debounceRef.current = debounce((val: string) => {
+      setDebouncedQuery(val)
+    }, 200)
+  }, [])
+
+  const handleChange = (text: string) => {
+    setQuery(text)
+    debounceRef.current?.(text)
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -53,23 +187,19 @@ const SearchUsers = () => {
           Connecte toi avec ton entourage
         </Label>
       </View>
-      <TextInput
-        autoFocus
-        onChangeText={setQuery}
-        placeholder="Rechercher un utilisateur"
-        placeholderTextColor={theme.text.disabled}
-        style={styles.input}
-        value={query}
-      />
-      <FlatList
-        data={results}
-        keyExtractor={(item) => item.id}
-        ListEmptyComponent={
-          query.length >= 2 && !loading ? <Text style={styles.emptyText}>Aucun utilisateur trouvé</Text> : null
-        }
-        renderItem={renderItem}
-        style={styles.list}
-      />
+      <View style={styles.search}>
+        <Search color={theme.text.base.tertiary} size={theme.fontSize.lg} />
+        <TextInput
+          autoFocus
+          maxLength={40}
+          onChangeText={handleChange}
+          placeholder="Rechercher un utilisateur"
+          placeholderTextColor={theme.text.disabled}
+          style={styles.input}
+          value={query}
+        />
+      </View>
+      <UserList query={debouncedQuery} />
     </SafeAreaView>
   )
 }
@@ -96,18 +226,31 @@ const styles = StyleSheet.create({
     marginLeft: theme.spacing[300],
   },
   input: {
-    backgroundColor: theme.surface.base.secondary,
-    borderRadius: theme.radius.base,
+    flex: 1,
     fontSize: theme.fontSize.md,
-    marginVertical: theme.spacing[400],
-    padding: theme.spacing[300],
+    fontWeight: theme.weight.medium,
+    marginLeft: theme.spacing[200],
   },
   list: {
     flex: 1,
   },
+  search: {
+    backgroundColor: theme.surface.base.secondary,
+    borderRadius: theme.radius.base,
+    display: 'flex',
+    flexDirection: 'row',
+    marginVertical: theme.spacing[600],
+    paddingHorizontal: theme.padding[400],
+    paddingVertical: theme.padding[400],
+  },
   userCard: {
     alignItems: 'center',
     flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: theme.spacing[300],
+  },
+  userCardContent: {
+    alignItems: 'center',
+    flexDirection: 'row',
   },
 })

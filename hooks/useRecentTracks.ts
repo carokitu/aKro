@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, useRef } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { type MaxInt, type PlayHistory } from '@spotify/web-api-ts-sdk'
 
@@ -10,11 +10,12 @@ export const useRecentTracks = (limit?: MaxInt<50>) => {
   const { loading: loadingToken, useApi } = useSpotifyApi()
   const [tracks, setTracks] = useState<PlayHistory[]>()
   const [loading, setLoading] = useState(loadingToken)
-  const initialFetchRef = useRef(false)
 
   const fetchRecentTracks = useCallback(async () => {
-    if (!useApi) return;
-    
+    if (!useApi) {
+      return
+    }
+
     try {
       const recentTracks = await useApi.player.getRecentlyPlayedTracks(limit)
       setTracks(recentTracks?.items)
@@ -24,16 +25,14 @@ export const useRecentTracks = (limit?: MaxInt<50>) => {
   }, [useApi, limit])
 
   useEffect(() => {
-    if (!useApi) return;
-    
-    // Don't run this effect if we've already fetched data and useApi hasn't changed
-    if (initialFetchRef.current && tracks) return;
-    
+    if (!useApi) {
+      return
+    }
+
     const fetchData = async () => {
       setLoading(true)
       await fetchRecentTracks()
       setLoading(false)
-      initialFetchRef.current = true
     }
 
     // Initial fetch only if needed

@@ -1,6 +1,15 @@
+import { useActionSheet } from '@expo/react-native-action-sheet'
 import { Search } from 'lucide-react-native'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Alert, FlatList, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
+import {
+  FlatList,
+  Keyboard,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { debounce } from 'lodash'
@@ -25,6 +34,7 @@ const UserList = ({ query }: UserListProps) => {
   const [results, setResults] = useState<UserWithStats[]>([])
   const [loading, setLoading] = useState(false)
   const [followLoading, setFollowLoading] = useState<null | string>(null)
+  const { showActionSheetWithOptions } = useActionSheet()
 
   const fetchUsers = useCallback(async () => {
     if (!currentUser) {
@@ -115,16 +125,18 @@ const UserList = ({ query }: UserListProps) => {
       }
     }
 
-    Alert.alert('Voulez-vous vraiment désabonner cet utilisateur ?', '', [
-      { style: 'cancel', text: 'Annuler' },
+    showActionSheetWithOptions(
       {
-        onPress: () => {
-          unfollow()
-        },
-        style: 'destructive',
-        text: 'Se désabonner',
+        cancelButtonIndex: 1,
+        destructiveButtonIndex: 0,
+        options: ['Se désabonner', 'Annuler'],
       },
-    ])
+      (index) => {
+        if (index === 0) {
+          unfollow()
+        }
+      },
+    )
   }
 
   const renderItem = ({ item }: { item: UserWithStats }) => (
@@ -141,13 +153,26 @@ const UserList = ({ query }: UserListProps) => {
       {item.is_followed ? (
         <Button
           disabled={followLoading === item.id}
-          onPress={() => handleUnfollow(item.id)}
+          onPress={() => {
+            console.log('onPress')
+            Keyboard.dismiss()
+            handleUnfollow(item.id)
+          }}
           size="sm"
           title="Ne plus suivre"
           variant="secondary"
         />
       ) : (
-        <Button disabled={followLoading === item.id} onPress={() => handleFollow(item.id)} size="sm" title="Suivre" />
+        <Button
+          disabled={followLoading === item.id}
+          onPress={() => {
+            console.log('onPress')
+            Keyboard.dismiss()
+            handleFollow(item.id)
+          }}
+          size="sm"
+          title="Suivre"
+        />
       )}
     </TouchableOpacity>
   )
@@ -180,27 +205,29 @@ const SearchUsers = () => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <H1>Ajoute des amis</H1>
-        <Label color="tertiary" size="large">
-          Connecte toi avec ton entourage
-        </Label>
-      </View>
-      <View style={styles.search}>
-        <Search color={theme.text.base.tertiary} size={theme.fontSize.lg} />
-        <TextInput
-          autoFocus
-          maxLength={40}
-          onChangeText={handleChange}
-          placeholder="Rechercher un utilisateur"
-          placeholderTextColor={theme.text.disabled}
-          style={styles.input}
-          value={query}
-        />
-      </View>
-      <UserList query={debouncedQuery} />
-    </SafeAreaView>
+    <TouchableWithoutFeedback accessible={false} onPress={() => Keyboard.dismiss()}>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <H1>Ajoute des amis</H1>
+          <Label color="tertiary" size="large">
+            Connecte toi avec ton entourage
+          </Label>
+        </View>
+        <View style={styles.search}>
+          <Search color={theme.text.base.tertiary} size={theme.fontSize.lg} />
+          <TextInput
+            autoFocus
+            maxLength={40}
+            onChangeText={handleChange}
+            placeholder="Rechercher un utilisateur"
+            placeholderTextColor={theme.text.disabled}
+            style={styles.input}
+            value={query}
+          />
+        </View>
+        <UserList query={debouncedQuery} />
+      </SafeAreaView>
+    </TouchableWithoutFeedback>
   )
 }
 

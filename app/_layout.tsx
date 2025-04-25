@@ -1,3 +1,4 @@
+import { ActionSheetProvider } from '@expo/react-native-action-sheet'
 import { StatusBar } from 'react-native'
 
 import { Outfit_400Regular, Outfit_600SemiBold } from '@expo-google-fonts/outfit'
@@ -60,7 +61,9 @@ export const RootLayout = () => {
   return (
     <UserProvider>
       <SpotifyAuthProvider>
-        <Layout />
+        <ActionSheetProvider>
+          <Layout />
+        </ActionSheetProvider>
       </SpotifyAuthProvider>
     </UserProvider>
   )

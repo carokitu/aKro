@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { router } from 'expo-router'
+import pluralize from 'pluralize'
 
 import { debounce } from 'lodash'
 
@@ -137,7 +138,7 @@ const UserList = ({ query }: UserListProps) => {
 
   const renderItem = ({ item }: { item: UserWithStats }) => {
     const { avatar_url, follows_me, id, is_followed, mutual_count, name, username } = item
-    const info = mutual_count ? `${name} • ${mutual_count} amis en commun` : name
+    const info = mutual_count ? `${name} • ${mutual_count} ${pluralize('ami', mutual_count)} en commun` : name
 
     return (
       <TouchableOpacity onPress={() => Keyboard.dismiss()} style={styles.userCard}>

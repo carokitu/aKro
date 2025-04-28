@@ -65,15 +65,15 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const checkIfUserExists = useCallback(
     async (authUser: AuthUser) => {
       try {
-        const { data, error } = await client.from('users').select('*').eq('auth_id', authUser.id).single<User>()
+        const { data, error } = await client.from('users').select('*').eq('id', authUser.id).single<User>()
 
         if (error) {
-          if (error.code !== 'PGRST116') {
+          // le user n'a pas encore été créé
+          if (error.code === 'PGRST116') {
+            dispatch({ payload: null, type: 'SET_USER' })
+          } else {
             throw new Error(error.message)
           }
-
-          dispatch({ type: 'CLEAR_USER' })
-          return
         }
 
         const payload = isEqual(state.user, data) ? state.user : data

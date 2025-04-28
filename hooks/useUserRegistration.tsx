@@ -38,8 +38,8 @@ export const UserRegistrationProvider = ({ children }: { children: React.ReactNo
     const input = {
       ...userData,
       ...data,
-      auth_id: session?.user.id,
       email: session?.user.email,
+      id: session?.user.id,
       phone: session?.user.phone,
     }
     const { error } = await client.from('users').insert(input)

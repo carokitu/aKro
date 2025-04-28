@@ -1,5 +1,5 @@
 import { useActionSheet } from '@expo/react-native-action-sheet'
-import { Search } from 'lucide-react-native'
+import { ChevronLeft, Search } from 'lucide-react-native'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   FlatList,
@@ -12,15 +12,18 @@ import {
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
+import { router } from 'expo-router'
+
 import { debounce } from 'lodash'
 
 import { useUser } from '../../hooks'
 import { type User as TUser } from '../../models'
-import { Avatar, Button, H1, Label, Text } from '../../src/system'
+import { Avatar, Button, H1, IconButton, Label, Text } from '../../src/system'
 import { theme } from '../../src/theme'
 import { client } from '../../supabase'
 
 type UserWithStats = Pick<TUser, 'avatar_url' | 'id' | 'name' | 'username'> & {
+  follows_me: boolean
   is_followed: boolean
   mutual_count: number
 }
@@ -139,41 +142,48 @@ const UserList = ({ query }: UserListProps) => {
     )
   }
 
-  const renderItem = ({ item }: { item: UserWithStats }) => (
-    <TouchableOpacity onPress={() => Keyboard.dismiss()} style={styles.userCard}>
-      <View style={styles.userCardContent}>
-        <Avatar avatar={item.avatar_url} size="lg" />
-        <View style={styles.info}>
-          <Label>{item.username}</Label>
-          <Text color="tertiary" size="small">
-            {item.name}
-          </Text>
+  const renderItem = ({ item }: { item: UserWithStats }) => {
+    const { avatar_url, follows_me, id, is_followed, mutual_count, name, username } = item
+    const info = mutual_count ? `${name} • ${mutual_count} amis en commun` : name
+
+    return (
+      <TouchableOpacity onPress={() => Keyboard.dismiss()} style={styles.userCard}>
+        <View style={styles.userCardContent}>
+          <Avatar avatar={avatar_url} size="lg" />
+          <View style={styles.info}>
+            <Label ellipsizeMode="tail" numberOfLines={1} style={styles.username}>
+              {username}
+            </Label>
+            <Text color="secondary" ellipsizeMode="tail" numberOfLines={1} size="small" style={styles.name}>
+              {info}
+            </Text>
+          </View>
         </View>
-      </View>
-      {item.is_followed ? (
-        <Button
-          disabled={followLoading === item.id}
-          onPress={() => {
-            handleUnfollow(item.id)
-            Keyboard.dismiss()
-          }}
-          size="sm"
-          title="Ne plus suivre"
-          variant="secondary"
-        />
-      ) : (
-        <Button
-          disabled={followLoading === item.id}
-          onPress={() => {
-            handleFollow(item.id)
-            Keyboard.dismiss()
-          }}
-          size="sm"
-          title="Suivre"
-        />
-      )}
-    </TouchableOpacity>
-  )
+        {is_followed ? (
+          <Button
+            disabled={followLoading === id}
+            onPress={() => {
+              handleUnfollow(id)
+              Keyboard.dismiss()
+            }}
+            size="sm"
+            title="Ne plus suivre"
+            variant="secondary"
+          />
+        ) : (
+          <Button
+            disabled={followLoading === id}
+            onPress={() => {
+              handleFollow(id)
+              Keyboard.dismiss()
+            }}
+            size="sm"
+            title={follows_me ? 'Suivre en retour' : 'Suivre'}
+          />
+        )}
+      </TouchableOpacity>
+    )
+  }
 
   return (
     <FlatList
@@ -206,12 +216,19 @@ const SearchUsers = () => {
   return (
     <TouchableWithoutFeedback accessible={false} onPress={() => Keyboard.dismiss()}>
       <SafeAreaView pointerEvents="box-none" style={styles.container}>
-        <View style={styles.header}>
+        <View style={styles.title}>
+          <IconButton
+            Icon={ChevronLeft}
+            onPress={() => router.back()}
+            size="md"
+            style={styles.backButton}
+            variant="secondary"
+          />
           <H1>Ajoute des amis</H1>
-          <Label color="tertiary" size="large">
-            Connecte toi avec ton entourage
-          </Label>
         </View>
+        <Text color="tertiary" size="large" style={styles.subtitle}>
+          Connecte toi avec ton entourage
+        </Text>
         <View style={styles.search}>
           <Search color={theme.text.base.tertiary} size={theme.fontSize.lg} />
           <TextInput
@@ -233,6 +250,10 @@ const SearchUsers = () => {
 export default SearchUsers
 
 const styles = StyleSheet.create({
+  backButton: {
+    left: 0,
+    position: 'absolute',
+  },
   container: {
     backgroundColor: theme.surface.base.default,
     flex: 1,
@@ -242,23 +263,24 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing[800],
     textAlign: 'center',
   },
-  header: {
-    alignItems: 'center',
-    gap: theme.spacing[200],
-    justifyContent: 'center',
-    marginTop: theme.spacing['1200'],
-  },
   info: {
-    marginLeft: theme.spacing[300],
+    flex: 1,
+    marginHorizontal: theme.spacing[300],
+    overflow: 'hidden',
   },
   input: {
     flex: 1,
     fontSize: theme.fontSize.md,
     fontWeight: theme.weight.medium,
     marginLeft: theme.spacing[200],
+    overflow: 'hidden',
+    width: '100%',
   },
   list: {
     flex: 1,
+  },
+  name: {
+    flexShrink: 1,
   },
   search: {
     backgroundColor: theme.surface.base.secondary,
@@ -269,14 +291,30 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.padding[400],
     paddingVertical: theme.padding[400],
   },
+  subtitle: {
+    marginTop: theme.spacing[200],
+    textAlign: 'center',
+    width: '100%',
+  },
+  title: {
+    alignItems: 'center',
+    gap: theme.spacing[200],
+    justifyContent: 'center',
+    marginTop: theme.spacing['1000'],
+  },
   userCard: {
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: theme.spacing[300],
+    overflow: 'hidden',
   },
   userCardContent: {
     alignItems: 'center',
+    flex: 1,
     flexDirection: 'row',
+  },
+  username: {
+    flexShrink: 1,
   },
 })

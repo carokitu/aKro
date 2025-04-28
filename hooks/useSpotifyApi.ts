@@ -6,7 +6,7 @@ import { useSpotifyAuth } from './useSpotifyAuth'
 
 export const useSpotifyApi = () => {
   const [loading, setLoading] = useState(true)
-  const [useApi, setApi] = useState<null | SpotifyApi>(null)
+  const [spotifyApi, setSpotifyApi] = useState<null | SpotifyApi>(null)
   const { accessToken } = useSpotifyAuth()
 
   useEffect(() => {
@@ -20,7 +20,7 @@ export const useSpotifyApi = () => {
 
       try {
         const sdk = SpotifyApi.withAccessToken(process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID as string, accessToken)
-        setApi(sdk)
+        setSpotifyApi(sdk)
       } catch (error) {
         console.error('Error initializing Spotify API:', error)
       } finally {
@@ -31,5 +31,5 @@ export const useSpotifyApi = () => {
     prepareRequest()
   }, [accessToken])
 
-  return { loading, useApi }
+  return { loading, spotifyApi }
 }

@@ -53,14 +53,11 @@ const UserList = ({ query }: UserListProps) => {
       })
 
       if (usersError) {
-        console.error('Erreur lors de la recherche utilisateurs:', usersError)
         setLoading(false)
         return
       }
 
       setResults(usersData as UserWithStats[])
-    } catch (error) {
-      console.error('Erreur:', error)
     } finally {
       setLoading(false)
     }
@@ -85,15 +82,13 @@ const UserList = ({ query }: UserListProps) => {
       })
 
       if (error) {
-        console.error('Erreur lors du suivi:', error)
+        setFollowLoading(null)
         return
       }
 
       setResults((prevResults) =>
         prevResults.map((user) => (user.id === userId ? { ...user, is_followed: true } : user)),
       )
-    } catch (error) {
-      console.error('Erreur lors du suivi:', error)
     } finally {
       setFollowLoading(null)
     }
@@ -114,15 +109,13 @@ const UserList = ({ query }: UserListProps) => {
           .match({ followed_id: userId, follower_id: currentUser.id })
 
         if (error) {
-          console.error('Erreur lors du désabonnement:', error)
+          setFollowLoading(null)
           return
         }
 
         setResults((prevResults) =>
           prevResults.map((user) => (user.id === userId ? { ...user, is_followed: false } : user)),
         )
-      } catch (error) {
-        console.error('Erreur lors du désabonnement:', error)
       } finally {
         setFollowLoading(null)
       }

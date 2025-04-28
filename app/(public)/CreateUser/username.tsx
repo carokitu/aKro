@@ -72,6 +72,7 @@ const UserName = () => {
     <SafeAreaView style={styles.container}>
       <H1 style={styles.title}>Choisis un nom d’utilisateur</H1>
       <TextInput
+        autoCorrect={false}
         autoFocus
         maxLength={30}
         onChangeText={setUsername}

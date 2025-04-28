@@ -5,7 +5,7 @@ import { type MaxInt, type SavedTrack } from '@spotify/web-api-ts-sdk'
 import { useSpotifyApi } from './useSpotifyApi'
 
 export const useSavedTracks = (baseLimit?: MaxInt<50>) => {
-  const { loading: loadingToken, useApi } = useSpotifyApi()
+  const { loading: loadingToken, spotifyApi } = useSpotifyApi()
   const [tracks, setTracks] = useState<SavedTrack[]>()
   const [loading, setLoading] = useState(loadingToken)
 
@@ -13,7 +13,7 @@ export const useSavedTracks = (baseLimit?: MaxInt<50>) => {
     async (limit?: MaxInt<50>, offset?: number) => {
       setLoading(true)
       try {
-        const likedTracks = await useApi?.currentUser.tracks.savedTracks(limit, offset)
+        const likedTracks = await spotifyApi?.currentUser.tracks.savedTracks(limit, offset)
         setTracks(likedTracks?.items)
       } catch (error) {
         console.error('Error fetching currently played tracks:', error)
@@ -21,7 +21,7 @@ export const useSavedTracks = (baseLimit?: MaxInt<50>) => {
         setLoading(false)
       }
     },
-    [useApi],
+    [spotifyApi],
   )
 
   const refreshSavedTracks = useCallback(async () => {
@@ -32,7 +32,7 @@ export const useSavedTracks = (baseLimit?: MaxInt<50>) => {
 
   useEffect(() => {
     refreshSavedTracks()
-  }, [fetchSavedTracks])
+  }, [])
 
   return { fetchSavedTracks, loading, refreshSavedTracks, setTracks, tracks }
 }

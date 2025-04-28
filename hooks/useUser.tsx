@@ -1,6 +1,8 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useReducer } from 'react'
 
 import { type User as AuthUser } from '@supabase/supabase-js'
+
+import { isEqual } from 'lodash'
 
 import { type User } from '../models'
 import { client } from '../supabase'
@@ -9,6 +11,19 @@ type LoginInput = {
   email: string
   password: string
 }
+
+type State = {
+  error: null | string
+  isLoggedIn: boolean
+  loading: boolean
+  user: null | User
+}
+
+type Action =
+  | { payload: boolean; type: 'SET_LOADING' }
+  | { payload: null | string; type: 'SET_ERROR' }
+  | { payload: null | User; type: 'SET_USER' }
+  | { type: 'CLEAR_USER' }
 
 type UserContextType = {
   error: null | string
@@ -22,30 +37,59 @@ type UserContextType = {
 
 const UserContext = createContext<undefined | UserContextType>(undefined)
 
-export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<null | User>(null)
-  const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<null | string>(null)
+const initialState: State = {
+  error: null,
+  isLoggedIn: false,
+  loading: true,
+  user: null,
+}
 
-  const checkIfUserExists = async (authUser: AuthUser) => {
-    setLoading(true)
-    const { data, error: authError } = await client.from('users').select('*').eq('auth_id', authUser.id).single<User>()
-
-    if (authError) {
-      if (authError.code !== 'PGRST116') {
-        setError(authError.message)
-      }
-    } else {
-      setUser(data)
-    }
-
-    setLoading(false)
+const reducer = (state: State, action: Action): State => {
+  switch (action.type) {
+    case 'CLEAR_USER':
+      return { ...state, error: null, isLoggedIn: false, user: null }
+    case 'SET_ERROR':
+      return { ...state, error: action.payload }
+    case 'SET_LOADING':
+      return { ...state, loading: action.payload }
+    case 'SET_USER':
+      return { ...state, error: null, isLoggedIn: true, user: action.payload }
+    default:
+      return state
   }
+}
 
-  useEffect(() => {
-    setLoading(true)
-    const getUser = async () => {
+export const UserProvider = ({ children }: { children: React.ReactNode }) => {
+  const [state, dispatch] = useReducer(reducer, initialState)
+
+  const checkIfUserExists = useCallback(
+    async (authUser: AuthUser) => {
+      try {
+        const { data, error } = await client.from('users').select('*').eq('auth_id', authUser.id).single<User>()
+
+        if (error) {
+          if (error.code !== 'PGRST116') {
+            throw new Error(error.message)
+          }
+
+          dispatch({ type: 'CLEAR_USER' })
+          return
+        }
+
+        const payload = isEqual(state.user, data) ? state.user : data
+        dispatch({ payload, type: 'SET_USER' })
+      } catch (err) {
+        dispatch({ payload: err instanceof Error ? err.message : 'Erreur utilisateur', type: 'SET_ERROR' })
+        dispatch({ type: 'CLEAR_USER' })
+      }
+    },
+    [state.user],
+  )
+
+  const init = useCallback(async () => {
+    dispatch({ payload: true, type: 'SET_LOADING' })
+
+    try {
       const {
         data: { session },
       } = await client.auth.getSession()
@@ -53,74 +97,85 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       if (session?.user) {
         await checkIfUserExists(session.user)
       } else {
-        setUser(null)
+        dispatch({ type: 'CLEAR_USER' })
       }
-
-      setLoading(false)
+    } catch {
+      dispatch({ payload: 'Erreur de session', type: 'SET_ERROR' })
+    } finally {
+      dispatch({ payload: false, type: 'SET_LOADING' })
     }
+  }, [checkIfUserExists])
 
-    getUser()
+  useEffect(() => {
+    let isMounted = true
+
+    init()
 
     const { data: listener } = client.auth.onAuthStateChange(async (_event, session) => {
-      setLoading(true)
-      if (session?.user) {
-        setIsLoggedIn(true)
-        await checkIfUserExists(session.user)
-      } else {
-        setIsLoggedIn(false)
-        setUser(null)
+      if (!isMounted) {
+        return
       }
 
-      setLoading(false)
+      if (session?.user) {
+        await checkIfUserExists(session.user)
+      } else {
+        dispatch({ type: 'CLEAR_USER' })
+      }
     })
 
     return () => {
+      isMounted = false
       listener?.subscription.unsubscribe()
+    }
+  }, [checkIfUserExists, init])
+
+  const login = useCallback(
+    async (input: LoginInput) => {
+      dispatch({ payload: true, type: 'SET_LOADING' })
+      try {
+        const { error } = await client.auth.signInWithPassword(input)
+        if (error) {
+          throw new Error(error.message)
+        }
+
+        await init()
+      } catch (err) {
+        dispatch({ payload: err instanceof Error ? err.message : 'Erreur connexion', type: 'SET_ERROR' })
+      } finally {
+        dispatch({ payload: false, type: 'SET_LOADING' })
+      }
+    },
+    [init],
+  )
+
+  const logout = useCallback(async () => {
+    dispatch({ payload: true, type: 'SET_LOADING' })
+
+    try {
+      await client.auth.signOut()
+      dispatch({ type: 'CLEAR_USER' })
+    } catch {
+      dispatch({ payload: 'Erreur de déconnexion', type: 'SET_ERROR' })
+    } finally {
+      dispatch({ payload: false, type: 'SET_LOADING' })
     }
   }, [])
 
   const refetchUser = useCallback(async () => {
-    setLoading(true)
-    const {
-      data: { session },
-    } = await client.auth.getSession()
-
-    if (session?.user) {
-      await checkIfUserExists(session.user)
-    }
-
-    setLoading(false)
-  }, [])
-
-  const login = useCallback(async (input: LoginInput) => {
-    try {
-      setLoading(true)
-      const { error: authError } = await client.auth.signInWithPassword(input)
-
-      if (authError) {
-        setError(authError.message)
-      } else {
-        setError(null)
-      }
-    } catch {
-      setError('Une erreur est survenue')
-    }
-
-    setLoading(false)
-  }, [])
-
-  // Logout function
-  const logout = useCallback(async () => {
-    setLoading(true)
-    await client.auth.signOut()
-    setUser(null)
-    setIsLoggedIn(false)
-    setLoading(false)
-  }, [])
+    await init()
+  }, [init])
 
   const value = useMemo(
-    () => ({ error, isLoggedIn, loading, login, logout, refetchUser, user }),
-    [error, isLoggedIn, loading, login, logout, refetchUser, user],
+    () => ({
+      error: state.error,
+      isLoggedIn: state.isLoggedIn,
+      loading: state.loading,
+      login,
+      logout,
+      refetchUser,
+      user: state.user,
+    }),
+    [login, logout, refetchUser, state],
   )
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>
@@ -128,8 +183,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useUser = () => {
   const context = useContext(UserContext)
-
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useUser must be used within a UserProvider')
   }
 

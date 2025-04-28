@@ -1,6 +1,5 @@
 import { useMemo, useRef } from 'react'
 import { StyleSheet } from 'react-native'
-import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
 
@@ -13,23 +12,21 @@ export const Drawer = () => {
   const bottomSheetRef = useRef<BottomSheet>(null)
 
   return (
-    <GestureHandlerRootView style={styles.container}>
-      <BottomSheet
-        backgroundStyle={styles.background}
-        enableDynamicSizing={false}
-        handleIndicatorStyle={styles.onHandleIndicator}
-        index={1}
-        ref={bottomSheetRef}
-        snapPoints={snapPoints}
-      >
-        <BottomSheetView style={styles.bottomSheetContainer}>
-          <Title style={styles.sectionTitle} size="large">
-            Faire découvrir un son
-          </Title>
-          <AllTracks />
-        </BottomSheetView>
-      </BottomSheet>
-    </GestureHandlerRootView>
+    <BottomSheet
+      backgroundStyle={styles.background}
+      enableDynamicSizing={false}
+      handleIndicatorStyle={styles.onHandleIndicator}
+      index={1}
+      ref={bottomSheetRef}
+      snapPoints={snapPoints}
+    >
+      <BottomSheetView style={styles.bottomSheetContainer}>
+        <Title size="large" style={styles.sectionTitle}>
+          Faire découvrir un son
+        </Title>
+        <AllTracks />
+      </BottomSheetView>
+    </BottomSheet>
   )
 }
 
@@ -40,9 +37,6 @@ const styles = StyleSheet.create({
     borderRadius: '6%',
   },
   bottomSheetContainer: {
-    flex: 1,
-  },
-  container: {
     flex: 1,
   },
   // eslint-disable-next-line react-native/no-color-literals

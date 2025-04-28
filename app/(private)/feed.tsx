@@ -1,13 +1,32 @@
-import { ActivityIndicator, ScrollView, StyleSheet } from 'react-native'
+import { UserPlus } from 'lucide-react-native'
+import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-import { useSpotifyApi } from '../../hooks'
+import { router } from 'expo-router'
+
+import { useRecentTracks, useSpotifyApi, useUser } from '../../hooks'
+import { type User } from '../../models'
 import { Drawer } from '../../src'
-import { RecentTracks } from '../../src/components/Drawer/Header/RecentTracks'
-import { Text } from '../../src/system'
+import { Track } from '../../src/components/Drawer/Header/Track'
+import { Avatar, IconButton } from '../../src/system'
+import { theme } from '../../src/theme'
+
+const Header = ({ user }: { user: User }) => (
+  <View style={styles.header}>
+    <Avatar avatar={user.avatar_url} />
+    <IconButton Icon={UserPlus} onPress={() => router.push('/search-users')} size="sm" variant="tertiary" />
+  </View>
+)
 
 const Feed = () => {
   const { loading } = useSpotifyApi()
+  const { tracks } = useRecentTracks(50)
+  const { user } = useUser()
+
+  if (!user) {
+    return null
+  }
 
   if (loading) {
     return <ActivityIndicator size="large" />
@@ -15,32 +34,36 @@ const Feed = () => {
 
   return (
     <SafeAreaView edges={['top']} style={styles.container}>
-      <ScrollView style={styles.content}>
-        <RecentTracks />
-        <Text>BOILER PLATE</Text>
-        <RecentTracks />
-        <RecentTracks />
-        <RecentTracks />
-        <RecentTracks />
-        <RecentTracks />
-        <RecentTracks />
-        <RecentTracks />
-      </ScrollView>
-      <Drawer />
+      <GestureHandlerRootView>
+        <View style={styles.listContainer}>
+          <FlatList
+            data={tracks}
+            keyExtractor={(item) => `${item.track.id}-${item.played_at}`}
+            ListHeaderComponent={<Header user={user} />}
+            renderItem={({ item }) => <Track {...item.track} />}
+            stickyHeaderIndices={[0]}
+          />
+        </View>
+        <Drawer />
+      </GestureHandlerRootView>
     </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: theme.surface.base.default,
     flex: 1,
   },
-  content: {
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
-    right: 0,
-    top: 0,
+  header: {
+    backgroundColor: theme.surface.base.default,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: theme.spacing[400],
+    paddingVertical: theme.spacing[100],
+  },
+  listContainer: {
+    flex: 1,
   },
 })
 

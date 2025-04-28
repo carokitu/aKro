@@ -1,6 +1,9 @@
-import { Redirect, Slot } from 'expo-router'
+import { StatusBar } from 'react-native'
+
+import { Redirect, Stack } from 'expo-router'
 
 import { useSpotifyAuth, useUser } from '../../hooks'
+import { theme } from '../../src/theme'
 
 export const PrivateLayout = () => {
   const { user } = useUser()
@@ -10,7 +13,15 @@ export const PrivateLayout = () => {
     return <Redirect href="/(public)" />
   }
 
-  return <Slot />
+  return (
+    <>
+      <StatusBar backgroundColor={theme.surface.base.default} barStyle="dark-content" />
+      <Stack>
+        <Stack.Screen name="feed" options={{ headerShown: false }} />
+        <Stack.Screen name="search-users" options={{ headerShown: false }} />
+      </Stack>
+    </>
+  )
 }
 
 export default PrivateLayout

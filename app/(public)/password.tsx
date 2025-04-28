@@ -23,7 +23,7 @@ const Password = () => {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<null | string>(null)
   const [showPassword, setShowPassword] = useState(false)
-  const [hasAccount, setHasAccount] = useState(true)
+  const [hasAccount, setHasAccount] = useState(false)
 
   const { email } = useLocalSearchParams<{ email: string }>()
 
@@ -109,7 +109,10 @@ const Password = () => {
         )}
       </View>
       <Button
-        onPress={() => setHasAccount(!hasAccount)}
+        onPress={() => {
+          setError(null)
+          setHasAccount(!hasAccount)
+        }}
         size="sm"
         title={hasAccount ? 'Pas encore de compte ?' : 'Tu as déjà un compte ?'}
         variant="tertiary"

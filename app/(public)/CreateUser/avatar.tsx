@@ -1,6 +1,7 @@
 import { CircleX, ImageUp } from 'lucide-react-native'
 import { useCallback, useState } from 'react'
 import {
+  ActivityIndicator,
   Image,
   Keyboard,
   SafeAreaView,
@@ -11,11 +12,14 @@ import {
   View,
 } from 'react-native'
 
+import { decode } from 'base64-arraybuffer'
+import * as FileSystem from 'expo-file-system'
 import * as ImagePicker from 'expo-image-picker'
 
 import { useUserRegistration } from '../../../hooks'
 import { Button, H1, Label, Text } from '../../../src/system'
 import { theme } from '../../../src/theme'
+import { client } from '../../../supabase'
 
 const MAX_LINES = 4
 const MAX_BIO_LENGTH = 150
@@ -24,9 +28,11 @@ const handleDismiss = () => Keyboard.dismiss()
 
 const Avatar = () => {
   const [avatarUrl, setAvatarUrl] = useState<null | string>(null)
+  const [uploading, setUploading] = useState(false)
+  const [localAvatarUri, setLocalAvatarUri] = useState<null | string>(null)
   const [bio, setBio] = useState<string>('')
   const [error, setError] = useState<null | string>(null)
-  const { createUser } = useUserRegistration()
+  const { createUser, userData } = useUserRegistration()
 
   const handleImagePermissions = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
@@ -46,16 +52,34 @@ const Avatar = () => {
       return
     }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      aspect: [1, 1],
-    })
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        allowsEditing: true,
+        aspect: [1, 1],
+      })
 
-    if (!result.canceled && result.assets.length > 0) {
-      setAvatarUrl(result.assets[0].uri)
-      setError(null)
+      if (!result.canceled && result.assets.length > 0) {
+        setLocalAvatarUri(result.assets[0].uri)
+        setError(null)
+        setUploading(true)
+
+        const img = result.assets[0]
+
+        if (img.type === 'image') {
+          const base64 = await FileSystem.readAsStringAsync(img.uri, { encoding: 'base64' })
+          const filePath = `${userData.username}_${Date.now()}.png`
+          await client.storage.from('avatars').upload(filePath, decode(base64), { contentType: 'image/png' })
+          setAvatarUrl(filePath)
+        } else {
+          setError("Le format de l'image n'est pas supporté.")
+        }
+
+        setUploading(false)
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Échec de la sélection de l'image.")
     }
-  }, [])
+  }, [userData.username])
 
   const handleBioChange = (text: string) => {
     const lineCount = text.split('\n').length
@@ -80,16 +104,14 @@ const Avatar = () => {
     <TouchableWithoutFeedback onPress={handleDismiss}>
       <SafeAreaView style={styles.container}>
         <H1 style={styles.title}>Pimpe ton profil</H1>
-        <TouchableOpacity onPress={pickImage} style={styles.optionContainer}>
+        <TouchableOpacity disabled={uploading} onPress={pickImage} style={styles.optionContainer}>
           <View style={styles.avatarContainer}>
-            {avatarUrl ? (
-              <Image source={{ uri: avatarUrl }} style={styles.avatarImage} />
-            ) : (
-              <ImageUp color={theme.text.base.default} size={40} />
-            )}
+            {uploading && <ActivityIndicator color={theme.colors.brand[700]} size="large" />}
+            {!uploading && localAvatarUri && <Image source={{ uri: localAvatarUri }} style={styles.avatarImage} />}
+            {!uploading && !localAvatarUri && <ImageUp color={theme.text.base.default} size={40} />}
           </View>
           <Label size="medium" style={styles.label}>
-            Choisir une photo
+            {uploading ? 'Upload en cours...' : 'Choisir une photo'}
           </Label>
         </TouchableOpacity>
         {error && (
@@ -112,7 +134,7 @@ const Avatar = () => {
           value={bio}
         />
         <View style={styles.buttonContainer}>
-          <Button fullWidth onPress={handleNext} size="lg" style={styles.button} title="Suivant" />
+          <Button disabled={uploading} fullWidth onPress={handleNext} size="lg" style={styles.button} title="Suivant" />
         </View>
       </SafeAreaView>
     </TouchableWithoutFeedback>

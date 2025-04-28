@@ -2,6 +2,8 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 
 import { type User as AuthUser } from '@supabase/supabase-js'
 
+import { isEqual } from 'lodash'
+
 import { type User } from '../models'
 import { client } from '../supabase'
 
@@ -25,111 +27,143 @@ const UserContext = createContext<undefined | UserContextType>(undefined)
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<null | User>(null)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<null | string>(null)
 
-  const checkIfUserExists = async (authUser: AuthUser) => {
-    setLoading(true)
-    const { data, error: authError } = await client.from('users').select('*').eq('auth_id', authUser.id).single<User>()
+  const checkIfUserExists = useCallback(async (authUser: AuthUser) => {
+    try {
+      const { data, error: fetchError } = await client
+        .from('users')
+        .select('*')
+        .eq('auth_id', authUser.id)
+        .single<User>()
 
-    if (authError) {
-      if (authError.code !== 'PGRST116') {
-        setError(authError.message)
-      }
-    } else {
-      setUser(data)
-    }
+      if (fetchError) {
+        if (fetchError.code !== 'PGRST116') {
+          throw new Error(fetchError.message)
+        }
 
-    setLoading(false)
-  }
-
-  useEffect(() => {
-    setLoading(true)
-    const getUser = async () => {
-      const {
-        data: { session },
-      } = await client.auth.getSession()
-
-      if (session?.user) {
-        await checkIfUserExists(session.user)
-      } else {
-        setUser(null)
+        return
       }
 
-      setLoading(false)
-    }
-
-    getUser()
-
-    const { data: listener } = client.auth.onAuthStateChange(async (_event, session) => {
-      setLoading(true)
-      if (session?.user) {
-        setIsLoggedIn(true)
-        await checkIfUserExists(session.user)
-      } else {
-        setIsLoggedIn(false)
-        setUser(null)
-      }
-
-      setLoading(false)
-    })
-
-    return () => {
-      listener?.subscription.unsubscribe()
+      setUser((prev) => (isEqual(prev, data) ? prev : data))
+      setIsLoggedIn(true)
+    } catch (err) {
+      console.error('checkIfUserExists error:', err)
+      setError(err instanceof Error ? err.message : 'Erreur lors de la récupération du user')
+      setUser(null)
+      setIsLoggedIn(false)
     }
   }, [])
 
+  useEffect(() => {
+    let isMounted = true
+
+    const init = async () => {
+      try {
+        const {
+          data: { session },
+        } = await client.auth.getSession()
+
+        if (!isMounted) {
+          return
+        }
+
+        if (session?.user) {
+          await checkIfUserExists(session.user)
+        } else {
+          setUser(null)
+          setIsLoggedIn(false)
+        }
+      } catch {
+        if (isMounted) {
+          setError("Erreur d'initialisation")
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false)
+        }
+      }
+    }
+
+    init()
+
+    const { data: listener } = client.auth.onAuthStateChange(async (_event, session) => {
+      if (!isMounted) {
+        return
+      }
+
+      if (session?.user) {
+        await checkIfUserExists(session.user)
+      } else {
+        setUser(null)
+        setIsLoggedIn(false)
+      }
+    })
+
+    return () => {
+      isMounted = false
+      listener?.subscription.unsubscribe()
+    }
+  }, [checkIfUserExists])
+
   const refetchUser = useCallback(async () => {
-    setLoading(true)
     const {
       data: { session },
     } = await client.auth.getSession()
 
     if (session?.user) {
       await checkIfUserExists(session.user)
+    } else {
+      setUser(null)
+      setIsLoggedIn(false)
     }
+  }, [checkIfUserExists])
 
-    setLoading(false)
-  }, [])
-
-  const login = useCallback(async (input: LoginInput) => {
-    try {
+  const login = useCallback(
+    async (input: LoginInput) => {
       setLoading(true)
-      const { error: authError } = await client.auth.signInWithPassword(input)
+      try {
+        const { error: authError } = await client.auth.signInWithPassword(input)
+        if (authError) {
+          throw new Error(authError.message)
+        }
 
-      if (authError) {
-        setError(authError.message)
-      } else {
+        await refetchUser()
         setError(null)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Erreur lors de la connexion')
+      } finally {
+        setLoading(false)
       }
-    } catch {
-      setError('Une erreur est survenue')
-    }
+    },
+    [refetchUser],
+  )
 
-    setLoading(false)
-  }, [])
-
-  // Logout function
   const logout = useCallback(async () => {
     setLoading(true)
-    await client.auth.signOut()
-    setUser(null)
-    setIsLoggedIn(false)
-    setLoading(false)
+    try {
+      await client.auth.signOut()
+      setUser(null)
+      setIsLoggedIn(false)
+    } catch (err) {
+      console.error('logout error:', err)
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
-  const value = useMemo(
+  const contextValue = useMemo(
     () => ({ error, isLoggedIn, loading, login, logout, refetchUser, user }),
     [error, isLoggedIn, loading, login, logout, refetchUser, user],
   )
 
-  return <UserContext.Provider value={value}>{children}</UserContext.Provider>
+  return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>
 }
 
 export const useUser = () => {
   const context = useContext(UserContext)
-
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useUser must be used within a UserProvider')
   }
 

@@ -4,7 +4,8 @@ import { type MaxInt, type PlayHistory } from '@spotify/web-api-ts-sdk'
 
 import { useSpotifyApi } from './useSpotifyApi'
 
-const REFRESH_INTERVAL = 5000 // 5 seconds
+// const REFRESH_INTERVAL = 5000 // 5 seconds
+const REFRESH_INTERVAL = 50_000 // 5 seconds
 
 export const useRecentTracks = (limit?: MaxInt<50>) => {
   const { loading: loadingToken, useApi } = useSpotifyApi()

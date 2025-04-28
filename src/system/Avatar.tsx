@@ -1,7 +1,8 @@
 import { User } from 'lucide-react-native'
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { Image, type StyleProp, StyleSheet, View, type ViewStyle } from 'react-native'
 
+import { client } from '../../supabase'
 import { theme } from '../theme'
 
 type Props = {
@@ -27,8 +28,30 @@ const SIZE_STYLES = {
 
 export const Avatar = ({ avatar, size = 'md', style }: Props) => {
   const [error, setError] = useState(false)
+  const [image, setImage] = useState<null | string>(null)
 
-  if (!avatar || error) {
+  const loadAvatar = useCallback(async () => {
+    if (!avatar) {
+      return
+    }
+
+    const { data, error: downloadError } = await client.storage.from('avatars').download(avatar)
+    if (data) {
+      const fr = new FileReader()
+      fr.readAsDataURL(data)
+      fr.onload = () => {
+        setImage(fr.result as string)
+      }
+    } else if (downloadError) {
+      setError(true)
+    }
+  }, [avatar])
+
+  useEffect(() => {
+    loadAvatar()
+  }, [loadAvatar])
+
+  if (!image || error) {
     return (
       <View style={[styles.iconContainer, SIZE_STYLES[size], style]}>
         <User color={theme.colors.neutral['50']} style={styles.icon} />
@@ -38,7 +61,14 @@ export const Avatar = ({ avatar, size = 'md', style }: Props) => {
 
   return (
     <View style={[styles.avatarContainer, SIZE_STYLES[size], style]}>
-      <Image onError={() => setError(true)} resizeMode="cover" source={{ uri: avatar }} style={styles.avatar} />
+      <Image
+        onError={() => {
+          setError(true)
+        }}
+        resizeMode="cover"
+        source={{ uri: image }}
+        style={styles.avatar}
+      />
     </View>
   )
 }

@@ -6,29 +6,27 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { router } from 'expo-router'
 
 import { useRecentTracks, useSpotifyApi, useUser } from '../../hooks'
+import { type User } from '../../models'
 import { Drawer } from '../../src'
 import { Track } from '../../src/components/Drawer/Header/Track'
 import { Avatar, IconButton } from '../../src/system'
 import { theme } from '../../src/theme'
 
-const Header = () => {
+const Header = ({ user }: { user: User }) => (
+  <View style={styles.header}>
+    <Avatar avatar={user.avatar_url} />
+    <IconButton Icon={UserPlus} onPress={() => router.push('/search-users')} size="sm" variant="tertiary" />
+  </View>
+)
+
+const Feed = () => {
+  const { loading } = useSpotifyApi()
+  const { tracks } = useRecentTracks(50)
   const { user } = useUser()
 
   if (!user) {
     return null
   }
-
-  return (
-    <View style={styles.header}>
-      <Avatar avatar={user?.avatar_url} />
-      <IconButton Icon={UserPlus} onPress={() => router.push('/search-users')} size="sm" variant="tertiary" />
-    </View>
-  )
-}
-
-const Feed = () => {
-  const { loading } = useSpotifyApi()
-  const { tracks } = useRecentTracks(50)
 
   if (loading) {
     return <ActivityIndicator size="large" />
@@ -41,7 +39,7 @@ const Feed = () => {
           <FlatList
             data={tracks}
             keyExtractor={(item) => `${item.track.id}-${item.played_at}`}
-            ListHeaderComponent={<Header />}
+            ListHeaderComponent={<Header user={user} />}
             renderItem={({ item }) => <Track {...item.track} />}
             stickyHeaderIndices={[0]}
           />

@@ -140,7 +140,7 @@ const UserList = ({ query }: UserListProps) => {
   }
 
   const renderItem = ({ item }: { item: UserWithStats }) => (
-    <TouchableOpacity style={styles.userCard}>
+    <TouchableOpacity onPress={() => Keyboard.dismiss()} style={styles.userCard}>
       <View style={styles.userCardContent}>
         <Avatar avatar={item.avatar_url} size="lg" />
         <View style={styles.info}>
@@ -154,9 +154,8 @@ const UserList = ({ query }: UserListProps) => {
         <Button
           disabled={followLoading === item.id}
           onPress={() => {
-            console.log('onPress')
-            Keyboard.dismiss()
             handleUnfollow(item.id)
+            Keyboard.dismiss()
           }}
           size="sm"
           title="Ne plus suivre"
@@ -166,9 +165,8 @@ const UserList = ({ query }: UserListProps) => {
         <Button
           disabled={followLoading === item.id}
           onPress={() => {
-            console.log('onPress')
-            Keyboard.dismiss()
             handleFollow(item.id)
+            Keyboard.dismiss()
           }}
           size="sm"
           title="Suivre"
@@ -180,6 +178,7 @@ const UserList = ({ query }: UserListProps) => {
   return (
     <FlatList
       data={results}
+      keyboardShouldPersistTaps="handled"
       keyExtractor={(item) => item.id}
       ListEmptyComponent={loading ? null : <Text style={styles.emptyText}>Aucun utilisateur trouvé</Text>}
       renderItem={renderItem}
@@ -206,7 +205,7 @@ const SearchUsers = () => {
 
   return (
     <TouchableWithoutFeedback accessible={false} onPress={() => Keyboard.dismiss()}>
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView pointerEvents="box-none" style={styles.container}>
         <View style={styles.header}>
           <H1>Ajoute des amis</H1>
           <Label color="tertiary" size="large">

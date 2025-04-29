@@ -1,5 +1,5 @@
 import { useCurrentTrack } from '../../../../hooks'
-import { Track } from './Track'
+import { Track } from '../Track'
 
 export const CurrentTrack = () => {
   const { currentTrack } = useCurrentTrack()

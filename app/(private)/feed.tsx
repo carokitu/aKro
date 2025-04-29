@@ -9,7 +9,7 @@ import { router } from 'expo-router'
 import { useRecentTracks, useSpotifyApi, useUser } from '../../hooks'
 import { type User } from '../../models'
 import { Drawer } from '../../src'
-import { Track } from '../../src/components/Drawer/Header/Track'
+import { Track } from '../../src/components/Drawer/Track'
 import { Avatar, IconButton } from '../../src/system'
 import { theme } from '../../src/theme'
 

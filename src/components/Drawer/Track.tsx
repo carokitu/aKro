@@ -3,9 +3,9 @@ import { Image, type StyleProp, StyleSheet, View, type ViewStyle } from 'react-n
 
 import { type Track as TTrack } from '@spotify/web-api-ts-sdk'
 
-import { Label } from '../../../system'
-import { theme } from '../../../theme'
-import { padding, spacing } from '../../../theme/spacing'
+import { Label } from '../../system'
+import { theme } from '../../theme'
+import { padding, spacing } from '../../theme/spacing'
 
 type Props = {
   current?: boolean

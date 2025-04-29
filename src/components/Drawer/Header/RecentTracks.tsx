@@ -4,7 +4,7 @@ import { StyleSheet, View } from 'react-native'
 import { useRecentTracks } from '../../../../hooks'
 import { Label } from '../../../system'
 import { theme } from '../../../theme'
-import { Track } from './Track'
+import { Track } from '../Track'
 
 export const RecentTracks = () => {
   const { tracks } = useRecentTracks(5)

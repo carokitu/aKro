@@ -1,15 +1,26 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { StyleSheet } from 'react-native'
+import { ActivityIndicator, StyleSheet, View } from 'react-native'
 
-import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
+import BottomSheet, { BottomSheetFlatList, BottomSheetView } from '@gorhom/bottom-sheet'
+import { type SavedTrack } from '@spotify/web-api-ts-sdk'
 
 import { useSavedTracks } from '../../../hooks'
-import { Title } from '../../system'
+import { Text, Title } from '../../system'
 import { theme } from '../../theme'
 import { padding } from '../../theme/spacing'
-import { AllTracks } from './AllTracks'
+import { Header } from './Header'
+import { Track } from './Track'
 
 const INDEX_ON_INIT = 1
+const ITEMS_PER_PAGE = 50
+
+const LoadingFooter = () => <ActivityIndicator size="large" />
+
+const EmptyComponent = () => (
+  <View style={styles.emptyContainer}>
+    <Text color="tertiary">Aucune piste disponible</Text>
+  </View>
+)
 
 export const Drawer = ({
   closeDrawer,
@@ -19,13 +30,12 @@ export const Drawer = ({
   setCloseDrawer: (value: boolean) => void
 }) => {
   const [currentSnapIndex, setCurrentSnapIndex] = useState(INDEX_ON_INIT)
+  const { loading, loadMore, refresh, refreshing, tracks } = useSavedTracks(ITEMS_PER_PAGE)
   const snapPoints = useMemo(() => ['10%', '40%', '100%'], [])
   const bottomSheetRef = useRef<BottomSheet>(null)
-  const { refresh } = useSavedTracks()
 
   const handleChange = useCallback(
     (index: number) => {
-      console.log('moooving', currentSnapIndex, index)
       if (currentSnapIndex === 0 && index > 0) {
         refresh()
       }
@@ -42,6 +52,13 @@ export const Drawer = ({
     }
   }, [closeDrawer, setCloseDrawer])
 
+  const renderItem = ({ index, item }: { index: number; item: SavedTrack }) => {
+    const isFirst = index === 0
+    const isLast = index === tracks.length - 1
+
+    return <Track isFirst={isFirst} isLast={isLast} track={item.track} />
+  }
+
   return (
     <BottomSheet
       backgroundStyle={styles.background}
@@ -56,7 +73,18 @@ export const Drawer = ({
         <Title size="large" style={styles.sectionTitle}>
           Faire découvrir un son
         </Title>
-        <AllTracks />
+        <BottomSheetFlatList
+          data={tracks}
+          keyExtractor={(item) => item.track.id}
+          ListEmptyComponent={loading ? null : EmptyComponent}
+          ListFooterComponent={loading ? <LoadingFooter /> : null}
+          ListHeaderComponent={<Header />}
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.8}
+          onRefresh={refresh}
+          refreshing={refreshing}
+          renderItem={renderItem}
+        />
       </BottomSheetView>
     </BottomSheet>
   )
@@ -69,6 +97,9 @@ const styles = StyleSheet.create({
   },
   bottomSheetContainer: {
     flex: 1,
+  },
+  emptyContainer: {
+    alignItems: 'center',
   },
   onHandleIndicator: {
     backgroundColor: theme.surface.base.secondaryPressed,

@@ -4,35 +4,65 @@ import { type MaxInt, type SavedTrack } from '@spotify/web-api-ts-sdk'
 
 import { useSpotifyApi } from './useSpotifyApi'
 
-export const useSavedTracks = (baseLimit?: MaxInt<50>) => {
-  const { loading: loadingToken, spotifyApi } = useSpotifyApi()
-  const [tracks, setTracks] = useState<SavedTrack[]>()
-  const [loading, setLoading] = useState(loadingToken)
+const DEFAULT_PAGE_SIZE: MaxInt<50> = 50
 
-  const fetchSavedTracks = useCallback(
-    async (limit?: MaxInt<50>, offset?: number) => {
-      setLoading(true)
+export const useSavedTracks = (baseLimit: MaxInt<50> = DEFAULT_PAGE_SIZE) => {
+  const { loading: loadingToken, spotifyApi } = useSpotifyApi()
+  const [tracks, setTracks] = useState<SavedTrack[]>([])
+  const [offset, setOffset] = useState(0)
+  const [loading, setLoading] = useState(loadingToken)
+  const [refreshing, setIsRefreshing] = useState(false)
+
+  const loadTracks = useCallback(
+    async (offsetToUse: number) => {
+      if (!spotifyApi) {
+        return []
+      }
+
       try {
-        const likedTracks = await spotifyApi?.currentUser.tracks.savedTracks(limit, offset)
-        setTracks(likedTracks?.items)
+        const { items } = await spotifyApi.currentUser.tracks.savedTracks(baseLimit, offsetToUse)
+        return items
       } catch (error) {
-        console.error('Error fetching currently played tracks:', error)
-      } finally {
-        setLoading(false)
+        console.error('Error fetching saved tracks:', error)
+        return []
       }
     },
-    [spotifyApi],
+    [spotifyApi, baseLimit],
   )
 
-  const refreshSavedTracks = useCallback(async () => {
+  const refresh = useCallback(async () => {
     setLoading(true)
-    await fetchSavedTracks(baseLimit)
+    setIsRefreshing(true)
+
+    const fresh = await loadTracks(0)
+    setTracks(fresh)
+    setOffset(baseLimit)
+
     setLoading(false)
-  }, [fetchSavedTracks, baseLimit])
+    setIsRefreshing(false)
+  }, [loadTracks, baseLimit])
+
+  const loadMore = useCallback(async () => {
+    if (loading || !spotifyApi) {
+      return
+    }
+
+    setLoading(true)
+    const more = await loadTracks(offset)
+
+    const existingIds = new Set(tracks.map((t) => t.track.id))
+    const newTracks = more.filter((t) => !existingIds.has(t.track.id))
+
+    setTracks((prev) => [...prev, ...newTracks])
+    setOffset((prev) => prev + baseLimit)
+    setLoading(false)
+  }, [loadTracks, offset, baseLimit, loading, tracks, spotifyApi])
 
   useEffect(() => {
-    refreshSavedTracks()
-  }, [])
+    if (spotifyApi) {
+      refresh()
+    }
+  }, [spotifyApi, refresh])
 
-  return { fetchSavedTracks, loading, refreshSavedTracks, setTracks, tracks }
+  return { loading, loadMore, refresh, refreshing, tracks }
 }

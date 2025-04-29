@@ -1,22 +1,71 @@
-import { useMemo, useRef } from 'react'
-import { StyleSheet } from 'react-native'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { ActivityIndicator, StyleSheet, View } from 'react-native'
 
-import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
+import BottomSheet, { BottomSheetFlatList, BottomSheetView } from '@gorhom/bottom-sheet'
+import { type SavedTrack } from '@spotify/web-api-ts-sdk'
 
-import { Title } from '../../system'
+import { useSavedTracks } from '../../../hooks'
+import { Text, Title } from '../../system'
+import { theme } from '../../theme'
 import { padding } from '../../theme/spacing'
-import { AllTracks } from './AllTracks'
+import { Header } from './Header'
+import { Track } from './Track'
 
-export const Drawer = () => {
+const INDEX_ON_INIT = 1
+const ITEMS_PER_PAGE = 50
+
+const LoadingFooter = () => <ActivityIndicator size="large" />
+
+const EmptyComponent = () => (
+  <View style={styles.emptyContainer}>
+    <Text color="tertiary">Aucune piste disponible</Text>
+  </View>
+)
+
+export const Drawer = ({
+  closeDrawer,
+  setCloseDrawer,
+}: {
+  closeDrawer: boolean
+  setCloseDrawer: (value: boolean) => void
+}) => {
+  const [currentSnapIndex, setCurrentSnapIndex] = useState(INDEX_ON_INIT)
+  const { loading, loadMore, refresh, refreshing, tracks } = useSavedTracks(ITEMS_PER_PAGE)
   const snapPoints = useMemo(() => ['10%', '40%', '100%'], [])
   const bottomSheetRef = useRef<BottomSheet>(null)
+
+  const handleChange = useCallback(
+    (index: number) => {
+      if (currentSnapIndex === 0 && index > 0) {
+        refresh()
+      }
+
+      setCurrentSnapIndex(index)
+    },
+    [currentSnapIndex, refresh],
+  )
+
+  useEffect(() => {
+    if (closeDrawer) {
+      bottomSheetRef.current?.snapToIndex(0)
+      setCloseDrawer(false)
+    }
+  }, [closeDrawer, setCloseDrawer])
+
+  const renderItem = ({ index, item }: { index: number; item: SavedTrack }) => {
+    const isFirst = index === 0
+    const isLast = index === tracks.length - 1
+
+    return <Track isFirst={isFirst} isLast={isLast} track={item.track} />
+  }
 
   return (
     <BottomSheet
       backgroundStyle={styles.background}
       enableDynamicSizing={false}
       handleIndicatorStyle={styles.onHandleIndicator}
-      index={1}
+      index={INDEX_ON_INIT}
+      onChange={handleChange}
       ref={bottomSheetRef}
       snapPoints={snapPoints}
     >
@@ -24,24 +73,36 @@ export const Drawer = () => {
         <Title size="large" style={styles.sectionTitle}>
           Faire découvrir un son
         </Title>
-        <AllTracks />
+        <BottomSheetFlatList
+          data={tracks}
+          keyExtractor={(item) => item.track.id}
+          ListEmptyComponent={loading ? null : EmptyComponent}
+          ListFooterComponent={loading ? <LoadingFooter /> : null}
+          ListHeaderComponent={<Header />}
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.8}
+          onRefresh={refresh}
+          refreshing={refreshing}
+          renderItem={renderItem}
+        />
       </BottomSheetView>
     </BottomSheet>
   )
 }
 
 const styles = StyleSheet.create({
-  // eslint-disable-next-line react-native/no-color-literals
   background: {
-    backgroundColor: '#EDECE7',
-    borderRadius: '6%',
+    backgroundColor: theme.surface.base.secondary,
+    borderRadius: theme.radius.large,
   },
   bottomSheetContainer: {
     flex: 1,
   },
-  // eslint-disable-next-line react-native/no-color-literals
+  emptyContainer: {
+    alignItems: 'center',
+  },
   onHandleIndicator: {
-    backgroundColor: '#DEDED8',
+    backgroundColor: theme.surface.base.secondaryPressed,
     height: 7,
     width: 40,
   },

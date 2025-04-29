@@ -1,22 +1,54 @@
-import { useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { StyleSheet } from 'react-native'
 
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
 
+import { useSavedTracks } from '../../../hooks'
 import { Title } from '../../system'
+import { theme } from '../../theme'
 import { padding } from '../../theme/spacing'
 import { AllTracks } from './AllTracks'
 
-export const Drawer = () => {
+const INDEX_ON_INIT = 1
+
+export const Drawer = ({
+  closeDrawer,
+  setCloseDrawer,
+}: {
+  closeDrawer: boolean
+  setCloseDrawer: (value: boolean) => void
+}) => {
+  const [currentSnapIndex, setCurrentSnapIndex] = useState(INDEX_ON_INIT)
   const snapPoints = useMemo(() => ['10%', '40%', '100%'], [])
   const bottomSheetRef = useRef<BottomSheet>(null)
+  const { refresh } = useSavedTracks()
+
+  const handleChange = useCallback(
+    (index: number) => {
+      console.log('moooving', currentSnapIndex, index)
+      if (currentSnapIndex === 0 && index > 0) {
+        refresh()
+      }
+
+      setCurrentSnapIndex(index)
+    },
+    [currentSnapIndex, refresh],
+  )
+
+  useEffect(() => {
+    if (closeDrawer) {
+      bottomSheetRef.current?.snapToIndex(0)
+      setCloseDrawer(false)
+    }
+  }, [closeDrawer, setCloseDrawer])
 
   return (
     <BottomSheet
       backgroundStyle={styles.background}
       enableDynamicSizing={false}
       handleIndicatorStyle={styles.onHandleIndicator}
-      index={1}
+      index={INDEX_ON_INIT}
+      onChange={handleChange}
       ref={bottomSheetRef}
       snapPoints={snapPoints}
     >
@@ -31,17 +63,15 @@ export const Drawer = () => {
 }
 
 const styles = StyleSheet.create({
-  // eslint-disable-next-line react-native/no-color-literals
   background: {
-    backgroundColor: '#EDECE7',
-    borderRadius: '6%',
+    backgroundColor: theme.surface.base.secondary,
+    borderRadius: theme.radius.large,
   },
   bottomSheetContainer: {
     flex: 1,
   },
-  // eslint-disable-next-line react-native/no-color-literals
   onHandleIndicator: {
-    backgroundColor: '#DEDED8',
+    backgroundColor: theme.surface.base.secondaryPressed,
     height: 7,
     width: 40,
   },

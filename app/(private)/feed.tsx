@@ -1,4 +1,5 @@
 import { UserPlus } from 'lucide-react-native'
+import { useState } from 'react'
 import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -23,6 +24,7 @@ const Feed = () => {
   const { loading } = useSpotifyApi()
   const { tracks } = useRecentTracks(50)
   const { user } = useUser()
+  const [closeDrawer, setCloseDrawer] = useState(false)
 
   if (!user) {
     return null
@@ -40,11 +42,12 @@ const Feed = () => {
             data={tracks}
             keyExtractor={(item) => `${item.track.id}-${item.played_at}`}
             ListHeaderComponent={<Header user={user} />}
+            onScrollBeginDrag={() => setCloseDrawer(true)}
             renderItem={({ item }) => <Track track={item.track} />}
             stickyHeaderIndices={[0]}
           />
         </View>
-        <Drawer />
+        <Drawer closeDrawer={closeDrawer} setCloseDrawer={setCloseDrawer} />
       </GestureHandlerRootView>
     </SafeAreaView>
   )

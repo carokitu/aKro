@@ -40,7 +40,7 @@ const Feed = () => {
             data={tracks}
             keyExtractor={(item) => `${item.track.id}-${item.played_at}`}
             ListHeaderComponent={<Header user={user} />}
-            renderItem={({ item }) => <Track {...item.track} />}
+            renderItem={({ item }) => <Track track={item.track} />}
             stickyHeaderIndices={[0]}
           />
         </View>

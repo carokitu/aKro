@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { ActivityIndicator, FlatList } from 'react-native'
+import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native'
 
 import { type SavedTrack } from '@spotify/web-api-ts-sdk'
 
@@ -11,11 +11,29 @@ const ITEMS_PER_PAGE = 50
 
 const LoadingFooter = () => <ActivityIndicator size="small" />
 
+const EmptyComponent = () => (
+  <View style={styles.emptyContainer}>
+    <Text>Aucune piste disponible</Text>
+  </View>
+)
+
 export const AllTracks = () => {
   const [offset, setOffset] = useState(0)
-  const { fetchSavedTracks, loading, refreshSavedTracks, tracks: fetchedTracks } = useSavedTracks(ITEMS_PER_PAGE)
+  const { fetchSavedTracks, loading, tracks: fetchedTracks } = useSavedTracks(ITEMS_PER_PAGE)
   const [allTracks, setAllTracks] = useState<SavedTrack[]>([])
   const [refreshing, setRefreshing] = useState(false)
+
+  useEffect(() => {
+    if (fetchedTracks.length > 0) {
+      setAllTracks((prev) => [...prev, ...fetchedTracks])
+    }
+  }, [fetchedTracks])
+
+  useEffect(() => {
+    const fetch = async () => await fetchSavedTracks(ITEMS_PER_PAGE, 0)
+
+    fetch()
+  }, [fetchSavedTracks])
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true)
@@ -23,35 +41,29 @@ export const AllTracks = () => {
     setAllTracks([])
     setOffset(0)
 
-    await refreshSavedTracks()
+    await fetchSavedTracks()
 
     setRefreshing(false)
-  }, [refreshSavedTracks])
+  }, [fetchSavedTracks])
 
-  useEffect(() => {
-    if (fetchedTracks) {
-      setAllTracks((prev) => [...prev, ...fetchedTracks])
-    }
-  }, [fetchedTracks])
-
-  const handleLoadMore = () => {
-    if (!loading && fetchedTracks?.length) {
-      const nextOffset = offset + ITEMS_PER_PAGE
-      setOffset(nextOffset)
-      fetchSavedTracks(ITEMS_PER_PAGE, nextOffset)
-    }
+  const handleLoadMore = async () => {
+    const nextOffset = offset + ITEMS_PER_PAGE
+    setOffset(nextOffset)
+    await fetchSavedTracks(ITEMS_PER_PAGE, nextOffset)
   }
 
-  if (!fetchedTracks) {
-    return null
-  }
+  const renderItem = ({ index, item }: { index: number; item: SavedTrack }) => {
+    const isFirst = index === 0
+    const isLast = index === allTracks.length - 1
 
-  const renderItem = ({ item }: { item: SavedTrack }) => <Track {...item.track} />
+    return <Track isFirst={isFirst} isLast={isLast} track={item.track} />
+  }
 
   return (
     <FlatList
       data={allTracks}
-      keyExtractor={(item) => item.track.id}
+      keyExtractor={() => Math.random().toString()}
+      ListEmptyComponent={EmptyComponent}
       ListFooterComponent={loading ? <LoadingFooter /> : null}
       ListHeaderComponent={<Header />}
       onEndReached={handleLoadMore}
@@ -62,3 +74,10 @@ export const AllTracks = () => {
     />
   )
 }
+
+const styles = StyleSheet.create({
+  emptyContainer: {
+    alignItems: 'center',
+    padding: 20,
+  },
+})

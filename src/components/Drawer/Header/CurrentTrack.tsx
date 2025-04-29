@@ -1,7 +1,4 @@
-import { StyleSheet, View } from 'react-native'
-
 import { useCurrentTrack } from '../../../../hooks'
-import { padding, spacing } from '../../../theme/spacing'
 import { Track } from './Track'
 
 export const CurrentTrack = () => {
@@ -11,15 +8,5 @@ export const CurrentTrack = () => {
     return null
   }
 
-  return (
-    <View style={styles.section}>
-      <Track {...currentTrack} />
-    </View>
-  )
+  return <Track current isFirst isLast track={currentTrack} />
 }
-
-const styles = StyleSheet.create({
-  section: {
-    marginBottom: spacing['50'],
-  },
-})

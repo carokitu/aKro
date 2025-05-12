@@ -56,6 +56,7 @@ const Avatar = () => {
       const result = await ImagePicker.launchImageLibraryAsync({
         allowsEditing: true,
         aspect: [1, 1],
+        quality: 0.8,
       })
 
       if (!result.canceled && result.assets.length > 0) {

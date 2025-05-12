@@ -34,6 +34,7 @@ export const ShareModal = ({ onClose, track }: Props) => {
       const { error: shareError } = await client.from('posts').insert({
         album_cover_url: track.album.images[0].url,
         artist_name: track.artists.map((artist) => artist.name).join(', '),
+        preview_url: track.preview_url,
         spotify_track_id: track.id,
         track_name: track.name,
         user_id: user.id,

@@ -47,13 +47,21 @@ type EnhancedFeedPost = FeedPost & {
 const Post = ({ item }: { item: EnhancedFeedPost }) => {
   const { user } = useUser()
   const { spotifyApi } = useSpotifyApi()
-  const [isOnSpotifyLibrary, setIsOnSpotifyLibrary] = useState(item.isOnSpotifyLibrary)
-  const [isLikedByCurrentUser, setIsLikedByCurrentUser] = useState(item.is_liked_by_current_user)
+  const [isOnSpotifyLibrary, setIsOnSpotifyLibrary] = useState(false)
+  const [isLikedByCurrentUser, setIsLikedByCurrentUser] = useState(false)
   const [likesCount, setLikesCount] = useState(item.likes_count)
 
   if (!user) {
     return null
   }
+
+  useEffect(() => {
+    setIsOnSpotifyLibrary(item.isOnSpotifyLibrary)
+  }, [item.isOnSpotifyLibrary])
+
+  useEffect(() => {
+    setIsLikedByCurrentUser(item.is_liked_by_current_user)
+  }, [item.is_liked_by_current_user])
 
   const handleLike = async () => {
     if (isLikedByCurrentUser) {
@@ -237,7 +245,6 @@ const Feed = () => {
       } else if (data.length > 0) {
         const feedPosts = data as FeedPost[]
         const trackIds = feedPosts.map((post) => post.spotify_track_id)
-
         // Check which tracks are liked
         const likedTracks = await checkLikedTracks(trackIds)
 
@@ -260,10 +267,6 @@ const Feed = () => {
     },
     [checkLikedTracks, currentUser, offset],
   )
-
-  useEffect(() => {
-    fetchPosts(true)
-  }, [fetchPosts])
 
   const onViewableItemsChanged = useCallback(
     async ({ viewableItems }: { viewableItems: Array<{ item: FeedPost }> }) => {
@@ -292,8 +295,8 @@ const Feed = () => {
 
   return (
     <SafeAreaView edges={['top']} style={styles.container}>
-      <Header user={user} />
       <GestureHandlerRootView>
+      <Header user={user} />
         {hasNewPosts && (
           // style a revoir
           <Button

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Image, Modal, StyleSheet, TouchableWithoutFeedback, View } from 'react-native'
+import { Modal, SafeAreaView, StyleSheet, TouchableWithoutFeedback, View } from 'react-native'
 
 import { type Track as TTrack } from '@spotify/web-api-ts-sdk'
 
@@ -7,6 +7,7 @@ import { useUser } from '../../../hooks'
 import { client } from '../../../supabase'
 import { Button, Label, Title } from '../../system'
 import { theme } from '../../theme'
+import { Post } from '../Post'
 
 type Props = {
   onClose: () => void
@@ -53,21 +54,27 @@ export const ShareModal = ({ onClose, track }: Props) => {
   }
 
   const artists = track.artists.map((artist) => artist.name).join(', ')
-  const description = isSuccess ? "Merci d'avoir fait découvrir ce banger à tes copains !" : 'Partager ce son'
 
   return (
     <Modal animationType="fade" onRequestClose={onClose} transparent>
       <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.modalContainer}>
+        <SafeAreaView style={styles.modalContainer}>
           <TouchableWithoutFeedback>
             <View style={styles.modalContent}>
-              <View style={styles.header}>
-                <Title size="large">{description}</Title>
+              <View style={styles.title}>
+                <Title size="large">Partager un son</Title>
               </View>
-              <View style={styles.trackInfo}>
-                <Image source={{ uri: track.album.images[0].url }} style={styles.albumCover} />
-                <Label size="large">{track.name}</Label>
-                <Label color="secondary">{artists}</Label>
+              <Post
+                item={{
+                  album_cover_url: track.album.images[0].url,
+                  artist_name: artists,
+                  preview_url: track.preview_url ?? undefined,
+                  spotify_track_id: track.id,
+                  track_name: track.name,
+                }}
+              />
+              <View style={styles.bio}>
+                <Label size="large">Ajouter une légende</Label>
               </View>
               {error && <Label color="danger">{error}</Label>}
               {!isSuccess && (
@@ -85,30 +92,17 @@ export const ShareModal = ({ onClose, track }: Props) => {
               )}
             </View>
           </TouchableWithoutFeedback>
-        </View>
+        </SafeAreaView>
       </TouchableWithoutFeedback>
     </Modal>
   )
 }
 
 const styles = StyleSheet.create({
-  albumCover: {
-    borderRadius: theme.radius['small'],
-    height: 150,
-    marginBottom: theme.spacing['200'],
-    marginRight: 10,
-    width: 150,
-  },
   buttonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginTop: theme.spacing['400'],
-  },
-  header: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    marginBottom: theme.spacing['400'],
-    textAlign: 'center',
   },
   // eslint-disable-next-line react-native/no-color-literals
   modalContainer: {
@@ -120,13 +114,16 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: theme.surface.base.default,
     borderRadius: theme.radius.large,
+    height: '100%',
     maxWidth: 400,
-    padding: theme.padding['600'],
-    width: '90%',
+    paddingVertical: theme.padding['600'],
+    width: '100%',
   },
-  trackInfo: {
+  title: {
     alignItems: 'center',
-    gap: theme.spacing['100'],
-    marginBottom: theme.spacing['100'],
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginBottom: theme.spacing['400'],
+    textAlign: 'center',
   },
 })

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { Image, type StyleProp, StyleSheet, TouchableOpacity, View, type ViewStyle } from 'react-native'
 
 import { useSpotifyApi } from '../../hooks/useSpotifyApi'
 import { type Post as TPost } from '../../models'
@@ -8,15 +8,14 @@ import { theme } from '../theme'
 
 type TrackForPost = Pick<TPost, 'album_cover_url' | 'artist_name' | 'preview_url' | 'spotify_track_id' | 'track_name'>
 
-export const Post = ({
-  ActionButtons,
-  Header,
-  item,
-}: {
+type Props = {
   ActionButtons?: React.ReactNode
   Header?: React.ReactNode
   item: TrackForPost
-}) => {
+  style?: StyleProp<ViewStyle>
+}
+
+export const Post = ({ ActionButtons, Header, item, style }: Props) => {
   const { spotifyApi } = useSpotifyApi()
 
   const playOnSpotify = async () => {
@@ -32,7 +31,7 @@ export const Post = ({
   }
 
   return (
-    <View style={styles.post}>
+    <View style={[styles.post, style]}>
       {Header}
       <View style={styles.track}>
         <View>
@@ -98,7 +97,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.surface.danger.default,
     borderRadius: theme.radius.full,
     height: 300,
-    marginLeft: 55,
+    marginLeft: 40,
     width: 300,
   },
   logo: {
@@ -108,7 +107,6 @@ const styles = StyleSheet.create({
   post: {
     backgroundColor: theme.surface.brand.default,
     borderRadius: theme.radius.medium,
-    margin: theme.spacing[200],
     paddingHorizontal: theme.spacing[400],
     paddingVertical: theme.spacing[400],
   },

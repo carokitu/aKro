@@ -1,5 +1,5 @@
 import { useActionSheet } from '@expo/react-native-action-sheet'
-import { ChevronLeft, Search } from 'lucide-react-native'
+import { ChevronLeft, Search, UserX } from 'lucide-react-native'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   FlatList,
@@ -19,7 +19,7 @@ import { debounce } from 'lodash'
 
 import { useUser } from '../../hooks'
 import { type User as TUser } from '../../models'
-import { Avatar, Button, H1, IconButton, Label, Text } from '../../src/system'
+import { Avatar, Button, H1, IconButton, Label, Text, Title } from '../../src/system'
 import { theme } from '../../src/theme'
 import { client } from '../../supabase'
 
@@ -32,6 +32,14 @@ type UserWithStats = Pick<TUser, 'avatar_url' | 'id' | 'name' | 'username'> & {
 type UserListProps = {
   query: string
 }
+
+const EmptyList = () => (
+  <View style={styles.emptyList}>
+    <UserX color={theme.text.base.secondary} size={33} style={styles.emptyIcon} />
+    <Title color="secondary">Aucun résultat</Title>
+    <Text>Essaye avec un autre nom utilisateur</Text>
+  </View>
+)
 
 const UserList = ({ query }: UserListProps) => {
   const { user: currentUser } = useUser()
@@ -161,7 +169,7 @@ const UserList = ({ query }: UserListProps) => {
               Keyboard.dismiss()
             }}
             size="sm"
-            title="Ne plus suivre"
+            title="Abonné"
             variant="secondary"
           />
         ) : (
@@ -184,7 +192,7 @@ const UserList = ({ query }: UserListProps) => {
       data={results}
       keyboardShouldPersistTaps="handled"
       keyExtractor={(item) => item.id}
-      ListEmptyComponent={loading ? null : <Text style={styles.emptyText}>Aucun utilisateur trouvé</Text>}
+      ListEmptyComponent={loading ? null : <EmptyList />}
       renderItem={renderItem}
       style={styles.list}
     />
@@ -216,13 +224,10 @@ const SearchUsers = () => {
             onPress={() => router.back()}
             size="md"
             style={styles.backButton}
-            variant="secondary"
+            variant="tertiary"
           />
           <H1>Ajoute des amis</H1>
         </View>
-        <Text color="tertiary" size="large" style={styles.subtitle}>
-          Connecte toi avec ton entourage
-        </Text>
         <View style={styles.search}>
           <Search color={theme.text.base.tertiary} size={theme.fontSize.lg} />
           <TextInput
@@ -253,9 +258,14 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: theme.spacing[400],
   },
-  emptyText: {
-    marginTop: theme.spacing[800],
-    textAlign: 'center',
+  emptyIcon: {
+    marginBottom: theme.spacing[200],
+  },
+  emptyList: {
+    alignItems: 'center',
+    gap: theme.spacing[200],
+    justifyContent: 'center',
+    paddingVertical: theme.spacing[400],
   },
   info: {
     flex: 1,
@@ -284,11 +294,6 @@ const styles = StyleSheet.create({
     marginVertical: theme.spacing[600],
     paddingHorizontal: theme.padding[400],
     paddingVertical: theme.padding[400],
-  },
-  subtitle: {
-    marginTop: theme.spacing[200],
-    textAlign: 'center',
-    width: '100%',
   },
   title: {
     alignItems: 'center',

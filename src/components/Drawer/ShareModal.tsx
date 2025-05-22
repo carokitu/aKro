@@ -97,7 +97,7 @@ export const ShareModal = ({ onClose, track }: Props) => {
             <Title size="large" style={styles.titleText}>
               Partager un son
             </Title>
-            <IconButton Icon={X} onPress={onClose} size="lg" style={styles.closeButton} variant="secondary" />
+            <IconButton Icon={X} onPress={onClose} size="lg" style={styles.closeButton} variant="tertiary" />
           </View>
           <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={10}>
             <ScrollView

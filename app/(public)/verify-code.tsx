@@ -105,14 +105,14 @@ const VerifyCode = () => {
           fullWidth
           onPress={handleVerify}
           size="lg"
-          style={{ marginBottom: theme.spacing['200'] }}
+          style={styles.button}
           title="Suivant"
         />
         <Button
           fullWidth
           onPress={() => router.back()}
           size="lg"
-          style={{ marginBottom: theme.spacing['200'] }}
+          style={styles.button}
           title="Retour"
           variant="tertiary"
         />
@@ -124,6 +124,9 @@ const VerifyCode = () => {
 export default VerifyCode
 
 const styles = StyleSheet.create({
+  button: {
+    marginBottom: theme.spacing['200'],
+  },
   buttonContainer: {
     marginTop: 'auto',
     width: '100%',

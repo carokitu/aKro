@@ -2,7 +2,7 @@ import { CircleX } from 'lucide-react-native'
 import React, { useCallback, useEffect, useState } from 'react'
 import { KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, TextInput, View } from 'react-native'
 
-import { useLocalSearchParams } from 'expo-router'
+import { router, useLocalSearchParams } from 'expo-router'
 import { parsePhoneNumberFromString } from 'libphonenumber-js'
 
 import { Button, H1, Text } from '../../src/system'
@@ -45,6 +45,10 @@ const VerifyCode = () => {
   }, [sendCode])
 
   useEffect(() => {
+    if (timer === 0) {
+      setIsTimerActive(false)
+    }
+
     if (!isTimerActive || timer === 0) {
       return
     }
@@ -76,7 +80,7 @@ const VerifyCode = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <H1 style={styles.title}>Entre le code envoyé sur ton numéro</H1>
+      <H1 style={styles.title}>Entre le code envoyé au {phoneNumber}</H1>
       <TextInput
         autoComplete={autoCompleteType}
         autoFocus
@@ -103,6 +107,14 @@ const VerifyCode = () => {
           size="lg"
           style={{ marginBottom: theme.spacing['200'] }}
           title="Suivant"
+        />
+        <Button
+          fullWidth
+          onPress={() => router.back()}
+          size="lg"
+          style={{ marginBottom: theme.spacing['200'] }}
+          title="Retour"
+          variant="tertiary"
         />
       </KeyboardAvoidingView>
     </SafeAreaView>

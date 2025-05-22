@@ -1,9 +1,8 @@
-// src/contexts/FeedContext.tsx
 import React, { createContext, useCallback, useContext, useState } from 'react'
 
 type FeedContextType = {
   newPostKey: number
-  refreshFeed: () => void
+  notifyNewPost: () => void
 }
 
 const FeedContext = createContext<FeedContextType | undefined>(undefined)
@@ -11,11 +10,11 @@ const FeedContext = createContext<FeedContextType | undefined>(undefined)
 export const FeedProvider = ({ children }: { children: React.ReactNode }) => {
   const [newPostKey, setNewPostKey] = useState(0)
 
-  const refreshFeed = useCallback(() => {
+  const notifyNewPost = useCallback(() => {
     setNewPostKey((k) => k + 1)
   }, [])
 
-  return <FeedContext.Provider value={{ newPostKey, refreshFeed }}>{children}</FeedContext.Provider>
+  return <FeedContext.Provider value={{ newPostKey, notifyNewPost }}>{children}</FeedContext.Provider>
 }
 
 export const useFeed = () => {

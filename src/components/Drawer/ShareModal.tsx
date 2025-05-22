@@ -27,7 +27,7 @@ type Props = {
 
 export const ShareModal = ({ onClose, track }: Props) => {
   const { user } = useUser()
-  const { refreshFeed } = useFeed()
+  const { notifyNewPost } = useFeed()
   const [description, setDescription] = useState<string | undefined>(undefined)
   const [isSharing, setIsSharing] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
@@ -48,10 +48,10 @@ export const ShareModal = ({ onClose, track }: Props) => {
   useEffect(() => {
     if (track && isSuccess) {
       setIsSuccess(false)
-      refreshFeed()
+      notifyNewPost()
       onClose()
     }
-  }, [isSuccess, onClose, refreshFeed, track])
+  }, [isSuccess, notifyNewPost, onClose, track])
 
   if (!track) {
     return null

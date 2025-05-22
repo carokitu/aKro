@@ -189,10 +189,9 @@ const Feed = () => {
 
       setLoading(true)
 
-      const currentOffset = reset ? 0 : offset
       const { data, error } = await client.rpc('get_user_feed', {
         p_limit: LIMIT,
-        p_offset: currentOffset,
+        p_offset: reset ? 0 : offset,
         p_user_id: user.id,
       })
 

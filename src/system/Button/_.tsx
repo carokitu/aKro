@@ -84,7 +84,7 @@ export const Button = ({
         disabled={disabled}
         onPressIn={() => setIsPressed(true)}
         onPressOut={() => setIsPressed(false)}
-        style={[styles.base, sizeStyles, backgroundStyle, style, fullWidth && styles.fullWidth]}
+        style={[styles.base, sizeStyles, backgroundStyle, fullWidth && styles.fullWidth, style]}
         {...props}
       >
         <View style={styles.content}>

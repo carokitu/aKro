@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { type MaxInt, type SavedTrack } from '@spotify/web-api-ts-sdk'
 
-import { useSpotifyApi } from './useSpotifyApi'
+import { useSpotifyApi } from '../useSpotifyApi'
 
 const DEFAULT_PAGE_SIZE: MaxInt<50> = 50
 

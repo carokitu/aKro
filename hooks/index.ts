@@ -1,6 +1,4 @@
-export { useCurrentTrack } from './useCurrentTrack'
-export { useRecentTracks } from './useRecentTracks'
-export { useSavedTracks } from './useSavedTracks'
+export * from './feed'
 export { useSpotifyApi } from './useSpotifyApi'
 export { SpotifyAuthProvider, useSpotifyAuth } from './useSpotifyAuth'
 export { UserProvider, useUser } from './useUser'

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 import { type Track } from '@spotify/web-api-ts-sdk'
 
-import { useSpotifyApi } from './useSpotifyApi'
+import { useSpotifyApi } from '../useSpotifyApi'
 
 const REFRESH_INTERVAL = 5000 // 5 seconds
 

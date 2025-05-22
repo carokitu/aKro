@@ -19,24 +19,34 @@ type Props = {
 
 export const Track = ({ current = false, isFirst, isLast, style: propsStyle, track }: Props) => {
   const [trackToShare, setTrackToShare] = useState<null | TTrack>(null)
+  const [pressed, setPressed] = useState(false)
+
+  const handleOnTouchEnd = () => {
+    setPressed(false)
+    setTrackToShare(track)
+  }
 
   return (
     <>
       <View
-        onTouchEnd={() => setTrackToShare(track)}
-        style={[styles.trackContainer, propsStyle, isFirst && styles.firstTrack, isLast && styles.lastTrack]}
+        onTouchCancel={() => setPressed(false)}
+        onTouchEnd={handleOnTouchEnd}
+        onTouchStart={() => setPressed(true)}
+        style={[styles.container, isFirst && styles.firstTrack, isLast && styles.lastTrack]}
       >
-        <Image source={{ uri: track.album.images[0].url }} style={styles.albumCover} />
-        <View style={styles.textContainer}>
-          <View style={styles.title}>
-            {current && <AudioLines color={theme.text.brand.secondary} size={theme.fontSize.xl} />}
-            <Label ellipsizeMode="tail" numberOfLines={1} size="large" style={styles.trackName}>
-              {track.name}
+        <View style={[styles.trackContainer, propsStyle, pressed && styles.pressed]}>
+          <Image source={{ uri: track.album.images[0].url }} style={styles.albumCover} />
+          <View style={styles.textContainer}>
+            <View style={styles.title}>
+              {current && <AudioLines color={theme.text.brand.secondary} size={theme.fontSize.xl} />}
+              <Label ellipsizeMode="tail" numberOfLines={1} size="large" style={styles.trackName}>
+                {track.name}
+              </Label>
+            </View>
+            <Label color="secondary" ellipsizeMode="tail" numberOfLines={1}>
+              {track.artists.map((artist) => artist.name).join(', ')}
             </Label>
           </View>
-          <Label color="secondary" ellipsizeMode="tail" numberOfLines={1}>
-            {track.artists.map((artist) => artist.name).join(', ')}
-          </Label>
         </View>
       </View>
       <ShareModal onClose={() => setTrackToShare(null)} track={trackToShare} />
@@ -51,11 +61,24 @@ const styles = StyleSheet.create({
     marginRight: 10,
     width: 50,
   },
+  container: {
+    backgroundColor: theme.colors.neutral[50],
+    marginHorizontal: padding['400'],
+    paddingHorizontal: theme.padding['200'],
+    paddingVertical: theme.padding['100'],
+  },
   firstTrack: {
-    paddingTop: theme.padding['400'],
+    borderTopLeftRadius: theme.radius.small,
+    borderTopRightRadius: theme.radius.small,
+    paddingTop: theme.padding['200'],
   },
   lastTrack: {
-    paddingBottom: theme.padding['400'],
+    borderBottomLeftRadius: theme.radius.small,
+    borderBottomRightRadius: theme.radius.small,
+    paddingBottom: theme.padding['200'],
+  },
+  pressed: {
+    backgroundColor: theme.colors.neutral[200],
   },
   textContainer: {
     flex: 1,
@@ -67,12 +90,9 @@ const styles = StyleSheet.create({
   },
   trackContainer: {
     alignItems: 'center',
-    backgroundColor: theme.colors.neutral[50],
     borderRadius: theme.radius.small,
     flexDirection: 'row',
-    marginHorizontal: padding['400'],
-    paddingHorizontal: theme.padding['400'],
-    paddingVertical: theme.padding['200'],
+    padding: theme.padding['100'],
   },
   trackName: {
     marginBottom: spacing['50'],

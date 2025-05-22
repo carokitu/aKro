@@ -1,78 +1,68 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/* eslint-disable @typescript-eslint/no-require-imports */
 import { CircleCheck, CirclePlus, Heart, UserPlus, VolumeOff } from 'lucide-react-native'
-import { useCallback, useEffect, useState } from 'react'
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { StyleSheet, View } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { FlashList } from '@shopify/flash-list'
 import { router } from 'expo-router'
 
-import { useSpotifyApi, useUser } from '../../hooks'
-import { type User } from '../../models'
+import { useFeed, useSpotifyApi, useUser } from '../../hooks'
+import { type Post as TPost, type User } from '../../models'
 import { Drawer } from '../../src'
+import { Post } from '../../src/components'
 import { Avatar, Button, IconButton, Label, Text } from '../../src/system'
 import { theme } from '../../src/theme'
 import { formatRelativeDate } from '../../src/utils'
 import { client } from '../../supabase'
 
-const Header = ({ user }: { user: User }) => (
-  <View style={styles.header}>
-    <Avatar avatar={user.avatar_url} />
-    <IconButton Icon={UserPlus} onPress={() => router.push('/search-users')} size="sm" variant="tertiary" />
-  </View>
-)
-
-type FeedPost = {
-  album_cover_url: string
-  artist_name: string
-  avatar_url: string
-  created_at: string
-  description?: string
-  id: string
-  is_liked_by_current_user: boolean
-  likes_count: number
-  preview_url?: string
-  spotify_track_id: string
-  track_name: string
-  user_id: string
-  username: string
-}
-
-type EnhancedFeedPost = FeedPost & {
+type EnhancedFeedPost = TPost & {
   isOnSpotifyLibrary: boolean
 }
 
-const Post = ({ item }: { item: EnhancedFeedPost }) => {
-  const { user } = useUser()
-  const { spotifyApi } = useSpotifyApi()
+const PostHeader = ({ item }: { item: EnhancedFeedPost }) => (
+  <View style={styles.user}>
+    <Avatar avatar={item.avatar_url} />
+    <View style={styles.info}>
+      <Label color="invert">{item.username}</Label>
+      <Text color="invert">{formatRelativeDate(item.created_at)}</Text>
+    </View>
+  </View>
+)
+
+const PostActionButtons = ({ item }: { item: EnhancedFeedPost }) => {
   const [isOnSpotifyLibrary, setIsOnSpotifyLibrary] = useState(false)
   const [isLikedByCurrentUser, setIsLikedByCurrentUser] = useState(false)
-  const [likesCount, setLikesCount] = useState(item.likes_count)
+  const [likesCount, setLikesCount] = useState(0)
+
+  const { user } = useUser()
+  const { spotifyApi } = useSpotifyApi()
+
+  useEffect(() => {
+    setLikesCount(item.likes_count)
+    setIsLikedByCurrentUser(item.is_liked_by_current_user)
+    setIsOnSpotifyLibrary(item.isOnSpotifyLibrary)
+  }, [item])
 
   if (!user) {
     return null
   }
 
-  useEffect(() => {
-    setIsOnSpotifyLibrary(item.isOnSpotifyLibrary)
-  }, [item.isOnSpotifyLibrary])
-
-  useEffect(() => {
-    setIsLikedByCurrentUser(item.is_liked_by_current_user)
-  }, [item.is_liked_by_current_user])
-
   const handleLike = async () => {
-    if (isLikedByCurrentUser) {
-      await client.from('post_likes').delete().eq('post_id', item.id).eq('user_id', user.id)
-      setLikesCount(likesCount - 1)
-    } else {
-      await client.from('post_likes').insert({ post_id: item.id, user_id: user.id })
-      setLikesCount(likesCount + 1)
-    }
+    try {
+      if (isLikedByCurrentUser) {
+        await client.from('post_likes').delete().eq('post_id', item.id).eq('user_id', user.id)
+        setLikesCount((prev) => prev - 1)
+      } else {
+        await client.from('post_likes').insert({ post_id: item.id, user_id: user.id })
+        setLikesCount((prev) => prev + 1)
+      }
 
-    setIsLikedByCurrentUser(!isLikedByCurrentUser)
+      setIsLikedByCurrentUser((prev) => !prev)
+    } catch (error) {
+      console.error('Error toggling like:', error)
+    }
   }
 
   const handleAddToSpotifyLibrary = async () => {
@@ -81,100 +71,63 @@ const Post = ({ item }: { item: EnhancedFeedPost }) => {
     }
 
     try {
+      const trackId = item.spotify_track_id
       if (isOnSpotifyLibrary) {
-        await (spotifyApi.currentUser.tracks.removeSavedTracks as any)({ ids: [item.spotify_track_id] })
+        await (spotifyApi.currentUser.tracks.removeSavedTracks as any)({ ids: [trackId] })
       } else {
-        await (spotifyApi.currentUser.tracks.saveTracks as any)({ ids: [item.spotify_track_id] })
+        await (spotifyApi.currentUser.tracks.saveTracks as any)({ ids: [trackId] })
       }
-    } catch (error) {
-      console.error('Error adding to Spotify library:', error)
-      return
-    } finally {
-      setIsOnSpotifyLibrary(!isOnSpotifyLibrary)
-    }
-  }
 
-  const playOnSpotify = async () => {
-    if (!spotifyApi) {
-      return
-    }
-
-    try {
-      await spotifyApi.player.startResumePlayback('', undefined, [`spotify:track:${item.spotify_track_id}`])
+      setIsOnSpotifyLibrary((prev) => !prev)
     } catch (error) {
-      console.error('Error playing on Spotify:', error)
+      console.error('Error adding/removing track from Spotify library:', error)
     }
   }
 
   return (
-    <View style={styles.post}>
-      <View style={styles.user}>
-        <Avatar avatar={item.avatar_url} />
-        <View style={styles.info}>
-          <Label color="invert">{item.username}</Label>
-          <Text color="invert">{formatRelativeDate(item.created_at)}</Text>
-        </View>
-      </View>
-      <View style={styles.track}>
-        <View>
-          <View style={styles.disk} />
-          <Image source={{ uri: item.album_cover_url }} style={styles.cover} />
-        </View>
-        <View style={styles.actions}>
-          <VolumeOff color={theme.surface.base.default} size="30" />
-          {isOnSpotifyLibrary ? (
-            <CircleCheck color={theme.surface.success.default} onPress={handleAddToSpotifyLibrary} size="30" />
-          ) : (
-            <CirclePlus color={theme.surface.base.default} onPress={handleAddToSpotifyLibrary} size="30" />
-          )}
-          <View style={styles.likes}>
-            <Heart
-              color={isLikedByCurrentUser ? theme.surface.danger.default : theme.surface.base.default}
-              onPress={handleLike}
-              size="30"
-            />
-            <Text color="invert">{likesCount}</Text>
-          </View>
-        </View>
-      </View>
-      <View style={styles.footer}>
-        <View style={styles.trackInfo}>
-          <Label color="invert" ellipsizeMode="tail" numberOfLines={1} size="large">
-            {item.track_name}
-          </Label>
-          <Text color="invert" ellipsizeMode="tail" numberOfLines={1} size="small">
-            {item.artist_name}
-          </Text>
-        </View>
-        <TouchableOpacity onPress={playOnSpotify} style={styles.spotify}>
-          <View>
-            <Text color="invert" size="extraSmall">
-              Écouter sur
-            </Text>
-            <Text color="invert" size="large">
-              Spotify
-            </Text>
-          </View>
-          <Image source={require('../../assets/images/icons/spotify.png')} style={styles.logo} />
-        </TouchableOpacity>
+    <View style={styles.actions}>
+      <VolumeOff color={theme.surface.base.default} size={30} />
+      {isOnSpotifyLibrary ? (
+        <CircleCheck color={theme.surface.success.default} onPress={handleAddToSpotifyLibrary} size={30} />
+      ) : (
+        <CirclePlus color={theme.surface.base.default} onPress={handleAddToSpotifyLibrary} size={30} />
+      )}
+      <View style={styles.likes}>
+        <Heart
+          color={isLikedByCurrentUser ? theme.surface.danger.default : theme.surface.base.default}
+          onPress={handleLike}
+          size={30}
+        />
+        <Text color="invert">{likesCount}</Text>
       </View>
     </View>
   )
 }
 
+const FeedHeader = ({ user }: { user: User }) => (
+  <View style={styles.header}>
+    <Avatar avatar={user.avatar_url} />
+    <IconButton Icon={UserPlus} onPress={() => router.push('/search-users')} size="sm" variant="tertiary" />
+  </View>
+)
+
 const Feed = () => {
-  const { loading: spotifyLoading, spotifyApi } = useSpotifyApi()
   const { user } = useUser()
-  const [closeDrawer, setCloseDrawer] = useState(false)
+  const { loading: spotifyLoading, spotifyApi } = useSpotifyApi()
+  const { newPostKey } = useFeed()
+
+  const [posts, setPosts] = useState<EnhancedFeedPost[]>([])
+  const [loading, setLoading] = useState(false)
+  const [offset, setOffset] = useState(0)
   const [latestPostTimestamp, setLatestPostTimestamp] = useState<null | string>(null)
   const [hasNewPosts, setHasNewPosts] = useState(false)
-  const { user: currentUser } = useUser()
-  const [posts, setPosts] = useState<EnhancedFeedPost[]>([])
-  const [loading, setLoading] = useState(spotifyLoading)
-  const [offset, setOffset] = useState(0)
+  const [closeDrawer, setCloseDrawer] = useState(false)
+  const [hasNewPostsKey, setHasNewPostsKey] = useState(0)
+  const [resetPending, setResetPending] = useState(false)
 
-  // Make sure this limit to does not exceed 50 for the liked tracks check
   const LIMIT = 20
+  const hasMounted = useRef(false)
+  const listRef = useRef<FlashList<EnhancedFeedPost>>(null)
 
   useEffect(() => {
     if (!latestPostTimestamp || !user) {
@@ -189,6 +142,7 @@ const Feed = () => {
       })
 
       if (error) {
+        console.error('Error polling new posts:', error)
         return
       }
 
@@ -203,21 +157,22 @@ const Feed = () => {
   }, [latestPostTimestamp, user])
 
   useEffect(() => {
-    setLoading(spotifyLoading)
+    if (spotifyLoading && !hasMounted.current) {
+      setLoading(true)
+    } else {
+      setLoading(false)
+      hasMounted.current = true
+    }
   }, [spotifyLoading])
 
   const checkLikedTracks = useCallback(
-    async (trackIds: string[]) => {
+    async (trackIds: string[]): Promise<boolean[]> => {
       if (!spotifyApi) {
         return []
       }
 
       try {
-        const results: boolean[] = []
-        const likedTracks = await spotifyApi.currentUser.tracks.hasSavedTracks(trackIds)
-        results.push(...likedTracks)
-
-        return results
+        return await spotifyApi.currentUser.tracks.hasSavedTracks(trackIds)
       } catch (error) {
         console.error('Error checking liked tracks:', error)
         return []
@@ -228,7 +183,7 @@ const Feed = () => {
 
   const fetchPosts = useCallback(
     async (reset = false) => {
-      if (!currentUser) {
+      if (!user) {
         return
       }
 
@@ -237,68 +192,91 @@ const Feed = () => {
       const { data, error } = await client.rpc('get_user_feed', {
         p_limit: LIMIT,
         p_offset: reset ? 0 : offset,
-        p_user_id: currentUser.id,
+        p_user_id: user.id,
       })
 
       if (error) {
         console.error('Error fetching feed:', error)
-      } else if (data.length > 0) {
-        const feedPosts = data as FeedPost[]
-        const trackIds = feedPosts.map((post) => post.spotify_track_id)
-        // Check which tracks are liked
-        const likedTracks = await checkLikedTracks(trackIds)
+        setLoading(false)
+        return
+      }
 
-        // Add liked status to each post
-        const postsWithLikedStatus = feedPosts.map((post, index) => ({
-          ...post,
-          isOnSpotifyLibrary: likedTracks[index] || false,
-        }))
-        setPosts((prev) => (reset ? postsWithLikedStatus : [...prev, ...postsWithLikedStatus]))
+      const feedPosts = data as TPost[]
+      const trackIds = feedPosts.map((post) => post.spotify_track_id)
+      const likedTracks = await checkLikedTracks(trackIds)
 
-        if (reset) {
-          setLatestPostTimestamp(data[0].created_at)
-          setHasNewPosts(false)
-        } else {
-          setOffset((prev) => prev + LIMIT)
-        }
+      const postsWithStatus: EnhancedFeedPost[] = feedPosts.map((post, index) => ({
+        ...post,
+        isOnSpotifyLibrary: likedTracks[index] || false,
+      }))
+
+      setPosts((prev) => (reset ? postsWithStatus : [...prev, ...postsWithStatus]))
+
+      if (reset) {
+        setOffset(LIMIT)
+        setLatestPostTimestamp(feedPosts[0]?.created_at ?? null)
+        setHasNewPosts(false)
+        setResetPending(true)
+      } else {
+        setOffset((prev) => prev + LIMIT)
       }
 
       setLoading(false)
     },
-    [checkLikedTracks, currentUser, offset],
+    [checkLikedTracks, offset, user],
   )
 
   const onViewableItemsChanged = useCallback(
-    async ({ viewableItems }: { viewableItems: Array<{ item: FeedPost }> }) => {
-      const focusedPost = viewableItems[0]?.item
-
-      if (!focusedPost) {
-        return
+    ({ viewableItems }: { viewableItems: Array<{ item: EnhancedFeedPost }> }) => {
+      const focusedPost = viewableItems?.[0]?.item
+      if (focusedPost) {
+        console.log('Centered post:', focusedPost.track_name)
       }
-
-      console.log('centeredPost', focusedPost.track_name)
-      // const currentTrack = await spotifyApi.tracks.get(centeredPost.spotify_track_id)
     },
     [],
   )
+
+  useEffect(() => {
+    if (newPostKey > 0 && newPostKey !== hasNewPostsKey) {
+      setCloseDrawer(true)
+      setHasNewPosts(true)
+      setHasNewPostsKey(newPostKey)
+    }
+  }, [hasNewPostsKey, newPostKey, setHasNewPosts])
+
+  useEffect(() => {
+    if (resetPending && posts.length > 0) {
+      // Timeout léger pour s'assurer que FlashList a tout rendu
+      setTimeout(() => {
+        listRef.current?.scrollToOffset({ animated: true, offset: 0 })
+      }, 100)
+
+      setResetPending(false)
+    }
+  }, [posts, resetPending])
 
   if (!user) {
     return null
   }
 
   const handleShowNewPosts = () => {
-    fetchPosts(true) // reload feed from scratch
-    setHasNewPosts(false)
+    fetchPosts(true)
   }
 
-  const renderItem = ({ item }: { item: EnhancedFeedPost }) => <Post item={item} />
+  const renderItem = ({ item }: { item: EnhancedFeedPost }) => (
+    <Post
+      ActionButtons={<PostActionButtons item={item} />}
+      Header={<PostHeader item={item} />}
+      item={item}
+      style={styles.post}
+    />
+  )
 
   return (
     <SafeAreaView edges={['top']} style={styles.container}>
       <GestureHandlerRootView>
-      <Header user={user} />
+        <FeedHeader user={user} />
         {hasNewPosts && (
-          // style a revoir
           <Button
             onPress={handleShowNewPosts}
             style={styles.newPostsButton}
@@ -310,13 +288,13 @@ const Feed = () => {
           data={posts}
           decelerationRate="fast"
           estimatedItemSize={400}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item.id ?? Math.random().toString()}
           onEndReached={() => fetchPosts()}
           onEndReachedThreshold={0.8}
           onRefresh={() => fetchPosts(true)}
           onScrollBeginDrag={() => setCloseDrawer(true)}
           onViewableItemsChanged={onViewableItemsChanged}
-          // pagingEnabled
+          ref={listRef}
           refreshing={loading}
           renderItem={renderItem}
           showsVerticalScrollIndicator={false}
@@ -341,25 +319,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.surface.base.default,
     flex: 1,
   },
-  cover: {
-    borderRadius: theme.radius.small,
-    height: 250,
-    left: 0,
-    position: 'absolute',
-    top: 0,
-    width: 250,
-  },
-  disk: {
-    backgroundColor: theme.surface.danger.default,
-    borderRadius: theme.radius.full,
-    height: 250,
-    marginLeft: 40,
-    width: 250,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
   header: {
     backgroundColor: theme.surface.base.default,
     flexDirection: 'row',
@@ -373,40 +332,17 @@ const styles = StyleSheet.create({
   likes: {
     alignItems: 'center',
   },
-  logo: {
-    height: 30,
-    width: 30,
-  },
   newPostsButton: {
     backgroundColor: theme.surface.base.default,
     padding: theme.spacing[400],
   },
   post: {
-    backgroundColor: theme.surface.brand.default,
-    borderRadius: theme.radius.medium,
     margin: theme.spacing[200],
-    paddingHorizontal: theme.spacing[400],
-    paddingVertical: theme.spacing[400],
-  },
-  spotify: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: theme.spacing[200],
-  },
-  track: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: theme.spacing[600],
-    marginTop: theme.spacing[1000],
-  },
-  trackInfo: {
-    flex: 1,
-    overflow: 'hidden',
-    paddingRight: theme.spacing[400],
   },
   user: {
     alignItems: 'center',
     flexDirection: 'row',
+    marginBottom: theme.spacing[1000],
   },
 })
 

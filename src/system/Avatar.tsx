@@ -8,7 +8,7 @@ import { theme } from '../theme'
 
 type Props = {
   avatar?: null | string
-  size?: 'lg' | 'md' | 'sm'
+  size?: 'lg' | 'md' | 'sm' | 'xl'
   style?: StyleProp<ViewStyle>
 }
 
@@ -24,6 +24,10 @@ const SIZE_STYLES = {
   sm: {
     height: 24,
     width: 24,
+  },
+  xl: {
+    height: 88,
+    width: 88,
   },
 }
 

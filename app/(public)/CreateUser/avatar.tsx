@@ -21,7 +21,7 @@ import { Button, H1, Label, Text } from '../../../src/system'
 import { theme } from '../../../src/theme'
 import { client } from '../../../supabase'
 
-const MAX_LINES = 4
+const MAX_LINES = 2
 const MAX_BIO_LENGTH = 150
 
 const handleDismiss = () => Keyboard.dismiss()

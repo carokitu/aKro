@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { CircleCheck, CirclePlus, Heart, UserPlus, VolumeOff } from 'lucide-react-native'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, TouchableOpacity, View } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
@@ -22,13 +22,13 @@ type EnhancedFeedPost = TPost & {
 }
 
 const PostHeader = ({ item }: { item: EnhancedFeedPost }) => (
-  <View style={styles.user}>
+  <TouchableOpacity activeOpacity={0.6} onPress={() => router.push(`/profile/${item.username}`)} style={styles.user}>
     <Avatar avatar={item.avatar_url} />
     <View style={styles.info}>
       <Label color="invert">{item.username}</Label>
       <Text color="invert">{formatRelativeDate(item.created_at)}</Text>
     </View>
-  </View>
+  </TouchableOpacity>
 )
 
 const PostActionButtons = ({ item }: { item: EnhancedFeedPost }) => {

@@ -1,17 +1,9 @@
-import { useActionSheet } from '@expo/react-native-action-sheet'
 import { ChevronLeft, Search, UserX } from 'lucide-react-native'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import {
-  FlatList,
-  Keyboard,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from 'react-native'
+import { Keyboard, StyleSheet, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
+import { FlashList } from '@shopify/flash-list'
 import { router } from 'expo-router'
 import pluralize from 'pluralize'
 
@@ -19,7 +11,8 @@ import { debounce } from 'lodash'
 
 import { useUser } from '../../hooks'
 import { type User as TUser } from '../../models'
-import { Avatar, Button, H1, IconButton, Label, Text, Title } from '../../src/system'
+import { FollowButton } from '../../src/components/ActionButtons/FollowButton'
+import { Avatar, H1, IconButton, Label, Text, Title } from '../../src/system'
 import { theme } from '../../src/theme'
 import { client } from '../../supabase'
 
@@ -45,8 +38,6 @@ const UserList = ({ query }: UserListProps) => {
   const { user: currentUser } = useUser()
   const [results, setResults] = useState<UserWithStats[]>([])
   const [loading, setLoading] = useState(false)
-  const [followLoading, setFollowLoading] = useState<null | string>(null)
-  const { showActionSheetWithOptions } = useActionSheet()
 
   const fetchUsers = useCallback(async () => {
     if (!currentUser) {
@@ -76,80 +67,20 @@ const UserList = ({ query }: UserListProps) => {
     fetchUsers()
   }, [fetchUsers, query])
 
-  const handleFollow = async (userId: string) => {
-    if (!currentUser) {
-      return
-    }
-
-    setFollowLoading(userId)
-
-    try {
-      const { error } = await client.from('follows').insert({
-        created_at: new Date().toISOString(),
-        followed_id: userId,
-        follower_id: currentUser.id,
-      })
-
-      if (error) {
-        setFollowLoading(null)
-        return
-      }
-
-      setResults((prevResults) =>
-        prevResults.map((user) => (user.id === userId ? { ...user, is_followed: true } : user)),
-      )
-    } finally {
-      setFollowLoading(null)
-    }
-  }
-
-  const handleUnfollow = async (userId: string) => {
-    if (!currentUser) {
-      return
-    }
-
-    const unfollow = async () => {
-      setFollowLoading(userId)
-
-      try {
-        const { error } = await client
-          .from('follows')
-          .delete()
-          .match({ followed_id: userId, follower_id: currentUser.id })
-
-        if (error) {
-          setFollowLoading(null)
-          return
-        }
-
-        setResults((prevResults) =>
-          prevResults.map((user) => (user.id === userId ? { ...user, is_followed: false } : user)),
-        )
-      } finally {
-        setFollowLoading(null)
-      }
-    }
-
-    showActionSheetWithOptions(
-      {
-        cancelButtonIndex: 1,
-        destructiveButtonIndex: 0,
-        options: ['Se désabonner', 'Annuler'],
-      },
-      (index) => {
-        if (index === 0) {
-          unfollow()
-        }
-      },
-    )
-  }
-
   const renderItem = ({ item }: { item: UserWithStats }) => {
     const { avatar_url, follows_me, id, is_followed, mutual_count, name, username } = item
     const info = mutual_count ? `${name} • ${mutual_count} ${pluralize('ami', mutual_count)} en commun` : name
 
+    const handlePress = () => {
+      router.push(`/profile/${username}`)
+    }
+
+    if (!currentUser) {
+      return null
+    }
+
     return (
-      <TouchableOpacity onPress={() => Keyboard.dismiss()} style={styles.userCard}>
+      <TouchableOpacity onPress={handlePress} style={styles.userCard}>
         <View style={styles.userCardContent}>
           <Avatar avatar={avatar_url} size="lg" />
           <View style={styles.info}>
@@ -161,40 +92,25 @@ const UserList = ({ query }: UserListProps) => {
             </Text>
           </View>
         </View>
-        {is_followed ? (
-          <Button
-            disabled={followLoading === id}
-            onPress={() => {
-              handleUnfollow(id)
-              Keyboard.dismiss()
-            }}
-            size="sm"
-            title="Abonné"
-            variant="secondary"
-          />
-        ) : (
-          <Button
-            disabled={followLoading === id}
-            onPress={() => {
-              handleFollow(id)
-              Keyboard.dismiss()
-            }}
-            size="sm"
-            title={follows_me ? 'Suivre en retour' : 'Suivre'}
-          />
-        )}
+        <FollowButton
+          currentUserId={currentUser.id}
+          follows_me={follows_me}
+          is_followed={is_followed}
+          otherUser={id}
+          size="sm"
+        />
       </TouchableOpacity>
     )
   }
 
   return (
-    <FlatList
+    <FlashList
       data={results}
+      estimatedItemSize={45}
       keyboardShouldPersistTaps="handled"
       keyExtractor={(item) => item.id}
       ListEmptyComponent={loading ? null : <EmptyList />}
       renderItem={renderItem}
-      style={styles.list}
     />
   )
 }
@@ -217,31 +133,33 @@ const SearchUsers = () => {
 
   return (
     <TouchableWithoutFeedback accessible={false} onPress={() => Keyboard.dismiss()}>
-      <SafeAreaView pointerEvents="box-none" style={styles.container}>
-        <View style={styles.title}>
-          <IconButton
-            Icon={ChevronLeft}
-            onPress={() => router.back()}
-            size="md"
-            style={styles.backButton}
-            variant="tertiary"
-          />
-          <H1>Ajoute des amis</H1>
-        </View>
-        <View style={styles.search}>
-          <Search color={theme.text.base.tertiary} size={theme.fontSize.lg} />
-          <TextInput
-            autoFocus
-            maxLength={40}
-            onChangeText={handleChange}
-            placeholder="Rechercher un utilisateur"
-            placeholderTextColor={theme.text.disabled}
-            style={styles.input}
-            value={query}
-          />
-        </View>
-        <UserList query={debouncedQuery} />
-      </SafeAreaView>
+      <View style={styles.container}>
+        <SafeAreaView pointerEvents="box-none" style={styles.area}>
+          <View style={styles.title}>
+            <IconButton
+              Icon={ChevronLeft}
+              onPress={() => router.back()}
+              size="md"
+              style={styles.backButton}
+              variant="tertiary"
+            />
+            <H1>Ajoute des amis</H1>
+          </View>
+          <View style={styles.search}>
+            <Search color={theme.text.base.tertiary} size={theme.fontSize.lg} />
+            <TextInput
+              autoFocus
+              maxLength={40}
+              onChangeText={handleChange}
+              placeholder="Rechercher un utilisateur"
+              placeholderTextColor={theme.text.disabled}
+              style={styles.input}
+              value={query}
+            />
+          </View>
+          <UserList query={debouncedQuery} />
+        </SafeAreaView>
+      </View>
     </TouchableWithoutFeedback>
   )
 }
@@ -249,6 +167,9 @@ const SearchUsers = () => {
 export default SearchUsers
 
 const styles = StyleSheet.create({
+  area: {
+    flex: 1,
+  },
   backButton: {
     left: 0,
     position: 'absolute',
@@ -280,9 +201,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     width: '100%',
   },
-  list: {
-    flex: 1,
-  },
   name: {
     flexShrink: 1,
   },
@@ -299,7 +217,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: theme.spacing[200],
     justifyContent: 'center',
-    marginTop: theme.spacing['1000'],
+    marginTop: theme.spacing['200'],
   },
   userCard: {
     alignItems: 'center',

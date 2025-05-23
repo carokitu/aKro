@@ -40,7 +40,6 @@ const styles = StyleSheet.create({
     gap: theme.spacing[100],
     marginBottom: theme.padding['400'],
     marginLeft: theme.padding['400'],
-    marginTop: theme.padding['600'],
     verticalAlign: 'middle',
   },
 })

@@ -15,6 +15,7 @@ import { theme } from '../../theme'
 import { Label } from '../Text'
 
 type ButtonProps = PressableProps & {
+  beforeElement?: React.ReactNode
   disabled?: boolean
   fullWidth?: boolean
   iconPath?: ImageSourcePropType
@@ -61,6 +62,7 @@ const SIZE_STYLES = {
 }
 
 export const Button = ({
+  beforeElement,
   disabled,
   fullWidth = false,
   iconPath,
@@ -88,6 +90,7 @@ export const Button = ({
         {...props}
       >
         <View style={styles.content}>
+          {beforeElement}
           {iconPath && <Image source={iconPath} style={styles.icon} />}
           <Label style={[styles.label, variantStyles.label, disabled && styles.disabledLabel]}>{title}</Label>
         </View>

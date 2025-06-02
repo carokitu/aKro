@@ -1,21 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { CircleCheck, CirclePlus, Heart, UserPlus, VolumeOff } from 'lucide-react-native'
+import { CircleCheck, CirclePlus, Heart, VolumeOff } from 'lucide-react-native'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
-import { GestureHandlerRootView } from 'react-native-gesture-handler'
-import { SafeAreaView } from 'react-native-safe-area-context'
 
-import { FlashList } from '@shopify/flash-list'
+import { FlashList, type FlashListProps } from '@shopify/flash-list'
 import { router } from 'expo-router'
 
-import { useFeed, useSpotifyApi, useUser } from '../../hooks'
-import { type Post as TPost, type User } from '../../models'
-import { Drawer } from '../../src'
-import { Post } from '../../src/components'
-import { Avatar, Button, IconButton, Label, Text } from '../../src/system'
-import { theme } from '../../src/theme'
-import { formatRelativeDate } from '../../src/utils'
-import { client } from '../../supabase'
+import { useFeed, useSpotifyApi, useUser } from '../../../hooks'
+import { type Post as TPost, type User } from '../../../models'
+import { client } from '../../../supabase'
+import { Avatar, Label, Text } from '../../system'
+import { theme } from '../../theme'
+import { formatRelativeDate } from '../../utils'
+import { Post } from '../Post'
 
 type EnhancedFeedPost = TPost & {
   isOnSpotifyLibrary: boolean
@@ -104,15 +101,12 @@ const PostActionButtons = ({ item }: { item: EnhancedFeedPost }) => {
   )
 }
 
-const FeedHeader = ({ user }: { user: User }) => (
-  <View style={styles.header}>
-    <Avatar avatar={user.avatar_url} />
-    <IconButton Icon={UserPlus} onPress={() => router.push('/search-users')} size="sm" variant="tertiary" />
-  </View>
-)
+type Props = Omit<FlashListProps<EnhancedFeedPost>, 'data' | 'renderItem'> & {
+  filterByUsername?: string
+  user: User
+}
 
-const Feed = () => {
-  const { user } = useUser()
+export const PostsList = ({ filterByUsername, user, ...flashListProps }: Props) => {
   const { loading: spotifyLoading, spotifyApi } = useSpotifyApi()
   const { newPostKey } = useFeed()
 
@@ -167,7 +161,7 @@ const Feed = () => {
 
   const checkLikedTracks = useCallback(
     async (trackIds: string[]): Promise<boolean[]> => {
-      if (!spotifyApi || !trackIds.length) {
+      if (!spotifyApi || trackIds.length === 0) {
         return []
       }
 
@@ -189,11 +183,18 @@ const Feed = () => {
 
       setLoading(true)
 
-      const { data, error } = await client.rpc('get_user_feed', {
+      const props = {
         p_limit: LIMIT,
         p_offset: reset ? 0 : offset,
-        p_user_id: user.id,
-      })
+        p_viewer_id: user.id,
+      }
+
+      const { data, error } = filterByUsername
+        ? await client.rpc('get_user_posts', {
+            p_username: filterByUsername,
+            ...props,
+          })
+        : await client.rpc('get_user_feed', props)
 
       if (error) {
         console.error('Error fetching feed:', error)
@@ -204,6 +205,7 @@ const Feed = () => {
       const feedPosts = data as TPost[]
       const trackIds = feedPosts.map((post) => post.spotify_track_id)
       const likedTracks = await checkLikedTracks(trackIds)
+      console.log('likedTracks', trackIds, likedTracks)
 
       const postsWithStatus: EnhancedFeedPost[] = feedPosts.map((post, index) => ({
         ...post,
@@ -223,7 +225,7 @@ const Feed = () => {
 
       setLoading(false)
     },
-    [checkLikedTracks, offset, user],
+    [checkLikedTracks, filterByUsername, offset, user],
   )
 
   const onViewableItemsChanged = useCallback(
@@ -255,6 +257,12 @@ const Feed = () => {
     }
   }, [posts, resetPending])
 
+  useEffect(() => {
+    if (!spotifyLoading && spotifyApi && user) {
+      fetchPosts(true)
+    }
+  }, [fetchPosts, spotifyApi, spotifyLoading, user])
+
   if (!user) {
     return null
   }
@@ -273,37 +281,24 @@ const Feed = () => {
   )
 
   return (
-    <SafeAreaView edges={['top']} style={styles.container}>
-      <GestureHandlerRootView>
-        <FeedHeader user={user} />
-        {hasNewPosts && (
-          <Button
-            onPress={handleShowNewPosts}
-            style={styles.newPostsButton}
-            title="New posts available"
-            variant="secondary"
-          />
-        )}
-        <FlashList
-          data={posts}
-          decelerationRate="fast"
-          estimatedItemSize={400}
-          keyExtractor={(item) => item.id ?? Math.random().toString()}
-          onEndReached={() => fetchPosts()}
-          onEndReachedThreshold={0.8}
-          onRefresh={() => fetchPosts(true)}
-          onScrollBeginDrag={() => setCloseDrawer(true)}
-          onViewableItemsChanged={onViewableItemsChanged}
-          ref={listRef}
-          refreshing={loading}
-          renderItem={renderItem}
-          showsVerticalScrollIndicator={false}
-          snapToAlignment="center"
-          viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
-        />
-        <Drawer closeDrawer={closeDrawer} setCloseDrawer={setCloseDrawer} />
-      </GestureHandlerRootView>
-    </SafeAreaView>
+    <FlashList
+      data={posts}
+      decelerationRate="fast"
+      estimatedItemSize={400}
+      keyExtractor={(item) => item.id ?? Math.random().toString()}
+      onEndReached={() => fetchPosts()}
+      onEndReachedThreshold={0.8}
+      onRefresh={() => fetchPosts(true)}
+      onScrollBeginDrag={() => setCloseDrawer(true)}
+      onViewableItemsChanged={onViewableItemsChanged}
+      ref={listRef}
+      refreshing={loading}
+      renderItem={renderItem}
+      showsVerticalScrollIndicator={false}
+      snapToAlignment="center"
+      viewabilityConfig={{ itemVisiblePercentThreshold: 50 }}
+      {...flashListProps}
+    />
   )
 }
 
@@ -315,26 +310,11 @@ const styles = StyleSheet.create({
     paddingRight: theme.spacing[400],
     paddingVertical: theme.spacing[800],
   },
-  container: {
-    backgroundColor: theme.surface.base.default,
-    flex: 1,
-  },
-  header: {
-    backgroundColor: theme.surface.base.default,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: theme.spacing[400],
-    paddingVertical: theme.spacing[100],
-  },
   info: {
     marginLeft: theme.spacing[200],
   },
   likes: {
     alignItems: 'center',
-  },
-  newPostsButton: {
-    backgroundColor: theme.surface.base.default,
-    padding: theme.spacing[400],
   },
   post: {
     margin: theme.spacing[200],
@@ -345,5 +325,3 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing[1000],
   },
 })
-
-export default Feed

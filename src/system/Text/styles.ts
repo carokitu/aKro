@@ -8,6 +8,9 @@ export const colorStyles: Record<TextColor, { color: string }> = {
   default: {
     color: text.base.default,
   },
+  disabled: {
+    color: text.disabled,
+  },
   informal: {
     color: text.informal.default,
   },

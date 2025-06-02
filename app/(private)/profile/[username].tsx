@@ -1,13 +1,13 @@
-import { ArrowRight, ChevronLeft } from 'lucide-react-native'
+import { ArrowRight, ChevronLeft, CircleOff } from 'lucide-react-native'
 import { useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-import { FlashList } from '@shopify/flash-list'
 import { router, useLocalSearchParams } from 'expo-router'
 
 import { useUser } from '../../../hooks'
 import { type User } from '../../../models'
+import { PostsList } from '../../../src'
 import { FollowButton } from '../../../src/components/ActionButtons/FollowButton'
 import { Avatar, H1, IconButton, Text, Title } from '../../../src/system'
 import { theme } from '../../../src/theme'
@@ -42,6 +42,7 @@ const FollowedByUsers = ({ user }: { user: EnhancedUser }) => {
   const displayedFollowers = user.followers?.slice(0, 4) || []
   const count = user.followers_count - displayedFollowers.length
   const hiddenCount = count > 99 ? '99+' : `+${count}`
+  const isDisabled = user.followers_count === 0
 
   return (
     <View style={styles.followedBy}>
@@ -58,10 +59,10 @@ const FollowedByUsers = ({ user }: { user: EnhancedUser }) => {
         )}
       </View>
       <View style={styles.followLabel}>
-        <Text style={styles.followText}>
+        <Text color={isDisabled ? 'disabled' : 'default'} style={styles.followText}>
           {user.followers_count} abonné{user.followers_count > 1 ? 's' : ''}
         </Text>
-        <ArrowRight color={theme.text.base.default} />
+        <ArrowRight color={isDisabled ? theme.text.disabled : theme.text.base.default} />
       </View>
     </View>
   )
@@ -69,6 +70,7 @@ const FollowedByUsers = ({ user }: { user: EnhancedUser }) => {
 
 const FollowsUsers = ({ user }: { user: EnhancedUser }) => {
   const displayedFollowers = user.following?.slice(0, 4) || []
+  const isDisabled = !user.following
 
   return (
     <View style={styles.followedBy}>
@@ -78,29 +80,31 @@ const FollowsUsers = ({ user }: { user: EnhancedUser }) => {
             <Avatar avatar={follower.avatar_url} size="md" />
           </View>
         ))}
-        <View style={[styles.avatarWrapper, styles.moreCircle, user.following && styles.notFirstAvatar]}>
-          <Text style={styles.moreText}>•••</Text>
-        </View>
+        {!isDisabled && (
+          <View style={[styles.avatarWrapper, styles.moreCircle, user.following && styles.notFirstAvatar]}>
+            <Text style={styles.moreText}>•••</Text>
+          </View>
+        )}
       </View>
       <View style={styles.followLabel}>
-        <Text style={styles.followText}>abonnements</Text>
-        <ArrowRight color={theme.text.base.default} />
+        <Text color={isDisabled ? 'disabled' : 'default'} style={styles.followText}>
+          abonnements
+        </Text>
+        <ArrowRight color={isDisabled ? theme.text.disabled : theme.text.base.default} />
       </View>
     </View>
   )
 }
 
-const Inspirations = ({ user }: { user: EnhancedUser }) => {
-  return (
-    <>
-      <Title style={styles.inspirationsTitle}>Inspirations</Title>
-      <View style={styles.inspirations}>
-        <FollowedByUsers user={user} />
-        <FollowsUsers user={user} />
-      </View>
-    </>
-  )
-}
+const Inspirations = ({ user }: { user: EnhancedUser }) => (
+  <>
+    <Title style={styles.inspirationsTitle}>Inspirations</Title>
+    <View style={styles.inspirations}>
+      <FollowedByUsers user={user} />
+      <FollowsUsers user={user} />
+    </View>
+  </>
+)
 
 const UserInfos = ({ user: userFromProps }: { user: EnhancedUser }) => {
   const { user: currentUser } = useUser()
@@ -144,10 +148,16 @@ const UserInfos = ({ user: userFromProps }: { user: EnhancedUser }) => {
       />
       <Inspirations user={user} />
       <Title style={styles.publicationsTitle}>Publications</Title>
-      <Text>Publications</Text>
     </View>
   )
 }
+
+const EmptyState = () => (
+  <View style={styles.emptyState}>
+    <CircleOff color={theme.text.base.secondary} size={40} />
+    <Title color="secondary">Aucune publication</Title>
+  </View>
+)
 
 const UserProfile = () => {
   const { username } = useLocalSearchParams()
@@ -179,7 +189,7 @@ const UserProfile = () => {
     }
   }, [currentUser, username])
 
-  if (!user) {
+  if (!user || !currentUser) {
     return (
       <SafeAreaView>
         <Text>Loading...</Text>
@@ -188,14 +198,13 @@ const UserProfile = () => {
   }
 
   return (
-    <SafeAreaView>
+    <SafeAreaView edges={['top']} style={styles.container}>
       <Header username={user.username} />
-      <UserInfos user={user} />
-      <FlashList
-        data={['yo', 'yo']}
-        ListEmptyComponent={<Text>No posts</Text>}
+      <PostsList
+        filterByUsername={user.username}
+        ListEmptyComponent={<EmptyState />}
         ListHeaderComponent={<UserInfos user={user} />}
-        renderItem={() => <Text>yo</Text>}
+        user={currentUser}
       />
     </SafeAreaView>
   )
@@ -207,6 +216,7 @@ const styles = StyleSheet.create({
   avatarRow: {
     alignItems: 'center',
     flexDirection: 'row',
+    height: 34,
   },
   avatarWrapper: {
     borderColor: theme.surface.base.secondary,
@@ -219,6 +229,15 @@ const styles = StyleSheet.create({
   backButton: {
     left: 10,
     position: 'absolute',
+  },
+  container: {
+    flex: 1,
+  },
+  emptyState: {
+    alignItems: 'center',
+    gap: theme.spacing['400'],
+    justifyContent: 'center',
+    marginTop: theme.spacing['800'],
   },
   followButton: {
     marginVertical: theme.spacing['400'],
@@ -237,7 +256,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   followText: {
-    color: theme.text.base.default,
     fontSize: 14,
     fontWeight: '500',
   },

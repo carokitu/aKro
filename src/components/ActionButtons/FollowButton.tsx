@@ -1,7 +1,7 @@
 import { useActionSheet } from '@expo/react-native-action-sheet'
 import { UserCheck, UserPlus } from 'lucide-react-native'
 import { useCallback, useEffect, useState } from 'react'
-import { Keyboard, type StyleProp, StyleSheet, type ViewStyle } from 'react-native'
+import { Keyboard, type StyleProp, type ViewStyle } from 'react-native'
 
 import { Button } from '../../../src/system'
 import { theme } from '../../../src/theme'
@@ -104,15 +104,9 @@ export const FollowButton = ({
         Keyboard.dismiss()
       }}
       size={size}
-      style={[styles.followButton, style]}
+      style={style}
       title={followButtonTitle}
       variant={isFollowed ? 'secondary' : 'primary'}
     />
   )
 }
-
-const styles = StyleSheet.create({
-  followButton: {
-    // width: '100%',
-  },
-})

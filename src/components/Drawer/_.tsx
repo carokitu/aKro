@@ -22,13 +22,7 @@ const EmptyComponent = () => (
   </View>
 )
 
-export const Drawer = ({
-  closeDrawer,
-  setCloseDrawer,
-}: {
-  closeDrawer: boolean
-  setCloseDrawer: (value: boolean) => void
-}) => {
+export const Drawer = ({ close, setClose }: { close: boolean; setClose: (value: boolean) => void }) => {
   const [currentSnapIndex, setCurrentSnapIndex] = useState(INDEX_ON_INIT)
   const { loading, loadMore, refresh, refreshing, tracks } = useSavedTracks(ITEMS_PER_PAGE)
   const snapPoints = useMemo(() => ['10%', '40%', '100%'], [])
@@ -46,11 +40,11 @@ export const Drawer = ({
   )
 
   useEffect(() => {
-    if (closeDrawer) {
+    if (close) {
       bottomSheetRef.current?.snapToIndex(0)
-      setCloseDrawer(false)
+      setClose(false)
     }
-  }, [closeDrawer, setCloseDrawer])
+  }, [close, setClose])
 
   const renderItem = ({ index, item }: { index: number; item: SavedTrack }) => {
     const isFirst = index === 0

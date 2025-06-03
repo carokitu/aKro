@@ -1,12 +1,12 @@
 import { ArrowRight, ChevronLeft, CircleOff } from 'lucide-react-native'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { router, useLocalSearchParams } from 'expo-router'
 
 import { useUser } from '../../../hooks'
-import { type User } from '../../../models'
+import { type Post, type User } from '../../../models'
 import { PostsList } from '../../../src'
 import { FollowButton } from '../../../src/components/ActionButtons/FollowButton'
 import { Avatar, H1, IconButton, Text, Title } from '../../../src/system'
@@ -189,6 +189,24 @@ const UserProfile = () => {
     }
   }, [currentUser, username])
 
+  const fetchPosts = useCallback(
+    async ({ limit, offset }: { limit: number; offset: number }): Promise<{ data: Post[]; error: Error | null }> => {
+      if (!user) {
+        return { data: [], error: new Error('User not found') }
+      }
+
+      const { data, error } = await client.rpc('get_user_posts', {
+        p_limit: limit,
+        p_offset: offset,
+        p_username: username,
+        p_viewer_id: user.id,
+      })
+
+      return { data: data as Post[], error }
+    },
+    [user, username],
+  )
+
   if (!user || !currentUser) {
     return (
       <SafeAreaView>
@@ -201,6 +219,7 @@ const UserProfile = () => {
     <SafeAreaView edges={['top']} style={styles.container}>
       <Header username={user.username} />
       <PostsList
+        fetchPosts={fetchPosts}
         filterByUsername={user.username}
         ListEmptyComponent={<EmptyState />}
         ListHeaderComponent={<UserInfos user={user} />}

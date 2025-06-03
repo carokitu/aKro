@@ -110,7 +110,7 @@ export const Avatar = ({ avatar, size = 'md', style }: Props) => {
     loadAvatar()
   }, [loadAvatar])
 
-  if (!image || error) {
+  if (!image || !avatar || error) {
     return (
       <View style={[styles.iconContainer, SIZE_STYLES[size], style]}>
         <User color={theme.colors.neutral['50']} style={styles.icon} />

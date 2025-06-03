@@ -4,6 +4,7 @@ import { View } from 'react-native'
 import { router, Stack } from 'expo-router'
 
 import { useSpotifyAuth, useUser } from '../../hooks'
+import { theme } from '../../src/theme'
 
 export const PublicLayout = () => {
   const { isLoggedIn, loading, user } = useUser()
@@ -29,7 +30,7 @@ export const PublicLayout = () => {
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    <Stack screenOptions={{ contentStyle: { backgroundColor: theme.surface.base.default }, headerShown: false }}>
       <Stack.Screen name="index" />
       <Stack.Screen name="password" />
       <Stack.Screen name="provider-sign-in" />

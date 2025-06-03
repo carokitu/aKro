@@ -16,9 +16,10 @@ export const PrivateLayout = () => {
   return (
     <FeedProvider>
       <StatusBar backgroundColor={theme.surface.base.default} barStyle="dark-content" />
-      <Stack>
+      <Stack screenOptions={{ contentStyle: { backgroundColor: theme.surface.base.default } }}>
         <Stack.Screen name="feed" options={{ headerShown: false }} />
         <Stack.Screen name="search-users" options={{ headerShown: false }} />
+        <Stack.Screen name="profile" options={{ headerShown: false }} />
       </Stack>
     </FeedProvider>
   )

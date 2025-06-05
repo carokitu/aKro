@@ -1,26 +1,18 @@
 import { ChevronLeft, Search, UserX } from 'lucide-react-native'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Keyboard, StyleSheet, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
+import { Keyboard, StyleSheet, TextInput, TouchableWithoutFeedback, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-import { FlashList } from '@shopify/flash-list'
 import { router } from 'expo-router'
-import pluralize from 'pluralize'
 
 import { debounce } from 'lodash'
 
 import { useUser } from '../../hooks'
-import { type User as TUser } from '../../models'
-import { FollowButton } from '../../src/components/ActionButtons/FollowButton'
-import { Avatar, H1, IconButton, Label, Text, Title } from '../../src/system'
+import { type UserWithStats } from '../../models/custom'
+import { UserList } from '../../src/components/Lists'
+import { H1, IconButton, Text, Title } from '../../src/system'
 import { theme } from '../../src/theme'
 import { client } from '../../supabase'
-
-type UserWithStats = Pick<TUser, 'avatar_url' | 'id' | 'name' | 'username'> & {
-  follows_me: boolean
-  is_followed: boolean
-  mutual_count: number
-}
 
 type UserListProps = {
   query: string
@@ -34,83 +26,50 @@ const EmptyList = () => (
   </View>
 )
 
-const UserList = ({ query }: UserListProps) => {
+const Users = ({ query }: UserListProps) => {
   const { user: currentUser } = useUser()
-  const [results, setResults] = useState<UserWithStats[]>([])
+  const [users, setUsers] = useState<UserWithStats[]>([])
   const [loading, setLoading] = useState(false)
 
   const fetchUsers = useCallback(async () => {
     if (!currentUser) {
-      return
+      return { error: new Error('Current user not found') }
     }
 
     setLoading(true)
 
-    try {
-      const { data: usersData, error: usersError } = await client.rpc('search_users_with_stats', {
-        p_query: query,
-        p_user_id: currentUser.id,
-      })
+    const { data: usersData, error: usersError } = await client.rpc('search_users_with_stats', {
+      p_query: query,
+      p_user_id: currentUser.id,
+    })
 
-      if (usersError) {
-        setLoading(false)
-        return
-      }
-
-      setResults(usersData as UserWithStats[])
-    } finally {
+    if (usersError) {
       setLoading(false)
+      return { error: usersError }
     }
+
+    setUsers(usersData as UserWithStats[])
+    setLoading(false)
+
+    return { error: null }
   }, [currentUser, query])
 
   useEffect(() => {
     fetchUsers()
   }, [fetchUsers, query])
 
-  const renderItem = ({ item }: { item: UserWithStats }) => {
-    const { avatar_url, follows_me, id, is_followed, mutual_count, name, username } = item
-    const info = mutual_count ? `${name} • ${mutual_count} ${pluralize('ami', mutual_count)} en commun` : name
-
-    const handlePress = () => {
-      router.push(`/profile/${username}`)
-    }
-
-    if (!currentUser) {
-      return null
-    }
-
-    return (
-      <TouchableOpacity onPress={handlePress} style={styles.userCard}>
-        <View style={styles.userCardContent}>
-          <Avatar avatar={avatar_url} size="lg" />
-          <View style={styles.info}>
-            <Label ellipsizeMode="tail" numberOfLines={1} style={styles.username}>
-              {username}
-            </Label>
-            <Text color="secondary" ellipsizeMode="tail" numberOfLines={1} size="small" style={styles.name}>
-              {info}
-            </Text>
-          </View>
-        </View>
-        <FollowButton
-          currentUserId={currentUser.id}
-          follows_me={follows_me}
-          is_followed={is_followed}
-          otherUser={id}
-          size="sm"
-        />
-      </TouchableOpacity>
-    )
+  if (!currentUser) {
+    return null
   }
 
   return (
-    <FlashList
-      data={results}
-      estimatedItemSize={45}
-      keyboardShouldPersistTaps="handled"
-      keyExtractor={(item) => item.id}
+    <UserList
+      currentUser={currentUser}
+      fetch={fetchUsers}
+      infinieScroll={false}
       ListEmptyComponent={loading ? null : <EmptyList />}
-      renderItem={renderItem}
+      loading={loading}
+      users={users}
     />
   )
 }
@@ -157,7 +116,7 @@ const SearchUsers = () => {
               value={query}
             />
           </View>
-          <UserList query={debouncedQuery} />
+          <Users query={debouncedQuery} />
         </SafeAreaView>
       </View>
     </TouchableWithoutFeedback>
@@ -188,11 +147,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: theme.spacing[400],
   },
-  info: {
-    flex: 1,
-    marginHorizontal: theme.spacing[300],
-    overflow: 'hidden',
-  },
   input: {
     flex: 1,
     fontSize: theme.fontSize.md,
@@ -200,9 +154,6 @@ const styles = StyleSheet.create({
     marginLeft: theme.spacing[200],
     overflow: 'hidden',
     width: '100%',
-  },
-  name: {
-    flexShrink: 1,
   },
   search: {
     backgroundColor: theme.surface.base.secondary,
@@ -218,20 +169,5 @@ const styles = StyleSheet.create({
     gap: theme.spacing[200],
     justifyContent: 'center',
     marginTop: theme.spacing['200'],
-  },
-  userCard: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: theme.spacing[300],
-    overflow: 'hidden',
-  },
-  userCardContent: {
-    alignItems: 'center',
-    flex: 1,
-    flexDirection: 'row',
-  },
-  username: {
-    flexShrink: 1,
   },
 })

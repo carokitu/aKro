@@ -16,6 +16,8 @@ export const PrivateLayout = () => {
       <Stack screenOptions={{ contentStyle: { backgroundColor: theme.surface.base.default } }}>
         <Stack.Screen name="me" options={{ headerShown: false }} />
         <Stack.Screen name="[username]" options={{ headerShown: false }} />
+        <Stack.Screen name="followers/[username]" options={{ headerShown: false }} />
+        <Stack.Screen name="following/[username]" options={{ headerShown: false }} />
       </Stack>
     </FeedProvider>
   )

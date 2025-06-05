@@ -4,6 +4,7 @@ import { FlashList, type FlashListProps } from '@shopify/flash-list'
 
 import { type User as TUser } from '../../../../models'
 import { type UserWithStats } from '../../../../models/custom'
+import { Error } from '../../../system'
 import { User } from './User'
 
 type UserListProps = Omit<FlashListProps<UserWithStats>, 'data' | 'renderItem'> & {
@@ -43,6 +44,7 @@ export const UserList = ({
       estimatedItemSize={45}
       keyboardShouldPersistTaps="handled"
       keyExtractor={(item) => item.id}
+      ListEmptyComponent={<Error />}
       onEndReached={infinieScroll ? fetchUsers : undefined}
       renderItem={renderItem}
       {...flashListProps}

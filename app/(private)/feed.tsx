@@ -109,6 +109,7 @@ const Feed = () => {
         <PostsList
           fetchPosts={fetchPosts}
           ListFooterComponent={FooterComponent}
+          loadNewPost
           onScrollBeginDrag={() => setCloseDrawer(true)}
           toast={
             newPostFromUser

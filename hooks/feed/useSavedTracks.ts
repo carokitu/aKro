@@ -21,9 +21,9 @@ export const useSavedTracks = (baseLimit: MaxInt<50> = DEFAULT_PAGE_SIZE) => {
 
       try {
         const { items } = await spotifyApi.currentUser.tracks.savedTracks(baseLimit, offsetToUse)
+
         return items
-      } catch (error) {
-        console.error('Error fetching saved tracks:', error)
+      } catch {
         return []
       }
     },

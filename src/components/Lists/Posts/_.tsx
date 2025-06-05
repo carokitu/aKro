@@ -16,7 +16,6 @@ import { type EnhancedFeedPost } from './types'
 
 type Props = Omit<FlashListProps<EnhancedFeedPost>, 'data' | 'renderItem'> & {
   fetchPosts: ({ limit, offset }: { limit: number; offset: number }) => Promise<{ data: TPost[]; error: Error | null }>
-  filterByUsername?: string
   onReset?: () => void
   toast?: ToastProps
   user: User

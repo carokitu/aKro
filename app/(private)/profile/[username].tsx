@@ -1,6 +1,6 @@
 import { ArrowRight, ChevronLeft, CircleOff } from 'lucide-react-native'
 import { useCallback, useEffect, useState } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { router, useLocalSearchParams } from 'expo-router'
@@ -43,9 +43,21 @@ const FollowedByUsers = ({ user }: { user: EnhancedUser }) => {
   const count = user.followers_count - displayedFollowers.length
   const hiddenCount = count > 99 ? '99+' : `+${count}`
   const isDisabled = user.followers_count === 0
+  const [isPressed, setIsPressed] = useState(false)
+
+  const handlePress = () => {
+    router.push(`./followers/${user.username}`)
+  }
 
   return (
-    <View style={styles.followedBy}>
+    <TouchableOpacity
+      activeOpacity={1}
+      disabled={isDisabled}
+      onPress={handlePress}
+      onPressIn={() => setIsPressed(true)}
+      onPressOut={() => setIsPressed(false)}
+      style={[styles.followedBy, isPressed && styles.pressed]}
+    >
       <View style={styles.avatarRow}>
         {displayedFollowers.map((follower, index) => (
           <View key={follower.id} style={[styles.avatarWrapper, index > 0 && styles.notFirstAvatar]}>
@@ -64,16 +76,28 @@ const FollowedByUsers = ({ user }: { user: EnhancedUser }) => {
         </Text>
         <ArrowRight color={isDisabled ? theme.text.disabled : theme.text.base.default} />
       </View>
-    </View>
+    </TouchableOpacity>
   )
 }
 
 const FollowsUsers = ({ user }: { user: EnhancedUser }) => {
   const displayedFollowers = user.following?.slice(0, 4) || []
   const isDisabled = !user.following
+  const [isPressed, setIsPressed] = useState(false)
+
+  const handlePress = () => {
+    router.push(`./following/${user.username}`)
+  }
 
   return (
-    <View style={styles.followedBy}>
+    <TouchableOpacity
+      activeOpacity={1}
+      disabled={isDisabled}
+      onPress={handlePress}
+      onPressIn={() => setIsPressed(true)}
+      onPressOut={() => setIsPressed(false)}
+      style={[styles.followedBy, isPressed && styles.pressed]}
+    >
       <View style={styles.avatarRow}>
         {displayedFollowers.map((follower, index) => (
           <View key={follower.id} style={[styles.avatarWrapper, index > 0 && styles.notFirstAvatar]}>
@@ -92,7 +116,7 @@ const FollowsUsers = ({ user }: { user: EnhancedUser }) => {
         </Text>
         <ArrowRight color={isDisabled ? theme.text.disabled : theme.text.base.default} />
       </View>
-    </View>
+    </TouchableOpacity>
   )
 }
 
@@ -220,7 +244,6 @@ const UserProfile = () => {
       <Header username={user.username} />
       <PostsList
         fetchPosts={fetchPosts}
-        filterByUsername={user.username}
         ListEmptyComponent={<EmptyState />}
         ListHeaderComponent={<UserInfos user={user} />}
         user={currentUser}
@@ -310,6 +333,9 @@ const styles = StyleSheet.create({
   },
   notFirstAvatar: {
     marginLeft: -12,
+  },
+  pressed: {
+    backgroundColor: theme.surface.base.secondaryPressed,
   },
   publicationsTitle: {
     marginBottom: theme.spacing['200'],

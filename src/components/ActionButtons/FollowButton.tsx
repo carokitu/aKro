@@ -11,8 +11,8 @@ type Props = {
   currentUserId: string
   follows_me: boolean
   is_followed: boolean
-  onFollow: () => void
-  onUnfollow: () => void
+  onFollow?: () => void
+  onUnfollow?: () => void
   otherUser: string
   size?: 'lg' | 'md' | 'sm'
   style?: StyleProp<ViewStyle>
@@ -54,7 +54,7 @@ export const FollowButton = ({
     }
 
     setIsLoading(false)
-    onFollow()
+    onFollow?.()
   }, [currentUserId, onFollow, otherUser])
 
   const unfollow = useCallback(async () => {
@@ -70,7 +70,7 @@ export const FollowButton = ({
     }
 
     setIsLoading(false)
-    onUnfollow()
+    onUnfollow?.()
   }, [currentUserId, onUnfollow, otherUser])
 
   const handleUnfollow = useCallback(() => {

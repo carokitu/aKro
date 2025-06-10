@@ -13,7 +13,7 @@ type AccessTokenWithExpiry = AccessToken & { expires_at: number }
 
 type SpotifyAuthContextType = {
   accessToken: AccessTokenWithExpiry | null
-  isLoading: boolean
+  loading: boolean
   login: () => Promise<void>
   loginError: null | string
   logout: () => Promise<void>
@@ -23,7 +23,7 @@ const SpotifyAuthContext = createContext<SpotifyAuthContextType | undefined>(und
 
 export const SpotifyAuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [accessToken, setAccessToken] = useState<AccessTokenWithExpiry | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [loading, setLoading] = useState(true)
   const [loginError, setLoginError] = useState<null | string>(null)
 
   const CLIENT_ID = process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID as string
@@ -113,7 +113,7 @@ export const SpotifyAuthProvider = ({ children }: { children: React.ReactNode })
     }
 
     if (response?.type === 'success' && response.params.code) {
-      setIsLoading(true)
+      setLoading(true)
       setLoginError(null)
 
       try {
@@ -142,7 +142,7 @@ export const SpotifyAuthProvider = ({ children }: { children: React.ReactNode })
         console.error('[SpotifyAuth] Auth exchange failed:', err)
         setLoginError('Authentication failed. Please try again.')
       } finally {
-        setIsLoading(false)
+        setLoading(false)
       }
     }
   }, [accessToken, CLIENT_ID, CLIENT_SECRET, redirectURI, response])
@@ -172,7 +172,7 @@ export const SpotifyAuthProvider = ({ children }: { children: React.ReactNode })
       } catch (err) {
         console.error('[SpotifyAuth] Token load failed:', err)
       } finally {
-        setIsLoading(false)
+        setLoading(false)
       }
     }
 
@@ -187,22 +187,22 @@ export const SpotifyAuthProvider = ({ children }: { children: React.ReactNode })
 
   // Fonction de login
   const login = useCallback(async () => {
-    if (isLoading) {
+    if (loading) {
       return
     }
 
-    setIsLoading(true)
+    setLoading(true)
     try {
       await promptAsync()
     } finally {
-      setIsLoading(false)
+      setLoading(false)
     }
-  }, [isLoading, promptAsync])
+  }, [loading, promptAsync])
 
   // Memoization du value pour éviter les rerenders inutiles
   const contextValue = useMemo(
-    () => ({ accessToken, isLoading, login, loginError, logout }),
-    [accessToken, isLoading, login, loginError, logout],
+    () => ({ accessToken, loading, login, loginError, logout }),
+    [accessToken, loading, login, loginError, logout],
   )
 
   return <SpotifyAuthContext.Provider value={contextValue}>{children}</SpotifyAuthContext.Provider>

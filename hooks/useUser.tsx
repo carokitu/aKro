@@ -88,6 +88,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const init = useCallback(async () => {
     dispatch({ payload: true, type: 'SET_LOADING' })
+    console.log('init')
 
     try {
       const {
@@ -109,6 +110,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     let isMounted = true
 
+    console.log('useEffect')
+
     init()
 
     const { data: listener } = client.auth.onAuthStateChange(async (_event, session) => {
@@ -127,11 +130,13 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       isMounted = false
       listener?.subscription.unsubscribe()
     }
-  }, [checkIfUserExists, init])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const login = useCallback(
     async (input: LoginInput) => {
       dispatch({ payload: true, type: 'SET_LOADING' })
+      console.log('login')
       try {
         const { error } = await client.auth.signInWithPassword(input)
         if (error) {
@@ -150,7 +155,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = useCallback(async () => {
     dispatch({ payload: true, type: 'SET_LOADING' })
-
+    console.log('logout')
     try {
       await client.auth.signOut()
       dispatch({ type: 'CLEAR_USER' })
@@ -183,6 +188,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useUser = () => {
   const context = useContext(UserContext)
+
   if (!context) {
     throw new Error('useUser must be used within a UserProvider')
   }

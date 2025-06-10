@@ -1,16 +1,15 @@
-import { ChevronLeft, Search, UserX } from 'lucide-react-native'
+import { Search, UserX } from 'lucide-react-native'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Keyboard, StyleSheet, TextInput, TouchableWithoutFeedback, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-
-import { router } from 'expo-router'
 
 import { debounce } from 'lodash'
 
 import { useUser } from '../../hooks'
 import { type UserWithStats } from '../../models/custom'
+import { NavBar } from '../../src/components'
 import { UserList } from '../../src/components/Lists'
-import { H1, IconButton, Text, Title } from '../../src/system'
+import { Text, Title } from '../../src/system'
 import { theme } from '../../src/theme'
 import { client } from '../../supabase'
 
@@ -92,18 +91,9 @@ const SearchUsers = () => {
 
   return (
     <TouchableWithoutFeedback accessible={false} onPress={() => Keyboard.dismiss()}>
-      <View style={styles.container}>
-        <SafeAreaView pointerEvents="box-none" style={styles.area}>
-          <View style={styles.title}>
-            <IconButton
-              Icon={ChevronLeft}
-              onPress={() => router.back()}
-              size="md"
-              style={styles.backButton}
-              variant="tertiary"
-            />
-            <H1>Ajoute des amis</H1>
-          </View>
+      <SafeAreaView pointerEvents="box-none" style={styles.area}>
+        <NavBar title="Ajoute des amis" />
+        <View style={styles.container}>
           <View style={styles.search}>
             <Search color={theme.text.base.tertiary} size={theme.fontSize.lg} />
             <TextInput
@@ -117,8 +107,8 @@ const SearchUsers = () => {
             />
           </View>
           <Users query={debouncedQuery} />
-        </SafeAreaView>
-      </View>
+        </View>
+      </SafeAreaView>
     </TouchableWithoutFeedback>
   )
 }
@@ -127,16 +117,12 @@ export default SearchUsers
 
 const styles = StyleSheet.create({
   area: {
-    flex: 1,
-  },
-  backButton: {
-    left: 0,
-    position: 'absolute',
-  },
-  container: {
     backgroundColor: theme.surface.base.default,
     flex: 1,
-    paddingHorizontal: theme.spacing[400],
+  },
+  container: {
+    flex: 1,
+    marginHorizontal: theme.spacing[400],
   },
   emptyIcon: {
     marginBottom: theme.spacing[200],
@@ -160,14 +146,9 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.base,
     display: 'flex',
     flexDirection: 'row',
-    marginVertical: theme.spacing[600],
+    marginBottom: theme.spacing[600],
+    marginTop: theme.spacing[200],
     paddingHorizontal: theme.padding[400],
     paddingVertical: theme.padding[400],
-  },
-  title: {
-    alignItems: 'center',
-    gap: theme.spacing[200],
-    justifyContent: 'center',
-    marginTop: theme.spacing['200'],
   },
 })

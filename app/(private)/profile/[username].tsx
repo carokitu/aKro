@@ -1,4 +1,4 @@
-import { ArrowRight, ChevronLeft, CircleOff } from 'lucide-react-native'
+import { ArrowRight, CircleOff, Settings } from 'lucide-react-native'
 import { useCallback, useEffect, useState } from 'react'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
@@ -8,8 +8,8 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { useUser } from '../../../hooks'
 import { type Post, type User } from '../../../models'
 import { PostsList } from '../../../src'
-import { FollowButton } from '../../../src/components'
-import { Avatar, Error as ErrorScreen, H1, IconButton, Text, Title } from '../../../src/system'
+import { FollowButton, NavBar } from '../../../src/components'
+import { Avatar, Error as ErrorScreen, Text, Title } from '../../../src/system'
 import { theme } from '../../../src/theme'
 import { client } from '../../../supabase'
 
@@ -24,19 +24,6 @@ type EnhancedUser = User & {
   follows_me: boolean
   is_followed: boolean
 }
-
-const Header = ({ username }: { username: string }) => (
-  <View style={styles.title}>
-    <IconButton
-      Icon={ChevronLeft}
-      onPress={() => router.back()}
-      size="md"
-      style={styles.backButton}
-      variant="tertiary"
-    />
-    <H1>{username}</H1>
-  </View>
-)
 
 const FollowedByUsers = ({ user }: { user: EnhancedUser }) => {
   const displayedFollowers = user.followers?.slice(0, 4) || []
@@ -187,12 +174,7 @@ const UserProfile = () => {
   const { username } = useLocalSearchParams()
   const { user: currentUser } = useUser()
   const [user, setUser] = useState<EnhancedUser | null>(null)
-
-  // useEffect(() => {
-  //   if (username === currentUser?.username) {
-  //     router.replace('/profile/me')
-  //   }
-  // }, [currentUser, username])
+  const isCurrentUserProfile = username === currentUser?.username
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -237,7 +219,10 @@ const UserProfile = () => {
 
   return (
     <SafeAreaView edges={['top']} style={styles.container}>
-      <Header username={user.username} />
+      <NavBar
+        rightIcon={isCurrentUserProfile ? { handlePress: () => {}, Icon: Settings } : undefined}
+        title={user.username}
+      />
       <PostsList
         fetchPosts={fetchPosts}
         ListEmptyComponent={<EmptyState />}
@@ -263,10 +248,6 @@ const styles = StyleSheet.create({
     height: 34,
     overflow: 'hidden',
     width: 34,
-  },
-  backButton: {
-    left: 10,
-    position: 'absolute',
   },
   container: {
     flex: 1,
@@ -336,11 +317,6 @@ const styles = StyleSheet.create({
   publicationsTitle: {
     marginBottom: theme.spacing['200'],
     marginTop: theme.spacing['600'],
-  },
-  title: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: theme.spacing['200'],
   },
   userInfos: {
     paddingHorizontal: theme.spacing['400'],

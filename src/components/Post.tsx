@@ -119,7 +119,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: theme.spacing[600],
-    // marginTop: theme.spacing[1000],
     marginTop: theme.spacing[200],
   },
   trackInfo: {

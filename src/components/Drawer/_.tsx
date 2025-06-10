@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { ActivityIndicator, StyleSheet, View } from 'react-native'
+import { ActivityIndicator, StyleSheet } from 'react-native'
 
 import BottomSheet, { BottomSheetFlatList, BottomSheetView } from '@gorhom/bottom-sheet'
 import { type SavedTrack } from '@spotify/web-api-ts-sdk'
 
 import { useSavedTracks } from '../../../hooks'
-import { Text, Title } from '../../system'
+import { Error, Title } from '../../system'
 import { theme } from '../../theme'
 import { padding } from '../../theme/spacing'
 import { Header } from './Header'
@@ -15,12 +15,6 @@ const INDEX_ON_INIT = 1
 const ITEMS_PER_PAGE = 50
 
 const LoadingFooter = () => <ActivityIndicator size="large" />
-
-const EmptyComponent = () => (
-  <View style={styles.emptyContainer}>
-    <Text color="tertiary">Aucune piste disponible</Text>
-  </View>
-)
 
 export const Drawer = ({ close, setClose }: { close: boolean; setClose: (value: boolean) => void }) => {
   const [currentSnapIndex, setCurrentSnapIndex] = useState(INDEX_ON_INIT)
@@ -70,7 +64,7 @@ export const Drawer = ({ close, setClose }: { close: boolean; setClose: (value: 
         <BottomSheetFlatList
           data={tracks}
           keyExtractor={(item) => item.track.id}
-          ListEmptyComponent={loading ? null : EmptyComponent}
+          ListEmptyComponent={loading ? null : Error}
           ListFooterComponent={loading ? <LoadingFooter /> : null}
           ListHeaderComponent={<Header />}
           onEndReached={loadMore}
@@ -91,9 +85,6 @@ const styles = StyleSheet.create({
   },
   bottomSheetContainer: {
     flex: 1,
-  },
-  emptyContainer: {
-    alignItems: 'center',
   },
   onHandleIndicator: {
     backgroundColor: theme.surface.base.secondaryPressed,

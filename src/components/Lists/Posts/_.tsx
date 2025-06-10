@@ -7,6 +7,7 @@ import { FlashList, type FlashListProps } from '@shopify/flash-list'
 import { useSpotifyApi } from '../../../../hooks'
 import { type Post as TPost, type User } from '../../../../models'
 import { client } from '../../../../supabase'
+import { Error } from '../../../system'
 import { theme } from '../../../theme'
 import { Post } from '../../Post'
 import { ActionButtons } from './ActionButtons'
@@ -16,12 +17,20 @@ import { type EnhancedFeedPost } from './types'
 
 type Props = Omit<FlashListProps<EnhancedFeedPost>, 'data' | 'renderItem'> & {
   fetchPosts: ({ limit, offset }: { limit: number; offset: number }) => Promise<{ data: TPost[]; error: Error | null }>
+  loadNewPost?: boolean
   onReset?: () => void
   toast?: ToastProps
   user: User
 }
 
-export const PostsList = ({ fetchPosts: fetchPostFromProps, onReset, toast, user, ...flashListProps }: Props) => {
+export const PostsList = ({
+  fetchPosts: fetchPostFromProps,
+  loadNewPost = false,
+  onReset,
+  toast,
+  user,
+  ...flashListProps
+}: Props) => {
   const { loading: spotifyLoading, spotifyApi } = useSpotifyApi()
 
   const [posts, setPosts] = useState<EnhancedFeedPost[]>([])
@@ -30,27 +39,23 @@ export const PostsList = ({ fetchPosts: fetchPostFromProps, onReset, toast, user
   const [latestPostTimestamp, setLatestPostTimestamp] = useState<null | string>(null)
   const [hasNewPosts, setHasNewPosts] = useState(false)
   const [resetPending, setResetPending] = useState(false)
+  const [error, setError] = useState<Error | null>(null)
 
   const LIMIT = 20
   const hasMounted = useRef(false)
   const listRef = useRef<FlashList<EnhancedFeedPost>>(null)
 
   useEffect(() => {
-    if (!latestPostTimestamp || !user) {
+    if (!latestPostTimestamp || !user || !loadNewPost) {
       return
     }
 
     const interval = setInterval(async () => {
-      const { data, error } = await client.rpc('get_user_feed', {
+      const { data } = await client.rpc('get_user_feed', {
         p_limit: 1,
         p_offset: 0,
         p_user_id: user.id,
       })
-
-      if (error) {
-        console.error('Error polling new posts:', error)
-        return
-      }
 
       const latestPost = data?.[0] ? (data?.[0] as TPost) : undefined
 
@@ -62,7 +67,7 @@ export const PostsList = ({ fetchPosts: fetchPostFromProps, onReset, toast, user
     }, 15_000)
 
     return () => clearInterval(interval)
-  }, [latestPostTimestamp, user])
+  }, [latestPostTimestamp, loadNewPost, user])
 
   useEffect(() => {
     if (spotifyLoading && !hasMounted.current) {
@@ -79,12 +84,7 @@ export const PostsList = ({ fetchPosts: fetchPostFromProps, onReset, toast, user
         return []
       }
 
-      try {
-        return await spotifyApi.currentUser.tracks.hasSavedTracks(trackIds)
-      } catch (error) {
-        console.error('Error checking liked tracks:', error)
-        return []
-      }
+      return await spotifyApi.currentUser.tracks.hasSavedTracks(trackIds)
     },
     [spotifyApi],
   )
@@ -102,12 +102,14 @@ export const PostsList = ({ fetchPosts: fetchPostFromProps, onReset, toast, user
         offset: reset ? 0 : offset,
       }
 
-      const { data, error } = await fetchPostFromProps(props)
+      const { data, error: err } = await fetchPostFromProps(props)
 
-      if (error) {
-        console.error('Error fetching feed:', error)
+      if (err) {
+        setError(err)
         setLoading(false)
         return
+      } else {
+        setError(null)
       }
 
       const feedPosts = data as TPost[]
@@ -183,6 +185,10 @@ export const PostsList = ({ fetchPosts: fetchPostFromProps, onReset, toast, user
       style={styles.post}
     />
   )
+
+  if (error) {
+    return <Error />
+  }
 
   return (
     <>

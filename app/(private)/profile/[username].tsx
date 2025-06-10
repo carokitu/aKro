@@ -9,7 +9,7 @@ import { useUser } from '../../../hooks'
 import { type Post, type User } from '../../../models'
 import { PostsList } from '../../../src'
 import { FollowButton } from '../../../src/components'
-import { Avatar, H1, IconButton, Text, Title } from '../../../src/system'
+import { Avatar, Error as ErrorScreen, H1, IconButton, Text, Title } from '../../../src/system'
 import { theme } from '../../../src/theme'
 import { client } from '../../../supabase'
 
@@ -232,11 +232,7 @@ const UserProfile = () => {
   )
 
   if (!user || !currentUser) {
-    return (
-      <SafeAreaView>
-        <Text>Loading...</Text>
-      </SafeAreaView>
-    )
+    return <ErrorScreen />
   }
 
   return (

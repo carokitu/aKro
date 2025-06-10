@@ -1,29 +1,15 @@
-import { ChevronLeft } from 'lucide-react-native'
 import { useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-import { router, useLocalSearchParams } from 'expo-router'
+import { useLocalSearchParams } from 'expo-router'
 
 import { useUser } from '../../../../hooks'
 import { type UserWithStats } from '../../../../models/custom'
+import { NavBar } from '../../../../src/components'
 import { UserList } from '../../../../src/components/Lists'
-import { H1, IconButton } from '../../../../src/system'
 import { theme } from '../../../../src/theme'
 import { client } from '../../../../supabase'
-
-const Header = () => (
-  <View style={styles.title}>
-    <IconButton
-      Icon={ChevronLeft}
-      onPress={() => router.back()}
-      size="md"
-      style={styles.backButton}
-      variant="tertiary"
-    />
-    <H1>abonnements</H1>
-  </View>
-)
 
 const Followers = () => {
   const { username } = useLocalSearchParams()
@@ -61,8 +47,10 @@ const Followers = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header />
-      <UserList currentUser={currentUser} fetch={fetchUsers} loading={false} users={followers} />
+      <NavBar title="abonnements" />
+      <View style={styles.list}>
+        <UserList currentUser={currentUser} fetch={fetchUsers} loading={false} users={followers} />
+      </View>
     </SafeAreaView>
   )
 }
@@ -70,18 +58,11 @@ const Followers = () => {
 export default Followers
 
 const styles = StyleSheet.create({
-  backButton: {
-    left: 0,
-    position: 'absolute',
-  },
   container: {
     flex: 1,
-    paddingHorizontal: theme.spacing['400'],
   },
-  title: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: theme.spacing['300'],
-    paddingVertical: theme.spacing['200'],
+  list: {
+    flex: 1,
+    paddingHorizontal: theme.spacing['400'],
   },
 })

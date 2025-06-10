@@ -1,4 +1,5 @@
 export { FollowButton } from './ActionButtons'
 export { Drawer } from './Drawer'
 export { PostsList } from './Lists'
+export { NavBar } from './NavBar'
 export { Post } from './Post'

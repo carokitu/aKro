@@ -1,31 +1,16 @@
-import { ChevronLeft } from 'lucide-react-native'
 import { useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-import { router, useLocalSearchParams } from 'expo-router'
+import { useLocalSearchParams } from 'expo-router'
 
 import { useUser } from '../../../../hooks'
 import { type UserWithStats } from '../../../../models/custom'
+import { NavBar } from '../../../../src/components'
 import { UserList } from '../../../../src/components/Lists'
-import { H1, IconButton } from '../../../../src/system'
+import { Error as ErrorScreen } from '../../../../src/system'
 import { theme } from '../../../../src/theme'
 import { client } from '../../../../supabase'
-
-const Header = ({ nbFollowers }: { nbFollowers: number }) => (
-  <View style={styles.title}>
-    <IconButton
-      Icon={ChevronLeft}
-      onPress={() => router.back()}
-      size="md"
-      style={styles.backButton}
-      variant="tertiary"
-    />
-    <H1>
-      {nbFollowers} abonné{nbFollowers > 1 ? 's' : ''}
-    </H1>
-  </View>
-)
 
 const Followers = () => {
   const { username } = useLocalSearchParams()
@@ -52,8 +37,6 @@ const Followers = () => {
     }
   }, [username])
 
-  console.log('fetchError', error)
-
   const fetchFollowers = async ({ limit, offset }: { limit: number; offset: number }) => {
     if (!currentUser) {
       return { error: new Error('Current user not found') }
@@ -79,14 +62,22 @@ const Followers = () => {
     return { error: null }
   }
 
-  if (!currentUser) {
-    return null
+  if (!currentUser || error) {
+    return <ErrorScreen />
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header nbFollowers={nbFollowers} />
-      <UserList currentUser={currentUser} fetch={fetchFollowers} loading={false} users={followers} />
+      <NavBar title={`${nbFollowers} abonné${nbFollowers > 1 ? 's' : ''}`} />
+      <View style={styles.list}>
+        <UserList
+          currentUser={currentUser}
+          fetch={fetchFollowers}
+          loading={false}
+          style={styles.list}
+          users={followers}
+        />
+      </View>
     </SafeAreaView>
   )
 }
@@ -94,18 +85,11 @@ const Followers = () => {
 export default Followers
 
 const styles = StyleSheet.create({
-  backButton: {
-    left: 0,
-    position: 'absolute',
-  },
   container: {
     flex: 1,
-    paddingHorizontal: theme.spacing['400'],
   },
-  title: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: theme.spacing['300'],
-    paddingVertical: theme.spacing['200'],
+  list: {
+    flex: 1,
+    paddingHorizontal: theme.spacing['400'],
   },
 })

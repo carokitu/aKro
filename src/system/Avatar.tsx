@@ -8,7 +8,7 @@ import { theme } from '../theme'
 
 type Props = {
   avatar?: null | string
-  size?: 'lg' | 'md' | 'sm' | 'xl'
+  size?: 'lg' | 'md' | 'sm' | 'xl' | 'xxl'
   style?: StyleProp<ViewStyle>
 }
 
@@ -28,6 +28,10 @@ const SIZE_STYLES = {
   xl: {
     height: 88,
     width: 88,
+  },
+  xxl: {
+    height: 100,
+    width: 100,
   },
 }
 
@@ -77,6 +81,7 @@ export const Avatar = ({ avatar, size = 'md', style }: Props) => {
 
     const avatarKey = `avatar-${avatar}`
     const cachedAvatar = await getCachedAvatar(avatarKey)
+
     if (cachedAvatar) {
       setImage(cachedAvatar)
       return
@@ -94,6 +99,7 @@ export const Avatar = ({ avatar, size = 'md', style }: Props) => {
 
       fr.onload = () => {
         const avatarUrl = fr.result as string
+
         if (avatarUrl !== image) {
           setImage(avatarUrl)
           cacheAvatar(avatarUrl, avatarKey) // Cache the avatar for future use

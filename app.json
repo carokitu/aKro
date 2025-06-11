@@ -9,7 +9,7 @@
     "experiments": {
       "typedRoutes": true
     },
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/logo/icon.png",
     "ios": {
       "supportsTablet": true
     },

@@ -70,13 +70,7 @@ const Followers = () => {
     <SafeAreaView style={styles.container}>
       <NavBar title={`${nbFollowers} abonné${nbFollowers > 1 ? 's' : ''}`} />
       <View style={styles.list}>
-        <UserList
-          currentUser={currentUser}
-          fetch={fetchFollowers}
-          loading={false}
-          style={styles.list}
-          users={followers}
-        />
+        <UserList currentUser={currentUser} fetch={fetchFollowers} loading={false} users={followers} />
       </View>
     </SafeAreaView>
   )

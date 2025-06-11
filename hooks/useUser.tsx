@@ -88,7 +88,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const init = useCallback(async () => {
     dispatch({ payload: true, type: 'SET_LOADING' })
-    console.log('init')
 
     try {
       const {
@@ -109,8 +108,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     let isMounted = true
-
-    console.log('useEffect')
 
     init()
 
@@ -136,7 +133,6 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const login = useCallback(
     async (input: LoginInput) => {
       dispatch({ payload: true, type: 'SET_LOADING' })
-      console.log('login')
       try {
         const { error } = await client.auth.signInWithPassword(input)
         if (error) {
@@ -155,7 +151,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = useCallback(async () => {
     dispatch({ payload: true, type: 'SET_LOADING' })
-    console.log('logout')
+
     try {
       await client.auth.signOut()
       dispatch({ type: 'CLEAR_USER' })

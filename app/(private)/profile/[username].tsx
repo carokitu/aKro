@@ -175,6 +175,7 @@ const UserProfile = () => {
   const { user: currentUser } = useUser()
   const [user, setUser] = useState<EnhancedUser | null>(null)
   const isCurrentUserProfile = username === currentUser?.username
+  console.log('username param:', username)
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -214,13 +215,14 @@ const UserProfile = () => {
   )
 
   if (!user || !currentUser) {
+    console.log('UserProfile mounted', user, currentUser)
     return <ErrorScreen />
   }
 
   return (
     <SafeAreaView edges={['top']} style={styles.container}>
       <NavBar
-        rightIcon={isCurrentUserProfile ? { handlePress: () => {}, Icon: Settings } : undefined}
+        rightIcon={isCurrentUserProfile ? { handlePress: () => router.push('./settings'), Icon: Settings } : undefined}
         title={user.username}
       />
       <PostsList

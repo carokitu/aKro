@@ -63,7 +63,7 @@ export const Drawer = ({ close, setClose }: { close: boolean; setClose: (value: 
         </Title>
         <BottomSheetFlatList
           data={tracks}
-          keyExtractor={(item) => item.track.id}
+          keyExtractor={(item, index) => `${item.track.id}-${index}`}
           ListEmptyComponent={loading ? null : Error}
           ListFooterComponent={loading ? <LoadingFooter /> : null}
           ListHeaderComponent={<Header />}

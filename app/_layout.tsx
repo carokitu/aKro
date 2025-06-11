@@ -19,8 +19,6 @@ const Layout = () => {
     return <SplashScreen />
   }
 
-  console.log('isSignedIn', isSignedIn)
-
   return (
     <>
       <StatusBar backgroundColor={theme.surface.base.default} barStyle="dark-content" translucent />

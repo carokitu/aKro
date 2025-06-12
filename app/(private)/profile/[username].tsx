@@ -170,12 +170,13 @@ const EmptyState = () => (
   </View>
 )
 
+const FooterComponent = () => <View style={styles.footer} />
+
 const UserProfile = () => {
   const { username } = useLocalSearchParams()
   const { user: currentUser } = useUser()
   const [user, setUser] = useState<EnhancedUser | null>(null)
   const isCurrentUserProfile = username === currentUser?.username
-  console.log('username param:', username)
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -215,7 +216,6 @@ const UserProfile = () => {
   )
 
   if (!user || !currentUser) {
-    console.log('UserProfile mounted', user, currentUser)
     return <ErrorScreen />
   }
 
@@ -228,6 +228,7 @@ const UserProfile = () => {
       <PostsList
         fetchPosts={fetchPosts}
         ListEmptyComponent={<EmptyState />}
+        ListFooterComponent={FooterComponent}
         ListHeaderComponent={<UserInfos user={user} />}
         user={currentUser}
       />
@@ -279,6 +280,9 @@ const styles = StyleSheet.create({
   followText: {
     fontSize: 14,
     fontWeight: '500',
+  },
+  footer: {
+    marginBottom: theme.spacing['600'],
   },
   infos: {
     alignItems: 'center',

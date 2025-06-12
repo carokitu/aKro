@@ -52,19 +52,6 @@ export const EditAvatar = ({ avatarUrl: initialAvatarUrl, onUpdateAvatar, setUpl
       setError(null)
 
       if (image.type === 'image') {
-        // const extension = image.uri.split('.').pop() || 'jpg'
-        // const contentType = `image/${extension}`
-        // const filePath = `${username}_${Date.now()}.${extension}`
-
-        // const base64 = await FileSystem.readAsStringAsync(image.uri, { encoding: 'base64' })
-        // const binary = decode(base64)
-
-        // const { error: uploadError } = await client.storage.from('avatars').upload(filePath, binary, { contentType })
-
-        // if (uploadError) {
-        //   throw uploadError
-        // }
-
         onUpdateAvatar(image)
       } else {
         setError("Le fichier sélectionné n'est pas une image.")

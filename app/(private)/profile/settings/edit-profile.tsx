@@ -6,8 +6,8 @@ import { useNavigation } from 'expo-router'
 
 import { useUser } from '../../../../hooks'
 import { NavBar } from '../../../../src'
-import { EditAvatar, EditBio } from '../../../../src/components/ActionButtons'
-import { Button, Error } from '../../../../src/system'
+import { EditAvatar } from '../../../../src/components/ActionButtons'
+import { Button, Error, Input } from '../../../../src/system'
 import { theme } from '../../../../src/theme'
 import { saveImage } from '../../../../src/utils/image'
 
@@ -39,7 +39,6 @@ const EditProfile = () => {
     }
 
     await updateUser(updatePayload)
-    // router.replace(`/profile/${user.username}`)
     navigation.reset({
       index: 0,
       routes: [{ name: '[username]' as never, params: { username: user.username } }],
@@ -66,7 +65,7 @@ const EditProfile = () => {
             setUploading={setUploading}
             uploading={uploading}
           />
-          <EditBio bio={bio} setBio={setBio} />
+          <Input setValue={setBio} title="Bio" value={bio} />
         </View>
         <View style={styles.buttonContainer}>
           <Button fullWidth onPress={handleSave} size="lg" title="Enregistrer" />

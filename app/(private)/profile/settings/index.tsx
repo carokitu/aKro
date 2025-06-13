@@ -1,26 +1,25 @@
-import { ArrowRight, Bell, CircleAlert, Landmark, LogOut, type LucideIcon, Pencil } from 'lucide-react-native'
+import { useActionSheet } from '@expo/react-native-action-sheet'
+import { ArrowRight, CircleAlert, Landmark, LogOut, type LucideIcon, Pencil } from 'lucide-react-native'
 import { useState } from 'react'
 import { SafeAreaView, StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import { router } from 'expo-router'
 
-import { useUser } from '../../../../hooks'
+import { useSpotifyAuth, useUser } from '../../../../hooks'
 import { type User } from '../../../../models'
 import { NavBar } from '../../../../src'
 import { Avatar, Error, Text, Title } from '../../../../src/system'
 import { theme } from '../../../../src/theme'
 
-const UserInfo = ({ user }: { user: User }) => {
-  return (
-    <View style={styles.userInfo}>
-      <Avatar avatar={user.avatar_url} size="lg" />
-      <View>
-        <Title>{user.name}</Title>
-        <Text>{user.username}</Text>
-      </View>
+const UserInfo = ({ user }: { user: User }) => (
+  <View style={styles.userInfo}>
+    <Avatar avatar={user.avatar_url} size="lg" />
+    <View>
+      <Title>{user.name}</Title>
+      <Text>{user.username}</Text>
     </View>
-  )
-}
+  </View>
+)
 
 const Card = ({ handlePress, Icon, title }: { handlePress: () => void; Icon: LucideIcon; title: string }) => {
   const [isPressed, setIsPressed] = useState(false)
@@ -43,7 +42,30 @@ const Card = ({ handlePress, Icon, title }: { handlePress: () => void; Icon: Luc
 }
 
 const Settings = () => {
-  const { user } = useUser()
+  const { logout: logoutFromUser, user } = useUser()
+  const { showActionSheetWithOptions } = useActionSheet()
+  const { logout: logoutFromSpotify } = useSpotifyAuth()
+
+  const logout = () => {
+    logoutFromSpotify()
+    logoutFromUser()
+  }
+
+  const handleLogout = () => {
+    showActionSheetWithOptions(
+      {
+        cancelButtonIndex: 1,
+        destructiveButtonIndex: 0,
+        options: ['Se déconnecter', 'Annuler'],
+        title: 'Voulez vous vraiment vous déconnecter ?',
+      },
+      (index) => {
+        if (index === 0) {
+          logout()
+        }
+      },
+    )
+  }
 
   if (!user) {
     return (
@@ -64,14 +86,17 @@ const Settings = () => {
           Icon={Pencil}
           title="Modifier mon profil"
         />
-        <Card handlePress={() => console.log('Gérer les notifications')} Icon={Bell} title="Gérer les notifications" />
-        <Card handlePress={() => console.log('Signaler un problème')} Icon={CircleAlert} title="Signaler un problème" />
         <Card
-          handlePress={() => console.log('Confidentialité et légal')}
-          Icon={Landmark}
-          title="Confidentialité et légal"
+          handlePress={() => router.push('/profile/settings/signal-issue')}
+          Icon={CircleAlert}
+          title="Signaler un problème"
         />
-        <Card handlePress={() => console.log('Se déconnecter')} Icon={LogOut} title="Se déconnecter" />
+        <Card
+          handlePress={() => router.push('/profile/settings/privacy-policy')}
+          Icon={Landmark}
+          title="Politique de confidentialité"
+        />
+        <Card handlePress={() => handleLogout()} Icon={LogOut} title="Se déconnecter" />
       </View>
     </SafeAreaView>
   )

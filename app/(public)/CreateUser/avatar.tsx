@@ -5,8 +5,8 @@ import { Keyboard, SafeAreaView, StyleSheet, TouchableWithoutFeedback, View } fr
 import type * as ImagePicker from 'expo-image-picker'
 
 import { useUserRegistration } from '../../../hooks'
-import { EditAvatar, EditBio, MAX_BIO_LENGTH } from '../../../src/components/ActionButtons'
-import { Button, H1, Text } from '../../../src/system'
+import { EditAvatar } from '../../../src/components/ActionButtons'
+import { Button, H1, Input, MAX_INPUT_LENGTH, Text } from '../../../src/system'
 import { theme } from '../../../src/theme'
 import { saveImage } from '../../../src/utils/image'
 
@@ -26,7 +26,7 @@ const Avatar = () => {
     try {
       await createUser({
         avatar_url: avatarUrl,
-        bio: bio.trim().slice(0, MAX_BIO_LENGTH) || null,
+        bio: bio.trim().slice(0, MAX_INPUT_LENGTH) || null,
       })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue lors de la création du compte.')
@@ -38,7 +38,7 @@ const Avatar = () => {
       <SafeAreaView style={styles.container}>
         <H1 style={styles.title}>Pimpe ton profil</H1>
         <EditAvatar onUpdateAvatar={setImage} setUploading={setUploading} uploading={uploading} />
-        <EditBio bio={bio} setBio={setBio} />
+        <Input setValue={setBio} title="Bio" value={bio} />
         {error && (
           <View style={styles.errorContainer}>
             <CircleX color={theme.text.danger.default} size={theme.fontSize.sm} style={styles.icon} />

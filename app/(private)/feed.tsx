@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 import { CircleCheck, EyeOff, UserPlus } from 'lucide-react-native'
 import { useCallback, useEffect, useState } from 'react'
-import { ImageBackground, StyleSheet, View } from 'react-native'
+import { ImageBackground, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
@@ -17,7 +17,9 @@ import { client } from '../../supabase'
 
 const FeedHeader = ({ user }: { user: User }) => (
   <View style={styles.header}>
-    <Avatar avatar={user.avatar_url} />
+    <TouchableOpacity onPress={() => router.push(`/profile/${user.username}`)}>
+      <Avatar avatar={user.avatar_url} />
+    </TouchableOpacity>
     <IconButton Icon={UserPlus} onPress={() => router.push('/search-users')} size="sm" variant="tertiary" />
   </View>
 )

@@ -7,21 +7,20 @@ import { useSpotifyApi } from '../useSpotifyApi'
 const DEFAULT_PAGE_SIZE: MaxInt<50> = 50
 
 export const useSavedTracks = (baseLimit: MaxInt<50> = DEFAULT_PAGE_SIZE) => {
-  const { loading: loadingToken, spotifyApi } = useSpotifyApi()
+  const { isReady, spotifyApi } = useSpotifyApi()
   const [tracks, setTracks] = useState<SavedTrack[]>([])
   const [offset, setOffset] = useState(0)
-  const [loading, setLoading] = useState(loadingToken)
+  const [loading, setLoading] = useState(false)
   const [refreshing, setIsRefreshing] = useState(false)
 
   const loadTracks = useCallback(
-    async (offsetToUse: number) => {
-      if (!spotifyApi) {
-        return []
-      }
-
+    async (offsetToUse: number): Promise<SavedTrack[]> => {
       try {
-        const { items } = await spotifyApi.currentUser.tracks.savedTracks(baseLimit, offsetToUse)
+        if (!spotifyApi) {
+          return []
+        }
 
+        const { items } = await spotifyApi.currentUser.tracks.savedTracks(baseLimit, offsetToUse)
         return items
       } catch {
         return []
@@ -59,10 +58,16 @@ export const useSavedTracks = (baseLimit: MaxInt<50> = DEFAULT_PAGE_SIZE) => {
   }, [loadTracks, offset, baseLimit, loading, tracks, spotifyApi])
 
   useEffect(() => {
-    if (spotifyApi) {
+    if (isReady) {
       refresh()
     }
-  }, [spotifyApi, refresh])
+  }, [isReady, refresh])
 
-  return { loading, loadMore, refresh, refreshing, tracks }
+  return {
+    loading,
+    loadMore,
+    refresh,
+    refreshing,
+    tracks,
+  }
 }

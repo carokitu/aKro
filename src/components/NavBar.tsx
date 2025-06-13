@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native'
 
 import { router } from 'expo-router'
 
-import { H1, IconButton } from '../system'
+import { IconButton, Title } from '../system'
 import { theme } from '../theme'
 
 type RightIconProps = {
@@ -14,7 +14,7 @@ type RightIconProps = {
 export const NavBar = ({ rightIcon, title }: { rightIcon?: RightIconProps; title: string }) => (
   <View style={styles.title}>
     <IconButton Icon={ChevronLeft} onPress={() => router.back()} size="md" variant="tertiary" />
-    <H1>{title}</H1>
+    <Title size="large">{title}</Title>
     {rightIcon ? (
       <IconButton Icon={rightIcon.Icon} onPress={rightIcon.handlePress} size="md" variant="tertiary" />
     ) : (

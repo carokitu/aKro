@@ -167,7 +167,8 @@ export const PostsList = ({
     if (!spotifyLoading && spotifyApi && user) {
       fetchPosts(true)
     }
-  }, [fetchPosts, posts, spotifyApi, spotifyLoading, user])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [spotifyApi, spotifyLoading, user])
 
   if (!user) {
     return null

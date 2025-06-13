@@ -6,13 +6,18 @@ import { useFonts } from 'expo-font'
 import { Stack } from 'expo-router'
 
 import { SpotifyAuthProvider, UserProvider, useSpotifyAuth, useUser } from '../hooks'
+import { SplashScreen } from '../src/components'
 import { theme } from '../src/theme'
 
 const Layout = () => {
-  const { user } = useUser()
-  const { accessToken } = useSpotifyAuth()
+  const { loading: userLoading, user } = useUser()
+  const { accessToken, loading: accessTokenLoading } = useSpotifyAuth()
 
   const isSignedIn = !!(user && accessToken)
+
+  if (userLoading || accessTokenLoading) {
+    return <SplashScreen />
+  }
 
   return (
     <>

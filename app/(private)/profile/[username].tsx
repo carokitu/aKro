@@ -117,7 +117,13 @@ const Inspirations = ({ user }: { user: EnhancedUser }) => (
   </>
 )
 
-const UserInfos = ({ user: userFromProps }: { user: EnhancedUser }) => {
+const UserInfos = ({
+  isCurrentUserProfile,
+  user: userFromProps,
+}: {
+  isCurrentUserProfile: boolean
+  user: EnhancedUser
+}) => {
   const { user: currentUser } = useUser()
   const [user, setUser] = useState<EnhancedUser>(userFromProps)
 
@@ -146,17 +152,21 @@ const UserInfos = ({ user: userFromProps }: { user: EnhancedUser }) => {
           )}
         </View>
       </View>
-      <FollowButton
-        currentUserId={currentUser.id}
-        follows_me={user.follows_me}
-        is_followed={user.is_followed}
-        onFollow={onFollow}
-        onUnfollow={onUnfollow}
-        otherUser={user.id}
-        size="md"
-        style={styles.followButton}
-        withIcon
-      />
+      {isCurrentUserProfile ? (
+        <View style={styles.hiddenFollowButton} />
+      ) : (
+        <FollowButton
+          currentUserId={currentUser.id}
+          follows_me={user.follows_me}
+          is_followed={user.is_followed}
+          onFollow={onFollow}
+          onUnfollow={onUnfollow}
+          otherUser={user.id}
+          size="md"
+          style={styles.followButton}
+          withIcon
+        />
+      )}
       <Inspirations user={user} />
       <Title style={styles.publicationsTitle}>Publications</Title>
     </View>
@@ -169,6 +179,8 @@ const EmptyState = () => (
     <Title color="secondary">Aucune publication</Title>
   </View>
 )
+
+const FooterComponent = () => <View style={styles.footer} />
 
 const UserProfile = () => {
   const { username } = useLocalSearchParams()
@@ -220,13 +232,14 @@ const UserProfile = () => {
   return (
     <SafeAreaView edges={['top']} style={styles.container}>
       <NavBar
-        rightIcon={isCurrentUserProfile ? { handlePress: () => {}, Icon: Settings } : undefined}
+        rightIcon={isCurrentUserProfile ? { handlePress: () => router.push('./settings'), Icon: Settings } : undefined}
         title={user.username}
       />
       <PostsList
         fetchPosts={fetchPosts}
         ListEmptyComponent={<EmptyState />}
-        ListHeaderComponent={<UserInfos user={user} />}
+        ListFooterComponent={FooterComponent}
+        ListHeaderComponent={<UserInfos isCurrentUserProfile={isCurrentUserProfile} user={user} />}
         user={currentUser}
       />
     </SafeAreaView>
@@ -277,6 +290,12 @@ const styles = StyleSheet.create({
   followText: {
     fontSize: 14,
     fontWeight: '500',
+  },
+  footer: {
+    marginBottom: theme.spacing['600'],
+  },
+  hiddenFollowButton: {
+    marginVertical: theme.spacing['200'],
   },
   infos: {
     alignItems: 'center',

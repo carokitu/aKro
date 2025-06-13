@@ -32,6 +32,7 @@ type UserContextType = {
   login: (input: LoginInput) => Promise<void>
   logout: () => Promise<void>
   refetchUser: () => Promise<void>
+  updateUser: (fields: Partial<User>) => Promise<void>
   user: null | User
 }
 
@@ -127,7 +128,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       isMounted = false
       listener?.subscription.unsubscribe()
     }
-  }, [checkIfUserExists, init])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const login = useCallback(
     async (input: LoginInput) => {
@@ -165,6 +167,24 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     await init()
   }, [init])
 
+  const updateUser = useCallback(
+    async (fields: Partial<User>) => {
+      if (!state.user) {
+        return
+      }
+
+      const { data, error } = await client.from('users').update(fields).eq('id', state.user.id).select().single()
+
+      if (error) {
+        dispatch({ payload: error.message, type: 'SET_ERROR' })
+        throw new Error(error.message)
+      }
+
+      dispatch({ payload: data, type: 'SET_USER' })
+    },
+    [state.user],
+  )
+
   const value = useMemo(
     () => ({
       error: state.error,
@@ -173,9 +193,10 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       login,
       logout,
       refetchUser,
+      updateUser,
       user: state.user,
     }),
-    [login, logout, refetchUser, state],
+    [login, logout, refetchUser, state, updateUser],
   )
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>
@@ -183,6 +204,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useUser = () => {
   const context = useContext(UserContext)
+
   if (!context) {
     throw new Error('useUser must be used within a UserProvider')
   }

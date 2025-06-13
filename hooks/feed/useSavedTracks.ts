@@ -42,7 +42,7 @@ export const useSavedTracks = (baseLimit: MaxInt<50> = DEFAULT_PAGE_SIZE) => {
   }, [loadTracks, baseLimit])
 
   const loadMore = useCallback(async () => {
-    if (loading || !spotifyApi?.currentUser?.tracks?.savedTracks) {
+    if (loading || !spotifyApi) {
       return
     }
 

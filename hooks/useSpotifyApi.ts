@@ -19,10 +19,6 @@ export const useSpotifyApi = () => {
 
       try {
         const sdk = SpotifyApi.withAccessToken(process.env.EXPO_PUBLIC_SPOTIFY_CLIENT_ID as string, accessToken)
-
-        // Test that the token works with a lightweight call
-        await sdk.currentUser.profile()
-
         setSpotifyApi(sdk)
       } catch (error) {
         console.error('Failed to initialize Spotify SDK:', error)

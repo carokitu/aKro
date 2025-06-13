@@ -16,43 +16,18 @@ export const useSavedTracks = (baseLimit: MaxInt<50> = DEFAULT_PAGE_SIZE) => {
   const loadTracks = useCallback(
     async (offsetToUse: number): Promise<SavedTrack[]> => {
       try {
-        console.log('loadTracks')
-        if (
-          !spotifyApi?.currentUser?.tracks?.savedTracks ||
-          typeof spotifyApi?.currentUser?.tracks?.savedTracks !== 'function'
-        ) {
-          console.warn('spotifyApi is null')
+        if (!spotifyApi) {
           return []
         }
 
-        console.log('loadTracks is trying')
         const { items } = await spotifyApi.currentUser.tracks.savedTracks(baseLimit, offsetToUse)
         return items
-      } catch (error) {
-        console.error('Error fetching saved tracks:', error)
+      } catch {
         return []
       }
     },
     [spotifyApi, baseLimit],
   )
-
-  // const loadTracks = useCallback(
-  //   async (offsetToUse: number): Promise<SavedTrack[]> => {
-  //     if (!spotifyApi?.currentUser?.tracks?.savedTracks) {
-  //       console.warn('Spotify API is not ready or user is not authenticated.')
-  //       return []
-  //     }
-
-  //     try {
-  //       const { items } = await spotifyApi.currentUser.tracks.savedTracks(baseLimit, offsetToUse)
-  //       return items
-  //     } catch (error) {
-  //       console.error('Failed to fetch saved tracks:', error)
-  //       return []
-  //     }
-  //   },
-  //   [spotifyApi, baseLimit],
-  // )
 
   const refresh = useCallback(async () => {
     setLoading(true)

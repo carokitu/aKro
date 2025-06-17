@@ -87,7 +87,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     gap: theme.spacing[1200],
     justifyContent: 'space-between',
-    paddingRight: theme.spacing[400],
     paddingVertical: theme.spacing[800],
   },
   likes: {

@@ -40,6 +40,7 @@ export const PostsList = ({
   const [hasNewPosts, setHasNewPosts] = useState(false)
   const [resetPending, setResetPending] = useState(false)
   const [error, setError] = useState<Error | null>(null)
+  const [triggerRefresh, setTriggerRefresh] = useState(false)
 
   const LIMIT = 20
   const hasMounted = useRef(false)
@@ -170,6 +171,13 @@ export const PostsList = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [spotifyApi, spotifyLoading, user])
 
+  useEffect(() => {
+    if (triggerRefresh) {
+      fetchPosts(true)
+      setTriggerRefresh(false)
+    }
+  }, [fetchPosts, triggerRefresh])
+
   if (!user) {
     return null
   }
@@ -181,7 +189,7 @@ export const PostsList = ({
   const renderItem = ({ item }: { item: EnhancedFeedPost }) => (
     <Post
       ActionButtons={<ActionButtons item={item} user={user} />}
-      Header={<Header item={item} />}
+      Header={<Header item={item} triggerRefresh={() => setTriggerRefresh(true)} user={user} />}
       item={item}
       style={styles.post}
     />

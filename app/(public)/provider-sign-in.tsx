@@ -1,10 +1,14 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-import { Image, SafeAreaView, StyleSheet, View } from 'react-native'
-import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { Dimensions, Image, StyleSheet, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
+
+import { LinearGradient } from 'expo-linear-gradient'
 
 import { useSpotifyAuth } from '../../hooks'
-import { Button, Label } from '../../src/system'
+import { Button, H1, Label } from '../../src/system'
 import { theme } from '../../src/theme'
+
+const { height, width } = Dimensions.get('window')
 
 const disabledProviders = [
   {
@@ -21,18 +25,31 @@ const disabledProviders = [
   },
 ]
 
+const Logo = () => (
+  <View style={styles.logoContainer}>
+    <Image source={require('../../assets/images/logo/white-square.png')} style={styles.logo} />
+  </View>
+)
+
+const Background = () => (
+  <>
+    <Image source={require('../../assets/images/welcomeScreen.png')} style={styles.headerBackground} />
+    <LinearGradient
+      colors={['rgba(13, 26, 38, 0)', 'rgba(0, 255, 102, 0)', 'rgba(48, 155, 255, 0.12)', 'rgba(13, 26, 38, 0.6)']}
+      locations={[0, 0.726, 0.8221, 1]}
+      style={styles.gradient}
+    />
+  </>
+)
+
 const ProviderSignIn = () => {
-  const insets = useSafeAreaInsets()
   const { login } = useSpotifyAuth()
 
   return (
-    <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
-      <View style={styles.logoContainer}>
-        <Image source={require('../../assets/images/logo/inline-dark.png')} style={styles.logo} />
-        <Label color="secondary" size="large">
-          Réoffrir la musique
-        </Label>
-      </View>
+    <SafeAreaView style={styles.container}>
+      <Background />
+      <Logo />
+      <H1 style={styles.title}>Bienvenue sur akro</H1>
       <View style={styles.buttonSection}>
         <Button
           iconPath={require('../../assets/images/icons/spotify.png')}
@@ -78,18 +95,35 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'space-between',
-    marginTop: 40,
-    padding: 20,
+  },
+  gradient: {
+    height: height * 0.46,
+    left: -180,
+    position: 'absolute',
+    top: -10,
+    width: width * 2,
+    zIndex: 1,
+  },
+  headerBackground: {
+    height: height * 0.46,
+    left: -180,
+    position: 'absolute',
+    top: -10,
+    width: width * 2,
+    zIndex: -1,
   },
   logo: {
-    height: 100,
+    borderRadius: theme.radius.large,
+    boxShadow: '0px 4px 14px rgba(109, 104, 91, 0.25)',
+    height: 160,
     resizeMode: 'contain',
-    width: 200,
+    width: 160,
+    zIndex: 2,
   },
   logoContainer: {
     alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center',
+    height: height * 0.45,
+    justifyContent: 'flex-end',
   },
   separator: {
     alignItems: 'center',
@@ -104,5 +138,9 @@ const styles = StyleSheet.create({
     backgroundColor: theme.border.base.default,
     flex: 1,
     height: 1,
+  },
+  title: {
+    alignSelf: 'center',
+    marginBottom: theme.spacing[300],
   },
 })

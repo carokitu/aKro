@@ -11,10 +11,10 @@ type RightIconProps = {
   Icon: LucideIcon
 }
 
-export const NavBar = ({ rightIcon, title }: { rightIcon?: RightIconProps; title: string }) => (
+export const NavBar = ({ rightIcon, title }: { rightIcon?: RightIconProps; title?: string }) => (
   <View style={styles.title}>
     <IconButton Icon={ChevronLeft} onPress={() => router.back()} size="md" variant="tertiary" />
-    <Title size="large">{title}</Title>
+    {title && <Title size="large">{title}</Title>}
     {rightIcon ? (
       <IconButton Icon={rightIcon.Icon} onPress={rightIcon.handlePress} size="md" variant="tertiary" />
     ) : (
@@ -33,5 +33,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: theme.spacing['400'],
     paddingVertical: theme.spacing['200'],
+    width: '100%',
   },
 })

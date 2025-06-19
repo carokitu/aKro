@@ -5,6 +5,7 @@ import { Keyboard, SafeAreaView, StyleSheet, TouchableWithoutFeedback, View } fr
 import type * as ImagePicker from 'expo-image-picker'
 
 import { useUserRegistration } from '../../../hooks'
+import { NavBar } from '../../../src'
 import { EditAvatar } from '../../../src/components/ActionButtons'
 import { Button, H1, Input, MAX_INPUT_LENGTH, Text } from '../../../src/system'
 import { theme } from '../../../src/theme'
@@ -36,17 +37,27 @@ const Avatar = () => {
   return (
     <TouchableWithoutFeedback onPress={handleDismiss}>
       <SafeAreaView style={styles.container}>
-        <H1 style={styles.title}>Pimpe ton profil</H1>
-        <EditAvatar onUpdateAvatar={setImage} setUploading={setUploading} uploading={uploading} />
-        <Input setValue={setBio} title="Bio" value={bio} />
-        {error && (
-          <View style={styles.errorContainer}>
-            <CircleX color={theme.text.danger.default} size={theme.fontSize.sm} style={styles.icon} />
-            <Text color="danger">{error}</Text>
+        <NavBar />
+        <View style={styles.formContainer}>
+          <H1 style={styles.title}>Pimpe ton profil</H1>
+          <EditAvatar onUpdateAvatar={setImage} setUploading={setUploading} uploading={uploading} />
+          <Input setValue={setBio} title="Bio" value={bio} />
+          {error && (
+            <View style={styles.errorContainer}>
+              <CircleX color={theme.text.danger.default} size={theme.fontSize.sm} style={styles.icon} />
+              <Text color="danger">{error}</Text>
+            </View>
+          )}
+          <View style={styles.buttonContainer}>
+            <Button
+              disabled={uploading}
+              fullWidth
+              onPress={handleNext}
+              size="lg"
+              style={styles.button}
+              title="Suivant"
+            />
           </View>
-        )}
-        <View style={styles.buttonContainer}>
-          <Button disabled={uploading} fullWidth onPress={handleNext} size="lg" style={styles.button} title="Suivant" />
         </View>
       </SafeAreaView>
     </TouchableWithoutFeedback>
@@ -64,9 +75,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   container: {
-    alignItems: 'center',
     flex: 1,
-    marginHorizontal: theme.spacing[400],
   },
   errorContainer: {
     alignItems: 'center',
@@ -74,12 +83,16 @@ const styles = StyleSheet.create({
     gap: theme.spacing['100'],
     marginTop: theme.spacing[200],
   },
+  formContainer: {
+    alignItems: 'center',
+    flex: 1,
+    marginHorizontal: theme.spacing[400],
+  },
   icon: {
     height: '100%',
     width: '100%',
   },
   title: {
-    marginTop: theme.spacing[1400],
     textAlign: 'center',
   },
 })

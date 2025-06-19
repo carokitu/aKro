@@ -13,6 +13,7 @@ import {
 import { validate } from 'email-validator'
 import { router, useLocalSearchParams } from 'expo-router'
 
+import { NavBar } from '../../src'
 import { Button, H1, Text } from '../../src/system'
 import { theme } from '../../src/theme'
 import { client } from '../../supabase'
@@ -70,55 +71,71 @@ const Password = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <H1 style={styles.title}>{hasAccount ? 'Entre ton mot de passe' : 'Choisis un mot de passe'}</H1>
-      <View style={styles.inputContainer}>
-        <TextInput
-          autoFocus
-          maxLength={30}
-          onChangeText={setPassword}
-          placeholder="motdepasse123"
-          placeholderTextColor={theme.text.disabled}
-          secureTextEntry={!showPassword}
-          style={styles.input}
-          value={password}
-        />
-        <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-          {showPassword ? (
-            <Eye color={theme.text.base.tertiary} size={theme.fontSize.lg} />
-          ) : (
-            <EyeOff color={theme.text.base.tertiary} size={theme.fontSize.lg} />
-          )}
-        </TouchableOpacity>
-      </View>
-      <View style={styles.feedback}>
-        {error && (
-          <>
-            <CircleX color={theme.text.danger.default} size={theme.fontSize.sm} style={styles.icon} />
-            <Text color="danger" style={styles.feedbackText}>
-              {error}
-            </Text>
-          </>
-        )}
-        {!error && password.length > 0 && (
-          <>
-            <CircleCheck color={theme.text.success.default} size={theme.fontSize.sm} style={styles.icon} />
-            <Text color="success" style={styles.feedbackText}>
-              Mot de passe valide
-            </Text>
-          </>
-        )}
-      </View>
-      <Button
-        onPress={() => {
-          setError(null)
-          setHasAccount(!hasAccount)
-        }}
-        size="sm"
-        title={hasAccount ? 'Pas encore de compte ?' : 'Tu as déjà un compte ?'}
-        variant="tertiary"
-      />
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.buttonContainer}>
-        <Button disabled={isDisabled} fullWidth onPress={handleNext} size="lg" style={styles.button} title="Suivant" />
+      <NavBar />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        style={styles.keyboardAvoidingView}
+      >
+        <View style={styles.formContainer}>
+          <H1 style={styles.title}>{hasAccount ? 'Entre ton mot de passe' : 'Choisis un mot de passe'}</H1>
+          <View style={styles.inputContainer}>
+            <TextInput
+              autoFocus
+              maxLength={30}
+              onChangeText={setPassword}
+              placeholder="motdepasse123"
+              placeholderTextColor={theme.text.disabled}
+              secureTextEntry={!showPassword}
+              style={styles.input}
+              value={password}
+            />
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              {showPassword ? (
+                <Eye color={theme.text.base.tertiary} size={theme.fontSize.lg} />
+              ) : (
+                <EyeOff color={theme.text.base.tertiary} size={theme.fontSize.lg} />
+              )}
+            </TouchableOpacity>
+          </View>
+          <View style={styles.feedback}>
+            {error && (
+              <>
+                <CircleX color={theme.text.danger.default} size={theme.fontSize.sm} style={styles.icon} />
+                <Text color="danger" style={styles.feedbackText}>
+                  {error}
+                </Text>
+              </>
+            )}
+            {!error && password.length > 0 && (
+              <>
+                <CircleCheck color={theme.text.success.default} size={theme.fontSize.sm} style={styles.icon} />
+                <Text color="success" style={styles.feedbackText}>
+                  Mot de passe valide
+                </Text>
+              </>
+            )}
+          </View>
+          <Button
+            onPress={() => {
+              setError(null)
+              setHasAccount(!hasAccount)
+            }}
+            size="sm"
+            title={hasAccount ? 'Pas encore de compte ?' : 'Tu as déjà un compte ?'}
+            variant="tertiary"
+          />
+          <View style={styles.buttonContainer}>
+            <Button
+              disabled={isDisabled}
+              fullWidth
+              onPress={handleNext}
+              size="lg"
+              style={styles.button}
+              title="Suivant"
+            />
+          </View>
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   )
@@ -135,9 +152,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   container: {
-    alignItems: 'center',
     flex: 1,
-    marginHorizontal: theme.spacing[400],
   },
   feedback: {
     alignItems: 'flex-start',
@@ -151,6 +166,11 @@ const styles = StyleSheet.create({
   feedbackText: {
     flexShrink: 1,
     flexWrap: 'wrap',
+  },
+  formContainer: {
+    alignItems: 'center',
+    flex: 1,
+    marginHorizontal: theme.spacing[400],
   },
   icon: {
     marginTop: theme.spacing[50],
@@ -171,8 +191,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.padding[600],
     paddingVertical: theme.padding[400],
   },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
   title: {
-    marginTop: theme.spacing[1400],
     textAlign: 'center',
   },
 })

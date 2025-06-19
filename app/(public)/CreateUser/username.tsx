@@ -5,6 +5,7 @@ import { KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, TextInput, Vi
 import { router } from 'expo-router'
 
 import { useUserRegistration } from '../../../hooks'
+import { NavBar } from '../../../src'
 import { Button, H1, Text } from '../../../src/system'
 import { theme } from '../../../src/theme'
 import { client } from '../../../supabase'
@@ -70,45 +71,61 @@ const UserName = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <H1 style={styles.title}>Choisis un nom d’utilisateur</H1>
-      <TextInput
-        autoCorrect={false}
-        autoFocus
-        maxLength={30}
-        onChangeText={setUsername}
-        placeholder="pauldupont12"
-        placeholderTextColor={theme.text.disabled}
-        style={styles.input}
-        value={username}
-      />
-      <View style={styles.feedback}>
-        {checking && (
-          <>
-            <Loader color={theme.text.informal.default} size={theme.fontSize.sm} style={styles.icon} />
-            <Text color="informal" style={styles.feedbackText}>
-              Vérification de la disponibilité...
-            </Text>
-          </>
-        )}
-        {!checking && error && (
-          <>
-            <CircleX color={theme.text.danger.default} size={theme.fontSize.sm} style={styles.icon} />
-            <Text color="danger" style={styles.feedbackText}>
-              {error}
-            </Text>
-          </>
-        )}
-        {!checking && !error && (
-          <>
-            <CircleCheck color={theme.text.success.default} size={theme.fontSize.sm} style={styles.icon} />
-            <Text color="success" style={styles.feedbackText}>
-              Nom d’utilisateur disponible
-            </Text>
-          </>
-        )}
-      </View>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.buttonContainer}>
-        <Button disabled={isDisabled} fullWidth onPress={handleNext} size="lg" style={styles.button} title="Suivant" />
+      <NavBar />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        style={styles.keyboardAvoidingView}
+      >
+        <View style={styles.formContainer}>
+          <H1 style={styles.title}>Choisis un nom d’utilisateur</H1>
+          <TextInput
+            autoCorrect={false}
+            autoFocus
+            maxLength={30}
+            onChangeText={setUsername}
+            placeholder="pauldupont12"
+            placeholderTextColor={theme.text.disabled}
+            style={styles.input}
+            value={username}
+          />
+          <View style={styles.feedback}>
+            {checking && (
+              <>
+                <Loader color={theme.text.informal.default} size={theme.fontSize.sm} style={styles.icon} />
+                <Text color="informal" style={styles.feedbackText}>
+                  Vérification de la disponibilité...
+                </Text>
+              </>
+            )}
+            {!checking && error && (
+              <>
+                <CircleX color={theme.text.danger.default} size={theme.fontSize.sm} style={styles.icon} />
+                <Text color="danger" style={styles.feedbackText}>
+                  {error}
+                </Text>
+              </>
+            )}
+            {!checking && !error && (
+              <>
+                <CircleCheck color={theme.text.success.default} size={theme.fontSize.sm} style={styles.icon} />
+                <Text color="success" style={styles.feedbackText}>
+                  Nom d’utilisateur disponible
+                </Text>
+              </>
+            )}
+          </View>
+          <View style={styles.buttonContainer}>
+            <Button
+              disabled={isDisabled}
+              fullWidth
+              onPress={handleNext}
+              size="lg"
+              style={styles.button}
+              title="Suivant"
+            />
+          </View>
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   )
@@ -125,9 +142,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   container: {
-    alignItems: 'center',
     flex: 1,
-    marginHorizontal: theme.spacing[400],
   },
   feedback: {
     alignItems: 'flex-start',
@@ -141,6 +156,11 @@ const styles = StyleSheet.create({
   feedbackText: {
     flexShrink: 1,
     flexWrap: 'wrap',
+  },
+  formContainer: {
+    alignItems: 'center',
+    flex: 1,
+    marginHorizontal: theme.spacing[400],
   },
   icon: {
     marginTop: theme.spacing[50],
@@ -156,8 +176,10 @@ const styles = StyleSheet.create({
     paddingVertical: theme.padding[400],
     width: '100%',
   },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
   title: {
-    marginTop: theme.spacing[1400],
     textAlign: 'center',
   },
 })

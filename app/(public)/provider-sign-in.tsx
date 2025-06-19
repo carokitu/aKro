@@ -37,7 +37,7 @@ const Background = () => (
     <LinearGradient
       colors={['rgba(13, 26, 38, 0)', 'rgba(0, 255, 102, 0)', 'rgba(48, 155, 255, 0.12)', 'rgba(13, 26, 38, 0.6)']}
       locations={[0, 0.726, 0.8221, 1]}
-      style={styles.gradient}
+      style={styles.headerBackground}
     />
   </>
 )
@@ -96,14 +96,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-between',
   },
-  gradient: {
-    height: height * 0.46,
-    left: -180,
-    position: 'absolute',
-    top: -10,
-    width: width * 2,
-    zIndex: 1,
-  },
   headerBackground: {
     height: height * 0.46,
     left: -180,
@@ -118,7 +110,6 @@ const styles = StyleSheet.create({
     height: 160,
     resizeMode: 'contain',
     width: 160,
-    zIndex: 2,
   },
   logoContainer: {
     alignItems: 'center',

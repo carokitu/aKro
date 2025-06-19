@@ -6,6 +6,7 @@ import { KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, TouchableOpac
 import { router } from 'expo-router'
 
 import { useUserRegistration } from '../../../hooks'
+import { NavBar } from '../../../src'
 import { Button, H1, Text } from '../../../src/system'
 import { theme } from '../../../src/theme'
 
@@ -65,39 +66,48 @@ const Birthday = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <H1 style={styles.title}>Indique ta date de naissance</H1>
-      {Platform.OS === 'android' && (
-        <TouchableOpacity onPress={() => setShowPicker(true)} style={styles.dateButton}>
-          <Text style={styles.dateText}>{formatDate}</Text>
-        </TouchableOpacity>
-      )}
-      {showPicker && (
-        <DateTimePicker
-          display="spinner"
-          mode="date"
-          onChange={handleDateChange}
-          style={styles.datePicker}
-          textColor={theme.text.base.default}
-          value={birthday}
-        />
-      )}
-      {!isOldEnough && (
-        <View style={styles.feedback}>
-          <CircleX color={theme.text.danger.default} size={theme.fontSize.sm} style={styles.icon} />
-          <Text color="danger" style={styles.feedbackText}>
-            Tu dois avoir au moins 16 ans pour t'inscrire
-          </Text>
+      <NavBar />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        style={styles.keyboardAvoidingView}
+      >
+        <View style={styles.formContainer}>
+          <H1 style={styles.title}>Indique ta date de naissance</H1>
+          {Platform.OS === 'android' && (
+            <TouchableOpacity onPress={() => setShowPicker(true)} style={styles.dateButton}>
+              <Text style={styles.dateText}>{formatDate}</Text>
+            </TouchableOpacity>
+          )}
+          {showPicker && (
+            <DateTimePicker
+              display="spinner"
+              mode="date"
+              onChange={handleDateChange}
+              style={styles.datePicker}
+              textColor={theme.text.base.default}
+              value={birthday}
+            />
+          )}
+          {!isOldEnough && (
+            <View style={styles.feedback}>
+              <CircleX color={theme.text.danger.default} size={theme.fontSize.sm} style={styles.icon} />
+              <Text color="danger" style={styles.feedbackText}>
+                Tu dois avoir au moins 16 ans pour t'inscrire
+              </Text>
+            </View>
+          )}
+          <View style={styles.buttonContainer}>
+            <Button
+              disabled={!isOldEnough}
+              fullWidth
+              onPress={handleNext}
+              size="lg"
+              style={styles.button}
+              title="Suivant"
+            />
+          </View>
         </View>
-      )}
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.buttonContainer}>
-        <Button
-          disabled={!isOldEnough}
-          fullWidth
-          onPress={handleNext}
-          size="lg"
-          style={styles.button}
-          title="Suivant"
-        />
       </KeyboardAvoidingView>
     </SafeAreaView>
   )
@@ -114,9 +124,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   container: {
-    alignItems: 'center',
     flex: 1,
-    marginHorizontal: theme.spacing[400],
   },
   dateButton: {
     backgroundColor: theme.surface.base.secondary,
@@ -148,11 +156,18 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     flexWrap: 'wrap',
   },
+  formContainer: {
+    alignItems: 'center',
+    flex: 1,
+    marginHorizontal: theme.spacing[400],
+  },
   icon: {
     marginTop: theme.spacing[50],
   },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
   title: {
-    marginTop: theme.spacing[1400],
     textAlign: 'center',
   },
 })

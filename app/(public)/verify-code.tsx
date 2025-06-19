@@ -5,6 +5,7 @@ import { KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, TextInput, Vi
 import { router, useLocalSearchParams } from 'expo-router'
 import { parsePhoneNumberFromString } from 'libphonenumber-js'
 
+import { NavBar } from '../../src'
 import { Button, H1, Text } from '../../src/system'
 import { theme } from '../../src/theme'
 import { client } from '../../supabase'
@@ -80,42 +81,51 @@ const VerifyCode = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <H1 style={styles.title}>Entre le code envoyé au {phoneNumber}</H1>
-      <TextInput
-        autoComplete={autoCompleteType}
-        autoFocus
-        keyboardType="number-pad"
-        maxLength={6}
-        onChangeText={setCode}
-        style={styles.input}
-        value={code}
-      />
-      {error && (
-        <View style={styles.feedback}>
-          <CircleX color={theme.text.danger.default} size={theme.fontSize.sm} style={styles.icon} />
-          <Text color="danger" style={styles.feedbackText}>
-            {error}
-          </Text>
+      <NavBar />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        style={styles.keyboardAvoidingView}
+      >
+        <View style={styles.formContainer}>
+          <H1 style={styles.title}>Entre le code envoyé au {phoneNumber}</H1>
+          <TextInput
+            autoComplete={autoCompleteType}
+            autoFocus
+            keyboardType="number-pad"
+            maxLength={6}
+            onChangeText={setCode}
+            style={styles.input}
+            value={code}
+          />
+          {error && (
+            <View style={styles.feedback}>
+              <CircleX color={theme.text.danger.default} size={theme.fontSize.sm} style={styles.icon} />
+              <Text color="danger" style={styles.feedbackText}>
+                {error}
+              </Text>
+            </View>
+          )}
+          <Button disabled={isTimerActive} onPress={sendCode} title={resendTitle} variant="tertiary" />
+          <View style={styles.buttonContainer}>
+            <Button
+              disabled={!isValidCode}
+              fullWidth
+              onPress={handleVerify}
+              size="lg"
+              style={styles.button}
+              title="Suivant"
+            />
+            <Button
+              fullWidth
+              onPress={() => router.back()}
+              size="lg"
+              style={styles.button}
+              title="Retour"
+              variant="tertiary"
+            />
+          </View>
         </View>
-      )}
-      <Button disabled={isTimerActive} onPress={sendCode} title={resendTitle} variant="tertiary" />
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.buttonContainer}>
-        <Button
-          disabled={!isValidCode}
-          fullWidth
-          onPress={handleVerify}
-          size="lg"
-          style={styles.button}
-          title="Suivant"
-        />
-        <Button
-          fullWidth
-          onPress={() => router.back()}
-          size="lg"
-          style={styles.button}
-          title="Retour"
-          variant="tertiary"
-        />
       </KeyboardAvoidingView>
     </SafeAreaView>
   )
@@ -132,9 +142,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   container: {
-    alignItems: 'center',
     flex: 1,
-    marginHorizontal: theme.spacing['400'],
   },
   feedback: {
     alignItems: 'flex-start',
@@ -148,6 +156,11 @@ const styles = StyleSheet.create({
   feedbackText: {
     flexShrink: 1,
     flexWrap: 'wrap',
+  },
+  formContainer: {
+    alignItems: 'center',
+    flex: 1,
+    marginHorizontal: theme.spacing[400],
   },
   icon: {
     marginTop: theme.spacing[50],
@@ -164,8 +177,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     width: '100%',
   },
+  keyboardAvoidingView: {
+    flex: 1,
+  },
   title: {
-    marginTop: theme.spacing['1400'],
     textAlign: 'center',
   },
 })

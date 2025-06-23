@@ -1,16 +1,17 @@
 import { ArrowUp } from 'lucide-react-native'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { StyleSheet } from 'react-native'
+import { type NativeScrollEvent, type NativeSyntheticEvent, StyleSheet } from 'react-native'
 
 import { FlashList, type FlashListProps } from '@shopify/flash-list'
 
-import { useSpotifyApi } from '../../../../hooks'
+import { PostProvider, usePost, useSpotifyApi } from '../../../../hooks'
 import { type Post as TPost, type User } from '../../../../models'
 import { client } from '../../../../supabase'
 import { Error } from '../../../system'
 import { theme } from '../../../theme'
 import { Post } from '../../Post'
 import { ActionButtons } from './ActionButtons'
+import ExpendedDescription from './ExpendedDescription'
 import { Header } from './Header'
 import { Toast, type ToastProps } from './Toast'
 import { type EnhancedFeedPost } from './types'
@@ -19,19 +20,23 @@ type Props = Omit<FlashListProps<EnhancedFeedPost>, 'data' | 'renderItem'> & {
   fetchPosts: ({ limit, offset }: { limit: number; offset: number }) => Promise<{ data: TPost[]; error: Error | null }>
   loadNewPost?: boolean
   onReset?: () => void
+  setShowFeedDrawer?: (option: boolean) => void
   toast?: ToastProps
   user: User
 }
 
-export const PostsList = ({
+const List = ({
   fetchPosts: fetchPostFromProps,
   loadNewPost = false,
   onReset,
+  onScrollBeginDrag,
+  setShowFeedDrawer,
   toast,
   user,
   ...flashListProps
 }: Props) => {
   const { loading: spotifyLoading, spotifyApi } = useSpotifyApi()
+  const { expendedDescription, setExpendedDescription } = usePost()
 
   const [posts, setPosts] = useState<EnhancedFeedPost[]>([])
   const [loading, setLoading] = useState(false)
@@ -45,6 +50,14 @@ export const PostsList = ({
   const LIMIT = 20
   const hasMounted = useRef(false)
   const listRef = useRef<FlashList<EnhancedFeedPost>>(null)
+
+  useEffect(() => {
+    if (expendedDescription) {
+      setShowFeedDrawer?.(false)
+    } else {
+      setShowFeedDrawer?.(true)
+    }
+  }, [expendedDescription, setShowFeedDrawer])
 
   useEffect(() => {
     if (!latestPostTimestamp || !user || !loadNewPost) {
@@ -178,6 +191,17 @@ export const PostsList = ({
     }
   }, [fetchPosts, triggerRefresh])
 
+  const handleScrollBeginDrag = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      if (expendedDescription) {
+        setExpendedDescription(undefined)
+      }
+
+      onScrollBeginDrag?.(event)
+    },
+    [expendedDescription, onScrollBeginDrag, setExpendedDescription],
+  )
+
   if (!user) {
     return null
   }
@@ -209,6 +233,7 @@ export const PostsList = ({
         onEndReached={() => fetchPosts()}
         onEndReachedThreshold={0.8}
         onRefresh={() => fetchPosts(true)}
+        onScrollBeginDrag={handleScrollBeginDrag}
         onViewableItemsChanged={onViewableItemsChanged}
         ref={listRef}
         refreshing={loading}
@@ -230,7 +255,16 @@ export const PostsList = ({
       {!toast && hasNewPosts && (
         <Toast Icon={ArrowUp} message="Nouveaux posts" onPress={handleToast} variant="default" />
       )}
+      <ExpendedDescription />
     </>
+  )
+}
+
+export const PostsList = (props: Props) => {
+  return (
+    <PostProvider>
+      <List {...props} />
+    </PostProvider>
   )
 }
 

@@ -54,7 +54,8 @@ const FooterComponent = () => (
 const Feed = () => {
   const { user } = useUser()
   const { newPostKey } = useFeed()
-  const [closeDrawer, setCloseDrawer] = useState(false)
+  const [minimizeDrawer, setMinimizeDrawer] = useState(false)
+  const [showDrawer, setShowDrawer] = useState(true)
   const [newPostFromUser, setNewPostFromUser] = useState(false)
   const [hasNewPostsKey, setHasNewPostsKey] = useState(0)
 
@@ -80,7 +81,7 @@ const Feed = () => {
     // => this is why we close the drawer
 
     if (newPostKey > 0 && newPostKey !== hasNewPostsKey) {
-      setCloseDrawer(true)
+      setMinimizeDrawer(true)
       setNewPostFromUser(true)
       setHasNewPostsKey(newPostKey)
     }
@@ -101,7 +102,7 @@ const Feed = () => {
 
   const onReset = () => {
     setNewPostFromUser(false)
-    setCloseDrawer(true)
+    setMinimizeDrawer(true)
   }
 
   return (
@@ -112,7 +113,8 @@ const Feed = () => {
           fetchPosts={fetchPosts}
           ListFooterComponent={FooterComponent}
           loadNewPost
-          onScrollBeginDrag={() => setCloseDrawer(true)}
+          onScrollBeginDrag={() => setMinimizeDrawer(true)}
+          setShowFeedDrawer={setShowDrawer}
           toast={
             newPostFromUser
               ? { Icon: CircleCheck, message: 'Reco postée', onPress: onReset, variant: 'success' }
@@ -120,7 +122,7 @@ const Feed = () => {
           }
           user={user}
         />
-        <Drawer close={closeDrawer} setClose={setCloseDrawer} />
+        <Drawer close={!showDrawer} minimize={minimizeDrawer} setMinimize={setMinimizeDrawer} />
       </GestureHandlerRootView>
     </SafeAreaView>
   )

@@ -6,7 +6,10 @@ import { type Post as TPost } from '../../models'
 import { Label, Text } from '../system'
 import { theme } from '../theme'
 
-type TrackForPost = Pick<TPost, 'album_cover_url' | 'artist_name' | 'preview_url' | 'spotify_track_id' | 'track_name'>
+type TrackForPost = Pick<
+  TPost,
+  'album_cover_url' | 'artist_name' | 'description' | 'preview_url' | 'spotify_track_id' | 'track_name'
+>
 
 type Props = {
   ActionButtons?: React.ReactNode

@@ -32,7 +32,7 @@ const Name = () => {
       return
     }
 
-    setError(validateNameFormat(text) ? null : 'Format invalide. Utilise des lettres, des espaces et des tirets.')
+    setError(validateNameFormat(text) ? null : `Format invalide.\nUtilise des lettres, des espaces et des tirets.`)
   }
 
   return (
@@ -86,7 +86,6 @@ const styles = StyleSheet.create({
     gap: theme.spacing['100'],
     textAlign: 'center',
     verticalAlign: 'middle',
-    width: '100%',
   },
   icon: {
     marginTop: theme.spacing[50],

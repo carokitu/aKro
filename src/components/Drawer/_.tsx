@@ -16,7 +16,15 @@ const ITEMS_PER_PAGE = 50
 
 const LoadingFooter = () => <ActivityIndicator size="large" />
 
-export const Drawer = ({ close, setClose }: { close: boolean; setClose: (value: boolean) => void }) => {
+export const Drawer = ({
+  close,
+  minimize,
+  setMinimize,
+}: {
+  close: boolean
+  minimize: boolean
+  setMinimize: (value: boolean) => void
+}) => {
   const [currentSnapIndex, setCurrentSnapIndex] = useState(INDEX_ON_INIT)
   const { loading, loadMore, refresh, refreshing, tracks } = useSavedTracks(ITEMS_PER_PAGE)
   const snapPoints = useMemo(() => ['10%', '40%', '100%'], [])
@@ -35,10 +43,18 @@ export const Drawer = ({ close, setClose }: { close: boolean; setClose: (value: 
 
   useEffect(() => {
     if (close) {
+      bottomSheetRef.current?.close()
+    } else {
       bottomSheetRef.current?.snapToIndex(0)
-      setClose(false)
     }
-  }, [close, setClose])
+  }, [close])
+
+  useEffect(() => {
+    if (minimize) {
+      bottomSheetRef.current?.snapToIndex(0)
+      setMinimize(false)
+    }
+  }, [minimize, setMinimize])
 
   const renderItem = ({ index, item }: { index: number; item: SavedTrack }) => {
     const isFirst = index === 0

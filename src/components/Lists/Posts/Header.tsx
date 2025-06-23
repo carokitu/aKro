@@ -9,6 +9,7 @@ import { client } from '../../../../supabase'
 import { Avatar, Label, Text } from '../../../system'
 import { theme } from '../../../theme'
 import { formatRelativeDate } from '../../../utils'
+import Description from './Description'
 import { type EnhancedFeedPost } from './types'
 
 export const deletePost = async (postId: string): Promise<{ error?: string; success: boolean }> => {
@@ -60,16 +61,23 @@ export const Header = ({
   }
 
   return (
-    <TouchableOpacity activeOpacity={0.6} onPress={() => router.push(`/profile/${item.username}`)} style={styles.user}>
-      <Avatar avatar={item.avatar_url} />
-      <View style={styles.info}>
-        <Label color="invert">{item.username}</Label>
-        <Text color="invert">{formatRelativeDate(item.created_at)}</Text>
-      </View>
-      {isCurrentUserPost && (
-        <EllipsisVertical color={theme.text.base.invert} onPress={handleEllipsisPress} style={styles.ellipsis} />
-      )}
-    </TouchableOpacity>
+    <>
+      <TouchableOpacity
+        activeOpacity={0.6}
+        onPress={() => router.push(`/profile/${item.username}`)}
+        style={styles.user}
+      >
+        <Avatar avatar={item.avatar_url} />
+        <View style={styles.info}>
+          <Label color="invert">{item.username}</Label>
+          <Text color="invert">{formatRelativeDate(item.created_at)}</Text>
+        </View>
+        {isCurrentUserPost && (
+          <EllipsisVertical color={theme.text.base.invert} onPress={handleEllipsisPress} style={styles.ellipsis} />
+        )}
+      </TouchableOpacity>
+      <Description description={item.description} />
+    </>
   )
 }
 
@@ -83,6 +91,6 @@ const styles = StyleSheet.create({
   user: {
     alignItems: 'center',
     flexDirection: 'row',
-    marginBottom: theme.spacing[1000],
+    // marginBottom: theme.spacing[1000],
   },
 })

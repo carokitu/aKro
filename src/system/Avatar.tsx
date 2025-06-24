@@ -35,6 +35,16 @@ const SIZE_STYLES = {
   },
 }
 
+// Calculate icon size based on container size (icon should be about 60% of container)
+const getIconSize = (size: keyof typeof SIZE_STYLES) => {
+  const containerSize = SIZE_STYLES[size].width
+  // For smaller sizes, use a slightly larger percentage to ensure good visibility
+  const percentage = containerSize <= 24 ? 0.7 : 0.6
+  const iconSize = Math.floor(containerSize * percentage)
+  // Ensure the icon size is even for better centering
+  return iconSize % 2 === 0 ? iconSize : iconSize - 1
+}
+
 const CACHE_EXPIRY_TIME = 1000 * 60 * 60 * 24 // 1 day
 
 // Caching functions
@@ -119,7 +129,7 @@ export const Avatar = ({ avatar, size = 'md', style }: Props) => {
   if (!image || !avatar || error) {
     return (
       <View style={[styles.iconContainer, SIZE_STYLES[size], style]}>
-        <User color={theme.colors.neutral['50']} style={styles.icon} />
+        <User color={theme.colors.neutral['50']} size={getIconSize(size)} />
       </View>
     )
   }
@@ -140,10 +150,6 @@ const styles = StyleSheet.create({
   avatarContainer: {
     borderRadius: theme.radius.full,
     overflow: 'hidden',
-  },
-  icon: {
-    height: '100%',
-    width: '100%',
   },
   iconContainer: {
     alignItems: 'center',

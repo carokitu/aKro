@@ -1,6 +1,6 @@
 import { AudioLines } from 'lucide-react-native'
-import { useState } from 'react'
-import { Image, type StyleProp, StyleSheet, View, type ViewStyle } from 'react-native'
+import { memo, useState } from 'react'
+import { Image, type StyleProp, StyleSheet, TouchableWithoutFeedback, View, type ViewStyle } from 'react-native'
 
 import { type Track as TTrack } from '@spotify/web-api-ts-sdk'
 
@@ -17,42 +17,38 @@ type Props = {
   track: TTrack
 }
 
-export const Track = ({ current = false, isFirst, isLast, style: propsStyle, track }: Props) => {
+export const Track = memo(({ current = false, isFirst, isLast, style: propsStyle, track }: Props) => {
   const [trackToShare, setTrackToShare] = useState<null | TTrack>(null)
   const [pressed, setPressed] = useState(false)
 
-  const handleOnTouchEnd = () => {
-    setPressed(false)
-    setTrackToShare(track)
-  }
-
   return (
     <>
-      <View
-        onTouchCancel={() => setPressed(false)}
-        onTouchEnd={handleOnTouchEnd}
-        onTouchStart={() => setPressed(true)}
-        style={[styles.container, isFirst && styles.firstTrack, isLast && styles.lastTrack]}
+      <TouchableWithoutFeedback
+        onPress={() => setTrackToShare(track)}
+        onPressIn={() => setPressed(true)}
+        onPressOut={() => setPressed(false)}
       >
-        <View style={[styles.trackContainer, propsStyle, pressed && styles.pressed]}>
-          <Image source={{ uri: track.album.images[0].url }} style={styles.albumCover} />
-          <View style={styles.textContainer}>
-            <View style={styles.title}>
-              {current && <AudioLines color={theme.text.brand.secondary} size={theme.fontSize.xl} />}
-              <Label ellipsizeMode="tail" numberOfLines={1} size="large" style={styles.trackName}>
-                {track.name}
+        <View style={[styles.container, isFirst && styles.firstTrack, isLast && styles.lastTrack]}>
+          <View style={[styles.trackContainer, propsStyle, pressed && styles.pressed]}>
+            <Image source={{ uri: track.album.images[0].url }} style={styles.albumCover} />
+            <View style={styles.textContainer}>
+              <View style={styles.title}>
+                {current && <AudioLines color={theme.text.brand.secondary} size={theme.fontSize.xl} />}
+                <Label ellipsizeMode="tail" numberOfLines={1} size="large" style={styles.trackName}>
+                  {track.name}
+                </Label>
+              </View>
+              <Label color="secondary" ellipsizeMode="tail" numberOfLines={1}>
+                {track.artists.map((artist) => artist.name).join(', ')}
               </Label>
             </View>
-            <Label color="secondary" ellipsizeMode="tail" numberOfLines={1}>
-              {track.artists.map((artist) => artist.name).join(', ')}
-            </Label>
           </View>
         </View>
-      </View>
+      </TouchableWithoutFeedback>
       <ShareModal onClose={() => setTrackToShare(null)} track={trackToShare} />
     </>
   )
-}
+})
 
 const styles = StyleSheet.create({
   albumCover: {

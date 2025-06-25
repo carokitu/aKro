@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { CirclePlus, Heart, VolumeOff } from 'lucide-react-native'
-import { useEffect, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import { useSpotifyApi } from '../../../../hooks'
@@ -11,7 +11,7 @@ import { Text } from '../../../system'
 import { theme } from '../../../theme'
 import { type EnhancedFeedPost } from './types'
 
-export const ActionButtons = ({ item, user }: { item: EnhancedFeedPost; user: User }) => {
+export const ActionButtons = memo(({ item, user }: { item: EnhancedFeedPost; user: User }) => {
   const [isOnSpotifyLibrary, setIsOnSpotifyLibrary] = useState(false)
   const [isLikedByCurrentUser, setIsLikedByCurrentUser] = useState(false)
   const [likesCount, setLikesCount] = useState(0)
@@ -87,7 +87,7 @@ export const ActionButtons = ({ item, user }: { item: EnhancedFeedPost; user: Us
       </TouchableOpacity>
     </View>
   )
-}
+})
 
 const styles = StyleSheet.create({
   actions: {

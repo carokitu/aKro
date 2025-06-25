@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
+import { memo } from 'react'
 import { Image, type StyleProp, StyleSheet, TouchableOpacity, View, type ViewStyle } from 'react-native'
 
 import { useSpotifyApi } from '../../hooks/useSpotifyApi'
@@ -18,7 +19,7 @@ type Props = {
   style?: StyleProp<ViewStyle>
 }
 
-export const Post = ({ ActionButtons, Header, item, style }: Props) => {
+export const Post = memo(({ ActionButtons, Header, item, style }: Props) => {
   const { spotifyApi } = useSpotifyApi()
 
   const playOnSpotify = async () => {
@@ -66,7 +67,7 @@ export const Post = ({ ActionButtons, Header, item, style }: Props) => {
       </View>
     </View>
   )
-}
+})
 
 const styles = StyleSheet.create({
   cover: {

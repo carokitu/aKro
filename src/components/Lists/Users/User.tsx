@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { memo, useState } from 'react'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import { router } from 'expo-router'
@@ -10,7 +10,7 @@ import { Avatar, Label, Text } from '../../../../src/system'
 import { theme } from '../../../../src/theme'
 import { FollowButton } from '../../ActionButtons'
 
-export const User = ({ currentUser, item }: { currentUser: TUser; item: UserWithStats }) => {
+export const User = memo(({ currentUser, item }: { currentUser: TUser; item: UserWithStats }) => {
   const [isPressed, setIsPressed] = useState(false)
   const { avatar_url, follows_me, id, is_followed, mutual_count, name, username } = item
 
@@ -53,7 +53,7 @@ export const User = ({ currentUser, item }: { currentUser: TUser; item: UserWith
       )}
     </TouchableOpacity>
   )
-}
+})
 
 const styles = StyleSheet.create({
   info: {

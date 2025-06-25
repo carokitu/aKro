@@ -1,11 +1,13 @@
+import { memo } from 'react'
 import { StyleSheet, View } from 'react-native'
 
 import { usePost } from '../../../../hooks'
 import { Label, Text } from '../../../system'
 import { theme } from '../../../theme'
 
-const Description = ({ description }: { description?: string }) => {
+const Description = memo(({ description }: { description?: string }) => {
   const { setExpendedDescription } = usePost()
+
   if (!description) {
     return <View style={styles.emptyDescription} />
   }
@@ -24,7 +26,7 @@ const Description = ({ description }: { description?: string }) => {
       )}
     </View>
   )
-}
+})
 
 const styles = StyleSheet.create({
   container: {

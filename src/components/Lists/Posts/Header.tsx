@@ -1,5 +1,6 @@
 import { useActionSheet } from '@expo/react-native-action-sheet'
 import { EllipsisVertical } from 'lucide-react-native'
+import { memo } from 'react'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import { router } from 'expo-router'
@@ -29,57 +30,51 @@ export const deletePost = async (postId: string): Promise<{ error?: string; succ
   }
 }
 
-export const Header = ({
-  item,
-  triggerRefresh,
-  user,
-}: {
-  item: EnhancedFeedPost
-  triggerRefresh: () => void
-  user: User
-}) => {
-  const isCurrentUserPost = user.id === item.user_id
-  const { showActionSheetWithOptions } = useActionSheet()
+export const Header = memo(
+  ({ item, triggerRefresh, user }: { item: EnhancedFeedPost; triggerRefresh: () => void; user: User }) => {
+    const isCurrentUserPost = user.id === item.user_id
+    const { showActionSheetWithOptions } = useActionSheet()
 
-  const handleEllipsisPress = async () => {
-    showActionSheetWithOptions(
-      {
-        destructiveButtonIndex: 1,
-        message: 'Cette action est irréversible. Êtes-vous sûr de vouloir continuer ?',
-        options: ['Conserver mon post', 'Supprimer mon post'],
-        title: 'Supprimer ce post ?',
-      },
-      async (index) => {
-        if (index === 1) {
-          const { success } = await deletePost(item.id)
-          if (success) {
-            triggerRefresh()
+    const handleEllipsisPress = async () => {
+      showActionSheetWithOptions(
+        {
+          destructiveButtonIndex: 1,
+          message: 'Cette action est irréversible. Êtes-vous sûr de vouloir continuer ?',
+          options: ['Conserver mon post', 'Supprimer mon post'],
+          title: 'Supprimer ce post ?',
+        },
+        async (index) => {
+          if (index === 1) {
+            const { success } = await deletePost(item.id)
+            if (success) {
+              triggerRefresh()
+            }
           }
-        }
-      },
-    )
-  }
+        },
+      )
+    }
 
-  return (
-    <>
-      <TouchableOpacity
-        activeOpacity={0.6}
-        onPress={() => router.push(`/profile/${item.username}`)}
-        style={styles.user}
-      >
-        <Avatar avatar={item.avatar_url} />
-        <View style={styles.info}>
-          <Label color="invert">{item.username}</Label>
-          <Text color="invert">{formatRelativeDate(item.created_at)}</Text>
-        </View>
-        {isCurrentUserPost && (
-          <EllipsisVertical color={theme.text.base.invert} onPress={handleEllipsisPress} style={styles.ellipsis} />
-        )}
-      </TouchableOpacity>
-      <Description description={item.description} />
-    </>
-  )
-}
+    return (
+      <>
+        <TouchableOpacity
+          activeOpacity={0.6}
+          onPress={() => router.push(`/profile/${item.username}`)}
+          style={styles.user}
+        >
+          <Avatar avatar={item.avatar_url} />
+          <View style={styles.info}>
+            <Label color="invert">{item.username}</Label>
+            <Text color="invert">{formatRelativeDate(item.created_at)}</Text>
+          </View>
+          {isCurrentUserPost && (
+            <EllipsisVertical color={theme.text.base.invert} onPress={handleEllipsisPress} style={styles.ellipsis} />
+          )}
+        </TouchableOpacity>
+        <Description description={item.description} />
+      </>
+    )
+  },
+)
 
 const styles = StyleSheet.create({
   ellipsis: {

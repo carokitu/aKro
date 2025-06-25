@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { CircleCheck, CirclePlus, Heart, VolumeOff } from 'lucide-react-native'
-import { useEffect, useState } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { CirclePlus, Heart, VolumeOff } from 'lucide-react-native'
+import { memo, useEffect, useState } from 'react'
+import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import { useSpotifyApi } from '../../../../hooks'
 import { type User } from '../../../../models'
@@ -10,7 +11,7 @@ import { Text } from '../../../system'
 import { theme } from '../../../theme'
 import { type EnhancedFeedPost } from './types'
 
-export const ActionButtons = ({ item, user }: { item: EnhancedFeedPost; user: User }) => {
+export const ActionButtons = memo(({ item, user }: { item: EnhancedFeedPost; user: User }) => {
   const [isOnSpotifyLibrary, setIsOnSpotifyLibrary] = useState(false)
   const [isLikedByCurrentUser, setIsLikedByCurrentUser] = useState(false)
   const [likesCount, setLikesCount] = useState(0)
@@ -65,22 +66,28 @@ export const ActionButtons = ({ item, user }: { item: EnhancedFeedPost; user: Us
   return (
     <View style={styles.actions}>
       <VolumeOff color={theme.surface.base.default} size={30} />
-      {isOnSpotifyLibrary ? (
-        <CircleCheck color={theme.surface.success.default} onPress={handleAddToSpotifyLibrary} size={30} />
-      ) : (
-        <CirclePlus color={theme.surface.base.default} onPress={handleAddToSpotifyLibrary} size={30} />
-      )}
-      <View style={styles.likes}>
-        <Heart
-          color={isLikedByCurrentUser ? theme.surface.danger.default : theme.surface.base.default}
-          onPress={handleLike}
-          size={30}
-        />
+      <TouchableOpacity onPress={handleAddToSpotifyLibrary}>
+        {isOnSpotifyLibrary ? (
+          <Image source={require('../../../../assets/images/icons/liked-spotify.png')} style={styles.customIcon} />
+        ) : (
+          <CirclePlus color={theme.surface.base.default} size={30} />
+        )}
+      </TouchableOpacity>
+      <TouchableOpacity onPress={handleLike} style={styles.likes}>
+        {isLikedByCurrentUser ? (
+          <Image
+            source={require('../../../../assets/images/icons/heart-filled.png')}
+            style={styles.customIcon}
+            tintColor={theme.text.base.invert}
+          />
+        ) : (
+          <Heart color={theme.surface.base.default} size={30} />
+        )}
         <Text color="invert">{likesCount}</Text>
-      </View>
+      </TouchableOpacity>
     </View>
   )
-}
+})
 
 const styles = StyleSheet.create({
   actions: {
@@ -88,6 +95,10 @@ const styles = StyleSheet.create({
     gap: theme.spacing[1200],
     justifyContent: 'space-between',
     paddingVertical: theme.spacing[800],
+  },
+  customIcon: {
+    height: 30,
+    width: 30,
   },
   likes: {
     alignItems: 'center',

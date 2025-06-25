@@ -36,7 +36,10 @@ export const UserList = ({
     setOffset(offset + LIMIT)
   }, [fetch, offset])
 
-  const renderItem = ({ item }: { item: UserWithStats }) => <User currentUser={currentUser} item={item} />
+  const renderItem = useCallback(
+    ({ item }: { item: UserWithStats }) => <User currentUser={currentUser} item={item} />,
+    [currentUser],
+  )
 
   return (
     <FlashList

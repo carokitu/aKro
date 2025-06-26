@@ -69,6 +69,7 @@ export const ShareModal = ({ onClose, track }: Props) => {
         album_cover_url: track.album.images[0].url,
         artist_name: track.artists.map((artist) => artist.name).join(', '),
         description,
+        isrc: track.external_ids.isrc,
         preview_url: track.preview_url,
         spotify_track_id: track.id,
         track_name: track.name,

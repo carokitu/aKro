@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { CirclePlus, Heart, VolumeOff } from 'lucide-react-native'
+import { CirclePlus, Heart, Volume2, VolumeOff } from 'lucide-react-native'
 import { memo, useEffect, useState } from 'react'
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
 
-import { useSpotifyApi } from '../../../../hooks'
+import { useMute, useSpotifyApi } from '../../../../hooks'
 import { type User } from '../../../../models'
 import { client } from '../../../../supabase'
 import { Text } from '../../../system'
@@ -12,10 +12,10 @@ import { theme } from '../../../theme'
 import { type EnhancedFeedPost } from './types'
 
 export const ActionButtons = memo(({ item, user }: { item: EnhancedFeedPost; user: User }) => {
+  const { mute, setMute } = useMute()
   const [isOnSpotifyLibrary, setIsOnSpotifyLibrary] = useState(false)
   const [isLikedByCurrentUser, setIsLikedByCurrentUser] = useState(false)
   const [likesCount, setLikesCount] = useState(0)
-
   const { spotifyApi } = useSpotifyApi()
 
   useEffect(() => {
@@ -65,7 +65,13 @@ export const ActionButtons = memo(({ item, user }: { item: EnhancedFeedPost; use
 
   return (
     <View style={styles.actions}>
-      <VolumeOff color={theme.surface.base.default} size={30} />
+      <TouchableOpacity onPress={() => setMute(!mute)}>
+        {mute ? (
+          <VolumeOff color={theme.surface.base.default} size={30} />
+        ) : (
+          <Volume2 color={theme.surface.base.default} size={30} />
+        )}
+      </TouchableOpacity>
       <TouchableOpacity onPress={handleAddToSpotifyLibrary}>
         {isOnSpotifyLibrary ? (
           <Image source={require('../../../../assets/images/icons/liked-spotify.png')} style={styles.customIcon} />

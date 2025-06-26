@@ -6,6 +6,7 @@ export type Post = {
   description?: string
   id: string
   is_liked_by_current_user: boolean
+  isrc: string
   likes_count: number
   preview_url?: string
   spotify_track_id: string

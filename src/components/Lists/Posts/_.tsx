@@ -6,7 +6,7 @@ import { type NativeScrollEvent, type NativeSyntheticEvent, StyleSheet } from 'r
 import { FlashList, type FlashListProps } from '@shopify/flash-list'
 import { Audio } from 'expo-av'
 
-import { MuteProvider, PostProvider, useMute, usePost, useSpotifyApi } from '../../../../hooks'
+import { PostProvider, useMute, usePost, useSpotifyApi } from '../../../../hooks'
 import { type Post as TPost, type User } from '../../../../models'
 import { client } from '../../../../supabase'
 import { Error } from '../../../system'
@@ -353,9 +353,7 @@ const List = ({
 
 export const PostsList = (props: Props) => (
   <PostProvider>
-    <MuteProvider>
-      <List {...props} />
-    </MuteProvider>
+    <List {...props} />
   </PostProvider>
 )
 

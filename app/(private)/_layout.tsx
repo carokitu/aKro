@@ -2,7 +2,7 @@ import { StatusBar } from 'react-native'
 
 import { Redirect, Stack } from 'expo-router'
 
-import { FeedProvider, useSpotifyAuth, useUser } from '../../hooks'
+import { FeedProvider, MuteProvider, useSpotifyAuth, useUser } from '../../hooks'
 import { SplashScreen } from '../../src'
 import { theme } from '../../src/theme'
 
@@ -20,12 +20,14 @@ export const PrivateLayout = () => {
 
   return (
     <FeedProvider>
-      <StatusBar backgroundColor={theme.surface.base.default} barStyle="dark-content" />
-      <Stack screenOptions={{ contentStyle: { backgroundColor: theme.surface.base.default } }}>
-        <Stack.Screen name="feed" options={{ headerShown: false }} />
-        <Stack.Screen name="search-users" options={{ headerShown: false }} />
-        <Stack.Screen name="profile" options={{ headerShown: false }} />
-      </Stack>
+      <MuteProvider>
+        <StatusBar backgroundColor={theme.surface.base.default} barStyle="dark-content" />
+        <Stack screenOptions={{ contentStyle: { backgroundColor: theme.surface.base.default } }}>
+          <Stack.Screen name="feed" options={{ headerShown: false }} />
+          <Stack.Screen name="search-users" options={{ headerShown: false }} />
+          <Stack.Screen name="profile" options={{ headerShown: false }} />
+        </Stack>
+      </MuteProvider>
     </FeedProvider>
   )
 }

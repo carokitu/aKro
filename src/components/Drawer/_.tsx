@@ -14,7 +14,7 @@ import { Track } from './Track'
 const INDEX_ON_INIT = 1
 const ITEMS_PER_PAGE = 50
 
-const LoadingFooter = () => <ActivityIndicator size="large" />
+const LoadingFooter = () => <ActivityIndicator size="large" style={styles.loader} />
 
 export const Drawer = ({
   close,
@@ -101,6 +101,9 @@ const styles = StyleSheet.create({
   },
   bottomSheetContainer: {
     flex: 1,
+  },
+  loader: {
+    marginVertical: padding['400'],
   },
   onHandleIndicator: {
     backgroundColor: theme.surface.base.secondaryPressed,

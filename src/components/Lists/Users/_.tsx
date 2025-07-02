@@ -44,7 +44,7 @@ export const UserList = ({
   return (
     <FlashList
       data={users}
-      estimatedItemSize={45}
+      estimatedItemSize={80}
       keyboardShouldPersistTaps="handled"
       keyExtractor={(item) => item.id}
       ListEmptyComponent={<Error />}

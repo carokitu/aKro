@@ -14,6 +14,7 @@ import { theme } from '../../../theme'
 import { Post } from '../../Post'
 import { ActionButtons } from './ActionButtons'
 import ExpendedDescription from './ExpendedDescription'
+import ExpendedLikes from './ExpendedLikes'
 import { Header } from './Header'
 import { Toast, type ToastProps } from './Toast'
 import { type EnhancedFeedPost } from './types'
@@ -38,7 +39,7 @@ const List = ({
   ...flashListProps
 }: Props) => {
   const { loading: spotifyLoading, spotifyApi } = useSpotifyApi()
-  const { expendedDescription, setExpendedDescription } = usePost()
+  const { expendedDescription, expendedLikesPostId, setExpendedDescription, setExpendedLikesPostId } = usePost()
   const { mute } = useMute()
 
   const [posts, setPosts] = useState<EnhancedFeedPost[]>([])
@@ -149,12 +150,12 @@ const List = ({
   }, [sound])
 
   useEffect(() => {
-    if (expendedDescription) {
+    if (expendedDescription || expendedLikesPostId) {
       setShowFeedDrawer?.(false)
     } else {
       setShowFeedDrawer?.(true)
     }
-  }, [expendedDescription, setShowFeedDrawer])
+  }, [expendedDescription, expendedLikesPostId, setShowFeedDrawer])
 
   useEffect(() => {
     if (!latestPostTimestamp || !user || !loadNewPost) {
@@ -265,11 +266,13 @@ const List = ({
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       if (expendedDescription) {
         setExpendedDescription(undefined)
+      } else if (expendedLikesPostId) {
+        setExpendedLikesPostId(undefined)
       }
 
       onScrollBeginDrag?.(event)
     },
-    [expendedDescription, onScrollBeginDrag, setExpendedDescription],
+    [expendedDescription, expendedLikesPostId, onScrollBeginDrag, setExpendedDescription, setExpendedLikesPostId],
   )
 
   const handleToast = () => fetchPosts(true)
@@ -347,6 +350,7 @@ const List = ({
         <Toast Icon={ArrowUp} message="Nouveaux posts" onPress={handleToast} variant="default" />
       )}
       <ExpendedDescription />
+      <ExpendedLikes />
     </>
   )
 }

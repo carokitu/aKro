@@ -92,7 +92,7 @@ export const ActionButtons = memo(({ item, user }: { item: EnhancedFeedPost; use
             <Heart color={theme.surface.base.default} size={30} />
           )}
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setExpendedLikesPostId(item.id)}>
+        <TouchableOpacity onPress={() => likesCount > 0 && setExpendedLikesPostId(item.id)}>
           <Text color="invert">{likesCount}</Text>
         </TouchableOpacity>
       </View>

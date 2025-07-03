@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useCallback } from 'react'
 import { StyleSheet, View } from 'react-native'
 
 import { usePost } from '../../../../hooks'
@@ -6,7 +6,12 @@ import { Label, Text } from '../../../system'
 import { theme } from '../../../theme'
 
 const Description = memo(({ description }: { description?: string }) => {
-  const { setExpendedDescription } = usePost()
+  const { setExpendedDescription, setExpendedLikesPostId } = usePost()
+
+  const handleSeeMore = useCallback(() => {
+    setExpendedDescription(description)
+    setExpendedLikesPostId(undefined)
+  }, [description, setExpendedDescription, setExpendedLikesPostId])
 
   if (!description) {
     return <View style={styles.emptyDescription} />
@@ -20,7 +25,7 @@ const Description = memo(({ description }: { description?: string }) => {
         {description}
       </Text>
       {showSeeMore && (
-        <Label color="invert" onPress={() => setExpendedDescription(description)} size="small" style={styles.seeMore}>
+        <Label color="invert" onPress={handleSeeMore} size="small" style={styles.seeMore}>
           Voir plus
         </Label>
       )}

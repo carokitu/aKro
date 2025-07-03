@@ -4,7 +4,7 @@ import { CirclePlus, Heart, Volume2, VolumeOff } from 'lucide-react-native'
 import { memo, useEffect, useState } from 'react'
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
 
-import { useMute, useSpotifyApi } from '../../../../hooks'
+import { useMute, usePost, useSpotifyApi } from '../../../../hooks'
 import { type User } from '../../../../models'
 import { client } from '../../../../supabase'
 import { Text } from '../../../system'
@@ -12,6 +12,7 @@ import { theme } from '../../../theme'
 import { type EnhancedFeedPost } from './types'
 
 export const ActionButtons = memo(({ item, user }: { item: EnhancedFeedPost; user: User }) => {
+  const { setExpendedLikesPostId } = usePost()
   const { mute, setMute } = useMute()
   const [isOnSpotifyLibrary, setIsOnSpotifyLibrary] = useState(false)
   const [isLikedByCurrentUser, setIsLikedByCurrentUser] = useState(false)
@@ -79,18 +80,22 @@ export const ActionButtons = memo(({ item, user }: { item: EnhancedFeedPost; use
           <CirclePlus color={theme.surface.base.default} size={30} />
         )}
       </TouchableOpacity>
-      <TouchableOpacity onPress={handleLike} style={styles.likes}>
-        {isLikedByCurrentUser ? (
-          <Image
-            source={require('../../../../assets/images/icons/heart-filled.png')}
-            style={styles.customIcon}
-            tintColor={theme.text.base.invert}
-          />
-        ) : (
-          <Heart color={theme.surface.base.default} size={30} />
-        )}
-        <Text color="invert">{likesCount}</Text>
-      </TouchableOpacity>
+      <View style={styles.likes}>
+        <TouchableOpacity onPress={handleLike}>
+          {isLikedByCurrentUser ? (
+            <Image
+              source={require('../../../../assets/images/icons/heart-filled.png')}
+              style={styles.customIcon}
+              tintColor={theme.text.base.invert}
+            />
+          ) : (
+            <Heart color={theme.surface.base.default} size={30} />
+          )}
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => likesCount > 0 && setExpendedLikesPostId(item.id)}>
+          <Text color="invert">{likesCount}</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   )
 })

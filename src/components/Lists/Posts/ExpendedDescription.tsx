@@ -1,5 +1,6 @@
+import { X } from 'lucide-react-native'
 import { useRef } from 'react'
-import { StyleSheet } from 'react-native'
+import { StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
 
@@ -32,9 +33,12 @@ const ExpendedDescription = () => {
       ref={bottomSheetRef}
     >
       <BottomSheetView style={styles.bottomSheetContainer}>
-        <Title size="large" style={styles.sectionTitle}>
-          Description
-        </Title>
+        <View style={styles.sectionTitle}>
+          <Title size="large">Description</Title>
+          <TouchableOpacity onPress={() => setExpendedDescription(undefined)}>
+            <X color={theme.text.base.default} size={28} />
+          </TouchableOpacity>
+        </View>
         <Text size="large" style={styles.description}>
           {expendedDescription}
         </Text>
@@ -45,15 +49,15 @@ const ExpendedDescription = () => {
 
 const styles = StyleSheet.create({
   background: {
-    backgroundColor: theme.surface.base.secondary,
+    backgroundColor: theme.surface.base.default,
     borderRadius: theme.radius.large,
   },
   bottomSheetContainer: {
     flex: 1,
+    marginHorizontal: theme.spacing[400],
   },
   description: {
     marginBottom: theme.spacing[1000],
-    marginHorizontal: theme.spacing[400],
   },
   onHandleIndicator: {
     backgroundColor: theme.surface.base.secondaryPressed,
@@ -61,8 +65,10 @@ const styles = StyleSheet.create({
     width: 40,
   },
   sectionTitle: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginBottom: theme.spacing['400'],
-    marginLeft: theme.spacing['400'],
   },
 })
 

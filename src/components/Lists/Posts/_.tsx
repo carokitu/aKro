@@ -12,9 +12,8 @@ import { client } from '../../../../supabase'
 import { Error } from '../../../system'
 import { theme } from '../../../theme'
 import { Post } from '../../Post'
-import { ActionButtons } from './ActionButtons'
+import { ActionButtons, ExpendedComments, ExpendedLikes } from './ActionButtons'
 import ExpendedDescription from './ExpendedDescription'
-import ExpendedLikes from './ExpendedLikes'
 import { Header } from './Header'
 import { Toast, type ToastProps } from './Toast'
 import { type EnhancedFeedPost } from './types'
@@ -39,7 +38,14 @@ const List = ({
   ...flashListProps
 }: Props) => {
   const { loading: spotifyLoading, spotifyApi } = useSpotifyApi()
-  const { expendedDescription, expendedLikesPostId, setExpendedDescription, setExpendedLikesPostId } = usePost()
+  const {
+    expendedCommentsPostId,
+    expendedDescription,
+    expendedLikesPostId,
+    setExpendedCommentsPostId,
+    setExpendedDescription,
+    setExpendedLikesPostId,
+  } = usePost()
   const { mute } = useMute()
 
   const [posts, setPosts] = useState<EnhancedFeedPost[]>([])
@@ -150,12 +156,12 @@ const List = ({
   }, [sound])
 
   useEffect(() => {
-    if (expendedDescription || expendedLikesPostId) {
+    if (expendedDescription || expendedLikesPostId || expendedCommentsPostId) {
       setShowFeedDrawer?.(false)
     } else {
       setShowFeedDrawer?.(true)
     }
-  }, [expendedDescription, expendedLikesPostId, setShowFeedDrawer])
+  }, [expendedCommentsPostId, expendedDescription, expendedLikesPostId, setShowFeedDrawer])
 
   useEffect(() => {
     if (!latestPostTimestamp || !user || !loadNewPost) {
@@ -266,13 +272,23 @@ const List = ({
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       if (expendedDescription) {
         setExpendedDescription(undefined)
+      } else if (expendedCommentsPostId) {
+        setExpendedCommentsPostId(undefined)
       } else if (expendedLikesPostId) {
         setExpendedLikesPostId(undefined)
       }
 
       onScrollBeginDrag?.(event)
     },
-    [expendedDescription, expendedLikesPostId, onScrollBeginDrag, setExpendedDescription, setExpendedLikesPostId],
+    [
+      expendedCommentsPostId,
+      expendedDescription,
+      expendedLikesPostId,
+      onScrollBeginDrag,
+      setExpendedCommentsPostId,
+      setExpendedDescription,
+      setExpendedLikesPostId,
+    ],
   )
 
   const handleToast = () => fetchPosts(true)
@@ -351,6 +367,7 @@ const List = ({
       )}
       <ExpendedDescription />
       <ExpendedLikes />
+      <ExpendedComments />
     </>
   )
 }

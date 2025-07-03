@@ -1,18 +1,18 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { CirclePlus, Heart, Volume2, VolumeOff } from 'lucide-react-native'
+import { CirclePlus, Heart, MessageSquareMore, Volume2, VolumeOff } from 'lucide-react-native'
 import { memo, useEffect, useState } from 'react'
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
 
-import { useMute, usePost, useSpotifyApi } from '../../../../hooks'
-import { type User } from '../../../../models'
-import { client } from '../../../../supabase'
-import { Text } from '../../../system'
-import { theme } from '../../../theme'
-import { type EnhancedFeedPost } from './types'
+import { useMute, usePost, useSpotifyApi } from '../../../../../hooks'
+import { type User } from '../../../../../models'
+import { client } from '../../../../../supabase'
+import { Text } from '../../../../system'
+import { theme } from '../../../../theme'
+import { type EnhancedFeedPost } from '../types'
 
 export const ActionButtons = memo(({ item, user }: { item: EnhancedFeedPost; user: User }) => {
-  const { setExpendedLikesPostId } = usePost()
+  const { setExpendedCommentsPostId, setExpendedLikesPostId } = usePost()
   const { mute, setMute } = useMute()
   const [isOnSpotifyLibrary, setIsOnSpotifyLibrary] = useState(false)
   const [isLikedByCurrentUser, setIsLikedByCurrentUser] = useState(false)
@@ -75,16 +75,20 @@ export const ActionButtons = memo(({ item, user }: { item: EnhancedFeedPost; use
       </TouchableOpacity>
       <TouchableOpacity onPress={handleAddToSpotifyLibrary}>
         {isOnSpotifyLibrary ? (
-          <Image source={require('../../../../assets/images/icons/liked-spotify.png')} style={styles.customIcon} />
+          <Image source={require('../../../../../assets/images/icons/liked-spotify.png')} style={styles.customIcon} />
         ) : (
           <CirclePlus color={theme.surface.base.default} size={30} />
         )}
       </TouchableOpacity>
-      <View style={styles.likes}>
+      <TouchableOpacity onPress={() => setExpendedCommentsPostId(item.id)} style={styles.composed}>
+        <MessageSquareMore color={theme.surface.base.default} size={32} />
+        <Text color="invert">00</Text>
+      </TouchableOpacity>
+      <View style={styles.composed}>
         <TouchableOpacity onPress={handleLike}>
           {isLikedByCurrentUser ? (
             <Image
-              source={require('../../../../assets/images/icons/heart-filled.png')}
+              source={require('../../../../../assets/images/icons/heart-filled.png')}
               style={styles.customIcon}
               tintColor={theme.text.base.invert}
             />
@@ -107,11 +111,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: theme.spacing[800],
   },
+  composed: {
+    alignItems: 'center',
+  },
   customIcon: {
     height: 30,
     width: 30,
-  },
-  likes: {
-    alignItems: 'center',
   },
 })

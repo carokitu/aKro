@@ -6,12 +6,13 @@ import { Label, Text } from '../../../system'
 import { theme } from '../../../theme'
 
 const Description = memo(({ description }: { description?: string }) => {
-  const { setExpendedDescription, setExpendedLikesPostId } = usePost()
+  const { setExpendedCommentsPostId, setExpendedDescription, setExpendedLikesPostId } = usePost()
 
   const handleSeeMore = useCallback(() => {
     setExpendedDescription(description)
     setExpendedLikesPostId(undefined)
-  }, [description, setExpendedDescription, setExpendedLikesPostId])
+    setExpendedCommentsPostId(undefined)
+  }, [description, setExpendedCommentsPostId, setExpendedDescription, setExpendedLikesPostId])
 
   if (!description) {
     return <View style={styles.emptyDescription} />

@@ -12,7 +12,7 @@ import { client } from '../../../../supabase'
 import { Error } from '../../../system'
 import { theme } from '../../../theme'
 import { Post } from '../../Post'
-import { ActionButtons, ExpendedComments, ExpendedLikes } from './ActionButtons'
+import { ActionButtons, ExpendedLikes } from './ActionButtons'
 import ExpendedDescription from './ExpendedDescription'
 import { Header } from './Header'
 import { Toast, type ToastProps } from './Toast'
@@ -367,7 +367,6 @@ const List = ({
       )}
       <ExpendedDescription />
       <ExpendedLikes />
-      <ExpendedComments />
     </>
   )
 }

@@ -96,13 +96,13 @@ export const ExpendedComments = () => {
       snapPoints={['80%', '100%']}
     >
       <BottomSheetView style={styles.bottomSheetContainer}>
-        <View style={styles.sectionTitle}>
-          <Title size="large">Commentaires</Title>
-          <TouchableOpacity onPress={() => setExpendedCommentsPostId(undefined)}>
-            <X color={theme.text.base.default} size={28} />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.usersList}>
+        <View style={styles.commentsContainer}>
+          <View style={styles.sectionTitle}>
+            <Title size="large">Commentaires</Title>
+            <TouchableOpacity onPress={() => setExpendedCommentsPostId(undefined)}>
+              <X color={theme.text.base.default} size={28} />
+            </TouchableOpacity>
+          </View>
           <FlashList
             data={comments}
             estimatedItemSize={80}
@@ -132,6 +132,10 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing[800],
     marginHorizontal: theme.spacing['400'],
   },
+  commentsContainer: {
+    flex: 1,
+    marginBottom: theme.spacing['400'],
+  },
   emptyState: {
     alignItems: 'center',
     gap: theme.spacing['200'],
@@ -151,9 +155,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: theme.spacing['400'],
-  },
-  usersList: {
-    flex: 1,
-    minHeight: 550,
   },
 })

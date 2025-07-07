@@ -41,7 +41,7 @@ const Name = () => {
       <TextInput
         autoComplete="name"
         autoFocus
-        keyboardType="default"
+        keyboardType="twitter"
         maxLength={50}
         onChangeText={onChangeText}
         placeholder="Paul Dupont"

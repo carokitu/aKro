@@ -38,14 +38,7 @@ const List = ({
   ...flashListProps
 }: Props) => {
   const { loading: spotifyLoading, spotifyApi } = useSpotifyApi()
-  const {
-    expendedCommentsPostId,
-    expendedDescription,
-    expendedLikesPostId,
-    setExpendedCommentsPostId,
-    setExpendedDescription,
-    setExpendedLikesPostId,
-  } = usePost()
+  const { expendedDescription, expendedLikesPostId, setExpendedDescription, setExpendedLikesPostId } = usePost()
   const { mute } = useMute()
 
   const [posts, setPosts] = useState<EnhancedFeedPost[]>([])
@@ -156,12 +149,12 @@ const List = ({
   }, [sound])
 
   useEffect(() => {
-    if (expendedDescription || expendedLikesPostId || expendedCommentsPostId) {
+    if (expendedDescription || expendedLikesPostId) {
       setShowFeedDrawer?.(false)
     } else {
       setShowFeedDrawer?.(true)
     }
-  }, [expendedCommentsPostId, expendedDescription, expendedLikesPostId, setShowFeedDrawer])
+  }, [expendedDescription, expendedLikesPostId, setShowFeedDrawer])
 
   useEffect(() => {
     if (!latestPostTimestamp || !user || !loadNewPost) {
@@ -272,23 +265,13 @@ const List = ({
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
       if (expendedDescription) {
         setExpendedDescription(undefined)
-      } else if (expendedCommentsPostId) {
-        setExpendedCommentsPostId(undefined)
       } else if (expendedLikesPostId) {
         setExpendedLikesPostId(undefined)
       }
 
       onScrollBeginDrag?.(event)
     },
-    [
-      expendedCommentsPostId,
-      expendedDescription,
-      expendedLikesPostId,
-      onScrollBeginDrag,
-      setExpendedCommentsPostId,
-      setExpendedDescription,
-      setExpendedLikesPostId,
-    ],
+    [expendedDescription, expendedLikesPostId, onScrollBeginDrag, setExpendedDescription, setExpendedLikesPostId],
   )
 
   const handleToast = () => fetchPosts(true)

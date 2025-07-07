@@ -71,6 +71,8 @@ const Feed = () => {
         p_user_id: user.id,
       })
 
+      console.log(data)
+
       return { data: data as TPost[], error }
     },
     [user],

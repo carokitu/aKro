@@ -4,6 +4,8 @@ import { CirclePlus, Heart, MessageSquareMore, Volume2, VolumeOff } from 'lucide
 import { memo, useEffect, useState } from 'react'
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
 
+import { router } from 'expo-router'
+
 import { useMute, usePost, useSpotifyApi } from '../../../../../hooks'
 import { type User } from '../../../../../models'
 import { client } from '../../../../../supabase'
@@ -12,7 +14,7 @@ import { theme } from '../../../../theme'
 import { type EnhancedFeedPost } from '../types'
 
 export const ActionButtons = memo(({ item, user }: { item: EnhancedFeedPost; user: User }) => {
-  const { setExpendedCommentsPostId, setExpendedLikesPostId } = usePost()
+  const { setExpendedLikesPostId } = usePost()
   const { mute, setMute } = useMute()
   const [isOnSpotifyLibrary, setIsOnSpotifyLibrary] = useState(false)
   const [isLikedByCurrentUser, setIsLikedByCurrentUser] = useState(false)
@@ -80,9 +82,9 @@ export const ActionButtons = memo(({ item, user }: { item: EnhancedFeedPost; use
           <CirclePlus color={theme.surface.base.default} size={30} />
         )}
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => setExpendedCommentsPostId(item.id)} style={styles.composed}>
+      <TouchableOpacity onPress={() => router.push(`/post/${item.id}`)} style={styles.composed}>
         <MessageSquareMore color={theme.surface.base.default} size={32} />
-        <Text color="invert">00</Text>
+        <Text color="invert">{item.comments_count}</Text>
       </TouchableOpacity>
       <View style={styles.composed}>
         <TouchableOpacity onPress={handleLike}>

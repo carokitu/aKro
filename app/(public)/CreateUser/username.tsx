@@ -82,6 +82,7 @@ const UserName = () => {
           <TextInput
             autoCorrect={false}
             autoFocus
+            keyboardType="twitter"
             maxLength={30}
             onChangeText={setUsername}
             placeholder="pauldupont12"

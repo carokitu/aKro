@@ -4,14 +4,14 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
 
-import { usePost, useUser } from '../../../../hooks'
-import { type UserWithStats } from '../../../../models/custom'
-import { client } from '../../../../supabase'
-import { Title } from '../../../system'
-import { theme } from '../../../theme'
-import { UserList } from '../Users'
+import { usePost, useUser } from '../../../../../hooks'
+import { type UserWithStats } from '../../../../../models/custom'
+import { client } from '../../../../../supabase'
+import { Title } from '../../../../system'
+import { theme } from '../../../../theme'
+import { UserList } from '../../Users'
 
-const ExpendedLikes = () => {
+export const ExpendedLikes = () => {
   const { expendedLikesPostId, setExpendedLikesPostId } = usePost()
   const { user } = useUser()
   const [users, setUsers] = useState<UserWithStats[]>([])
@@ -111,5 +111,3 @@ const styles = StyleSheet.create({
     minHeight: 550,
   },
 })
-
-export default ExpendedLikes

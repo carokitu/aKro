@@ -15,7 +15,12 @@ export const PostProvider = ({ children }: { children: ReactNode }) => {
 
   return (
     <PostContext.Provider
-      value={{ expendedDescription, expendedLikesPostId, setExpendedDescription, setExpendedLikesPostId }}
+      value={{
+        expendedDescription,
+        expendedLikesPostId,
+        setExpendedDescription,
+        setExpendedLikesPostId,
+      }}
     >
       {children}
     </PostContext.Provider>

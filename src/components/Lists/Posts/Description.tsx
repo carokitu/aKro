@@ -17,7 +17,9 @@ const Description = memo(({ description }: { description?: string }) => {
     return <View style={styles.emptyDescription} />
   }
 
-  const showSeeMore = description.length > 60
+  const hasLineBreaks = description.includes('\n')
+  const isLongDescription = description.length > 60
+  const showSeeMore = hasLineBreaks || isLongDescription
 
   return (
     <View style={styles.container}>

@@ -2,6 +2,7 @@ export type Post = {
   album_cover_url: string
   artist_name: string
   avatar_url: string
+  comments_count: number
   created_at: string
   description?: string
   id: string

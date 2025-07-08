@@ -6,7 +6,7 @@ import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import { router } from 'expo-router'
 
-import { useMute, usePost, useSpotifyApi } from '../../../../../hooks'
+import { useFeed, useMute, usePost, useSpotifyApi } from '../../../../../hooks'
 import { type User } from '../../../../../models'
 import { client } from '../../../../../supabase'
 import { Text } from '../../../../system'
@@ -16,16 +16,27 @@ import { type EnhancedFeedPost } from '../types'
 export const ActionButtons = memo(({ item, user }: { item: EnhancedFeedPost; user: User }) => {
   const { setExpendedLikesPostId } = usePost()
   const { mute, setMute } = useMute()
+  const { commentUpdates } = useFeed()
   const [isOnSpotifyLibrary, setIsOnSpotifyLibrary] = useState(false)
   const [isLikedByCurrentUser, setIsLikedByCurrentUser] = useState(false)
   const [likesCount, setLikesCount] = useState(0)
+  const [commentsCount, setCommentsCount] = useState(0)
   const { spotifyApi } = useSpotifyApi()
 
   useEffect(() => {
     setLikesCount(item.likes_count)
     setIsLikedByCurrentUser(item.is_liked_by_current_user)
     setIsOnSpotifyLibrary(item.isOnSpotifyLibrary)
+    setCommentsCount(item.comments_count)
   }, [item])
+
+  // Écouter les mises à jour du nombre de commentaires depuis le contexte
+  useEffect(() => {
+    const updatedCount = commentUpdates.get(item.id)
+    if (updatedCount !== undefined) {
+      setCommentsCount(updatedCount)
+    }
+  }, [commentUpdates, item.id])
 
   if (!user) {
     return null
@@ -84,7 +95,7 @@ export const ActionButtons = memo(({ item, user }: { item: EnhancedFeedPost; use
       </TouchableOpacity>
       <TouchableOpacity onPress={() => router.push(`/post/${item.id}`)} style={styles.composed}>
         <MessageSquareMore color={theme.surface.base.default} size={32} />
-        <Text color="invert">{item.comments_count}</Text>
+        <Text color="invert">{commentsCount}</Text>
       </TouchableOpacity>
       <View style={styles.composed}>
         <TouchableOpacity onPress={handleLike}>

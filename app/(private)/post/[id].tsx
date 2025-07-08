@@ -1,4 +1,5 @@
-import { MessageSquareOff, Send } from 'lucide-react-native'
+import { useActionSheet } from '@expo/react-native-action-sheet'
+import { Ellipsis, MessageSquareOff, Send } from 'lucide-react-native'
 import { useRef, useState } from 'react'
 import {
   ActivityIndicator,
@@ -13,7 +14,7 @@ import {
 import { FlashList } from '@shopify/flash-list'
 import { router, useLocalSearchParams } from 'expo-router'
 
-import { useUser } from '../../../hooks'
+import { useFeed, useUser } from '../../../hooks'
 import { type Comment as TComment } from '../../../models'
 import { NavBar } from '../../../src'
 import { Avatar, IconButton, Text, Title } from '../../../src/system'
@@ -29,7 +30,7 @@ const EmptyState = () => {
       <MessageSquareOff color={theme.text.base.secondary} size={40} />
       <Title color="secondary">Aucun commentaire</Title>
       <Text color="secondary" style={styles.emptyStateText}>
-        Personne n’a encore commenté sur cette publication
+        Personne n'a encore commenté sur cette publication
       </Text>
     </View>
   )
@@ -47,6 +48,7 @@ const NewComment = ({
   userId: string
 }) => {
   const { user } = useUser()
+  const { updateCommentCount } = useFeed()
   const [loading, setLoading] = useState(false)
   const [text, setText] = useState('')
 
@@ -74,6 +76,12 @@ const NewComment = ({
 
     setText('')
     setComments((prev) => [...prev, { avatar_url: user.avatar_url, name: user.name, username: user.username, ...data }])
+
+    // Mettre à jour le nombre de commentaires dans le contexte
+    const newCount =
+      (await client.from('comments').select('id', { count: 'exact', head: true }).eq('post_id', postId)).count || 0
+    updateCommentCount(postId, newCount)
+
     setTimeout(() => {
       listRef.current?.scrollToEnd({ animated: true })
     }, 100)
@@ -110,17 +118,53 @@ const NewComment = ({
   )
 }
 
-const Comment = ({ comment }: { comment: TComment }) => {
+const Comment = ({ comment, currentUserId, postId }: { comment: TComment; currentUserId: string; postId: string }) => {
+  const isCurrentUser = comment.author_id === currentUserId
+  const [isDeleted, setIsDeleted] = useState(false)
+  const { showActionSheetWithOptions } = useActionSheet()
+  const { updateCommentCount } = useFeed()
+
+  const onPress = async () => {
+    showActionSheetWithOptions(
+      {
+        destructiveButtonIndex: 1,
+        message: 'Cette action est irréversible. Êtes-vous sûr de vouloir continuer ?',
+        options: ['Conserver', 'Supprimer'],
+        title: 'Supprimer ce commentaire ?',
+      },
+      async (index) => {
+        if (index === 1) {
+          const { error } = await client.from('comments').delete().eq('id', comment.id)
+          if (!error) {
+            setIsDeleted(true)
+
+            const newCount =
+              (await client.from('comments').select('id', { count: 'exact', head: true }).eq('post_id', postId))
+                .count || 0
+            updateCommentCount(postId, newCount)
+          }
+        }
+      },
+    )
+  }
+
+  if (isDeleted) {
+    return null
+  }
+
   return (
     <View style={styles.comment}>
       <Avatar avatar={comment.avatar_url} />
       <View style={styles.commentBody}>
-        <View style={styles.infos}>
-          <Text color="disabled" ellipsizeMode="tail" numberOfLines={1}>
-            {comment.username}
-          </Text>
-          <Text color="disabled">•</Text>
-          <Text color="disabled">{formatRelativeDate(comment.created_at)}</Text>
+        <View style={styles.commentHeader}>
+          <View style={styles.infos}>
+            <Text color="disabled" ellipsizeMode="tail" numberOfLines={1}>
+              {comment.username}
+            </Text>
+            <Text color="disabled">•</Text>
+            <Text color="disabled">{formatRelativeDate(comment.created_at)}</Text>
+          </View>
+          {isCurrentUser && <IconButton Icon={Ellipsis} onPress={onPress} size="sm" variant="tertiary" />}
         </View>
         <Text style={styles.content}>{comment.content}</Text>
       </View>
@@ -188,7 +232,7 @@ const ExpendedComments = () => {
         onEndReachedThreshold={0.8}
         ref={listRef}
         refreshing={loading}
-        renderItem={({ item }) => <Comment comment={item} />}
+        renderItem={({ item }) => <Comment comment={item} currentUserId={user.id} postId={postID} />}
         showsVerticalScrollIndicator={false}
       />
       <NewComment listRef={listRef} postId={postID} setComments={setComments} userId={user.id} />
@@ -207,6 +251,11 @@ const styles = StyleSheet.create({
   },
   commentBody: {
     flex: 1,
+  },
+  commentHeader: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   container: {
     flex: 1,

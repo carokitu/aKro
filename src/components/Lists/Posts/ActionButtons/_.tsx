@@ -30,7 +30,6 @@ export const ActionButtons = memo(({ item, user }: { item: EnhancedFeedPost; use
     setCommentsCount(item.comments_count)
   }, [item])
 
-  // Écouter les mises à jour du nombre de commentaires depuis le contexte
   useEffect(() => {
     const updatedCount = commentUpdates.get(item.id)
     if (updatedCount !== undefined) {

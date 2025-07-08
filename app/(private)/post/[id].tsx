@@ -24,28 +24,24 @@ import { client } from '../../../supabase'
 
 const LIMIT = 20
 
-const EmptyState = () => {
-  return (
-    <View style={styles.emptyState}>
-      <MessageSquareOff color={theme.text.base.secondary} size={40} />
-      <Title color="secondary">Aucun commentaire</Title>
-      <Text color="secondary" style={styles.emptyStateText}>
-        Personne n'a encore commenté sur cette publication
-      </Text>
-    </View>
-  )
-}
+const EmptyState = () => (
+  <View style={styles.emptyState}>
+    <MessageSquareOff color={theme.text.base.secondary} size={40} />
+    <Title color="secondary">Aucun commentaire</Title>
+    <Text color="secondary" style={styles.emptyStateText}>
+      Personne n'a encore commenté sur cette publication
+    </Text>
+  </View>
+)
 
 const NewComment = ({
   listRef,
   postId,
   setComments,
-  userId,
 }: {
   listRef: React.RefObject<FlashList<TComment>>
   postId: string
   setComments: React.Dispatch<React.SetStateAction<TComment[]>>
-  userId: string
 }) => {
   const { user } = useUser()
   const { updateCommentCount } = useFeed()
@@ -60,7 +56,7 @@ const NewComment = ({
     setLoading(true)
 
     const comment = {
-      author_id: userId,
+      author_id: user.id,
       content: text.trim(),
       post_id: postId,
     }
@@ -77,7 +73,6 @@ const NewComment = ({
     setText('')
     setComments((prev) => [...prev, { avatar_url: user.avatar_url, name: user.name, username: user.username, ...data }])
 
-    // Mettre à jour le nombre de commentaires dans le contexte
     const newCount =
       (await client.from('comments').select('id', { count: 'exact', head: true }).eq('post_id', postId)).count || 0
     updateCommentCount(postId, newCount)
@@ -235,7 +230,7 @@ const ExpendedComments = () => {
         renderItem={({ item }) => <Comment comment={item} currentUserId={user.id} postId={postID} />}
         showsVerticalScrollIndicator={false}
       />
-      <NewComment listRef={listRef} postId={postID} setComments={setComments} userId={user.id} />
+      <NewComment listRef={listRef} postId={postID} setComments={setComments} />
     </SafeAreaView>
   )
 }

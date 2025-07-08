@@ -17,7 +17,6 @@ const Description = memo(({ description }: { description?: string }) => {
     return <View style={styles.emptyDescription} />
   }
 
-  // Check if description needs "see more" based on length or line breaks
   const hasLineBreaks = description.includes('\n')
   const isLongDescription = description.length > 60
   const showSeeMore = hasLineBreaks || isLongDescription

@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   StyleSheet,
   TextInput,
+  TouchableOpacity,
   View,
 } from 'react-native'
 
@@ -159,7 +160,11 @@ const Comment = ({ comment, currentUserId, postId }: { comment: TComment; curren
             <Text color="disabled">•</Text>
             <Text color="disabled">{formatRelativeDate(comment.created_at)}</Text>
           </View>
-          {isCurrentUser && <IconButton Icon={Ellipsis} onPress={onPress} size="sm" variant="tertiary" />}
+          {isCurrentUser && (
+            <TouchableOpacity onPress={onPress}>
+              <Ellipsis color={theme.text.base.default} size="18" />
+            </TouchableOpacity>
+          )}
         </View>
         <Text style={styles.content}>{comment.content}</Text>
       </View>

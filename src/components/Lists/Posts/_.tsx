@@ -89,8 +89,11 @@ const List = ({
       const resumeAudio = async () => {
         try {
           if (sound && !mute) {
-            await sound.setPositionAsync(0)
-            await sound.playAsync()
+            const status = await sound.getStatusAsync()
+            if (status.isLoaded) {
+              await sound.setPositionAsync(0)
+              await sound.playAsync()
+            }
           }
         } catch (err) {
           console.error('Erreur reprise son :', err)

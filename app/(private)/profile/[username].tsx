@@ -12,6 +12,7 @@ import { FollowButton, NavBar } from '../../../src/components'
 import { Avatar, Error as ErrorScreen, Text, Title } from '../../../src/system'
 import { theme } from '../../../src/theme'
 import { client } from '../../../supabase'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 // Follower       Followed
 // currentUser    user          is_followed
@@ -231,17 +232,21 @@ const UserProfile = () => {
 
   return (
     <SafeAreaView edges={['top']} style={styles.container}>
-      <NavBar
-        rightIcon={isCurrentUserProfile ? { handlePress: () => router.push('./settings'), Icon: Settings } : undefined}
-        title={user.username}
-      />
-      <PostsList
-        fetchPosts={fetchPosts}
-        ListEmptyComponent={<EmptyState />}
-        ListFooterComponent={FooterComponent}
-        ListHeaderComponent={<UserInfos isCurrentUserProfile={isCurrentUserProfile} user={user} />}
-        user={currentUser}
-      />
+      <GestureHandlerRootView>
+        <NavBar
+          rightIcon={
+            isCurrentUserProfile ? { handlePress: () => router.push('./settings'), Icon: Settings } : undefined
+          }
+          title={user.username}
+        />
+        <PostsList
+          fetchPosts={fetchPosts}
+          ListEmptyComponent={<EmptyState />}
+          ListFooterComponent={FooterComponent}
+          ListHeaderComponent={<UserInfos isCurrentUserProfile={isCurrentUserProfile} user={user} />}
+          user={currentUser}
+        />
+      </GestureHandlerRootView>
     </SafeAreaView>
   )
 }

@@ -68,6 +68,11 @@ export const ActionButtons = memo(({ item, user }: { item: EnhancedFeedPost; use
         await (spotifyApi.currentUser.tracks.removeSavedTracks as any)({ ids: [trackId] })
       } else {
         await (spotifyApi.currentUser.tracks.saveTracks as any)({ ids: [trackId] })
+        const { error } = await client
+          .from('user_saved_tracks')
+          .insert({ isrc: item.isrc, post_id: item.id, user_id: user.id })
+
+        console.log(error)
       }
 
       setIsOnSpotifyLibrary((prev) => !prev)

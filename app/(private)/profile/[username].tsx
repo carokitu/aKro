@@ -1,6 +1,7 @@
 import { ArrowRight, CircleOff, Settings } from 'lucide-react-native'
 import { useCallback, useEffect, useState } from 'react'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { router, useLocalSearchParams } from 'expo-router'
@@ -12,7 +13,6 @@ import { FollowButton, NavBar } from '../../../src/components'
 import { Avatar, Error as ErrorScreen, Text, Title } from '../../../src/system'
 import { theme } from '../../../src/theme'
 import { client } from '../../../supabase'
-import { GestureHandlerRootView } from 'react-native-gesture-handler'
 
 // Follower       Followed
 // currentUser    user          is_followed

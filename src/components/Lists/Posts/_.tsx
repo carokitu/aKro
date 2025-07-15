@@ -39,7 +39,7 @@ const List = ({
 }: Props) => {
   const { loading: spotifyLoading, spotifyApi } = useSpotifyApi()
   const { expendedDescription, expendedLikesPostId, setExpendedDescription, setExpendedLikesPostId } = usePost()
-  const { mute } = useMute()
+  const { mute, temporaryMute } = useMute()
 
   const [posts, setPosts] = useState<EnhancedFeedPost[]>([])
   const [loading, setLoading] = useState(false)
@@ -125,12 +125,14 @@ const List = ({
 
   useEffect(() => {
     const applyMute = async () => {
+      console.log('mute', mute)
+      console.log('temporaryMute', temporaryMute)
       if (!sound) {
         return
       }
 
       try {
-        if (mute) {
+        if (mute || temporaryMute) {
           await sound.pauseAsync()
         } else {
           await sound.playAsync()
@@ -141,7 +143,7 @@ const List = ({
     }
 
     applyMute()
-  }, [mute, sound])
+  }, [mute, sound, temporaryMute])
 
   useEffect(() => {
     return () => {

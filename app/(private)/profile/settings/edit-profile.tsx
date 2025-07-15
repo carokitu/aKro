@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { SafeAreaView, StyleSheet, View } from 'react-native'
+import { KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, View } from 'react-native'
 
 import { type ImagePickerAsset } from 'expo-image-picker'
 import { useNavigation } from 'expo-router'
@@ -57,7 +57,11 @@ const EditProfile = () => {
   return (
     <SafeAreaView style={styles.area}>
       <NavBar title="Modifier mon profil" />
-      <View style={styles.container}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={theme.spacing['400']}
+        style={styles.container}
+      >
         <View style={styles.formContainer}>
           <EditAvatar
             avatarUrl={user.avatar_url ?? undefined}
@@ -70,7 +74,7 @@ const EditProfile = () => {
         <View style={styles.buttonContainer}>
           <Button fullWidth onPress={handleSave} size="lg" title="Enregistrer" />
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   )
 }

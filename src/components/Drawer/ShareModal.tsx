@@ -14,7 +14,7 @@ import {
 
 import { type Track as TTrack } from '@spotify/web-api-ts-sdk'
 
-import { useFeed, useUser } from '../../../hooks'
+import { useFeed, useMute, useUser } from '../../../hooks'
 import { client } from '../../../supabase'
 import { Button, IconButton, Label, Title } from '../../system'
 import { theme } from '../../theme'
@@ -28,6 +28,7 @@ type Props = {
 export const ShareModal = ({ onClose, track }: Props) => {
   const { user } = useUser()
   const { notifyNewPost } = useFeed()
+  const { setTemporaryMute } = useMute()
   const [description, setDescription] = useState<string | undefined>(undefined)
   const [isSharing, setIsSharing] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
@@ -44,6 +45,14 @@ export const ShareModal = ({ onClose, track }: Props) => {
       showSub.remove()
     }
   }, [])
+
+  useEffect(() => {
+    if (track) {
+      setTemporaryMute(true)
+    } else {
+      setTemporaryMute(false)
+    }
+  }, [setTemporaryMute, track])
 
   useEffect(() => {
     if (track && isSuccess) {

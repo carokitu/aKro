@@ -4,7 +4,7 @@ import { ActivityIndicator, StyleSheet } from 'react-native'
 import BottomSheet, { BottomSheetFlatList, BottomSheetView } from '@gorhom/bottom-sheet'
 import { type SavedTrack } from '@spotify/web-api-ts-sdk'
 
-import { useSavedTracks } from '../../../hooks'
+import { useMute, useSavedTracks } from '../../../hooks'
 import { Error, Title } from '../../system'
 import { theme } from '../../theme'
 import { padding } from '../../theme/spacing'
@@ -25,6 +25,7 @@ export const Drawer = ({
   minimize: boolean
   setMinimize: (value: boolean) => void
 }) => {
+  const { setTemporaryMute } = useMute()
   const [currentSnapIndex, setCurrentSnapIndex] = useState(INDEX_ON_INIT)
   const { loading, loadMore, refresh, refreshing, tracks } = useSavedTracks(ITEMS_PER_PAGE)
   const snapPoints = useMemo(() => ['10%', '40%', '100%'], [])
@@ -36,9 +37,15 @@ export const Drawer = ({
         refresh()
       }
 
+      if (index === 2) {
+        setTemporaryMute(true)
+      } else {
+        setTemporaryMute(false)
+      }
+
       setCurrentSnapIndex(index)
     },
-    [currentSnapIndex, refresh],
+    [currentSnapIndex, refresh, setTemporaryMute],
   )
 
   useEffect(() => {

@@ -51,6 +51,18 @@ const List = ({
   const LIMIT = 20
   const listRef = useRef<FlashList<TPost>>(null)
 
+  const stopPreview = useCallback(async () => {
+    if (sound) {
+      try {
+        await sound.stopAsync()
+        await sound.unloadAsync()
+        setSound(null)
+      } catch (err) {
+        console.error('Error stopping preview:', err)
+      }
+    }
+  }, [sound])
+
   const playPreviewFromISRC = useCallback(
     async (isrc: string) => {
       try {
@@ -63,7 +75,7 @@ const List = ({
         }
 
         if (sound) {
-          await sound.unloadAsync()
+          await stopPreview()
         }
 
         const { sound: newSound } = await Audio.Sound.createAsync(
@@ -76,7 +88,7 @@ const List = ({
         console.error('Error playing Deezer preview:', err)
       }
     },
-    [mute, sound],
+    [mute, sound, stopPreview],
   )
 
   useFocusEffect(
@@ -106,18 +118,6 @@ const List = ({
       }
     }, [mute, sound]),
   )
-
-  const stopPreview = useCallback(async () => {
-    if (sound) {
-      try {
-        await sound.stopAsync()
-        await sound.unloadAsync()
-        setSound(null)
-      } catch (err) {
-        console.error('Error stopping preview:', err)
-      }
-    }
-  }, [sound])
 
   useEffect(() => {
     const applyMute = async () => {
@@ -279,43 +279,46 @@ const List = ({
     },
   ])
 
-  const handleLike = async (post: TPost) => {
-    if (!user) {
-      return
-    }
-
-    try {
-      if (post.is_liked_by_current_user) {
-        await client.from('post_likes').delete().eq('post_id', post.id).eq('user_id', user.id)
-        setPosts((prev) =>
-          prev.map((p) =>
-            p.id === post.id
-              ? {
-                  ...p,
-                  is_liked_by_current_user: false,
-                  likes_count: p.likes_count - 1,
-                }
-              : p,
-          ),
-        )
-      } else {
-        await client.from('post_likes').insert({ post_id: post.id, user_id: user.id })
-        setPosts((prev) =>
-          prev.map((p) =>
-            p.id === post.id
-              ? {
-                  ...p,
-                  is_liked_by_current_user: true,
-                  likes_count: p.likes_count + 1,
-                }
-              : p,
-          ),
-        )
+  const handleLike = useCallback(
+    async (post: TPost) => {
+      if (!user) {
+        return
       }
-    } catch (err) {
-      console.error('Failed to toggle like:', err)
-    }
-  }
+
+      try {
+        if (post.is_liked_by_current_user) {
+          await client.from('post_likes').delete().eq('post_id', post.id).eq('user_id', user.id)
+          setPosts((prev) =>
+            prev.map((p) =>
+              p.id === post.id
+                ? {
+                    ...p,
+                    is_liked_by_current_user: false,
+                    likes_count: p.likes_count - 1,
+                  }
+                : p,
+            ),
+          )
+        } else {
+          await client.from('post_likes').insert({ post_id: post.id, user_id: user.id })
+          setPosts((prev) =>
+            prev.map((p) =>
+              p.id === post.id
+                ? {
+                    ...p,
+                    is_liked_by_current_user: true,
+                    likes_count: p.likes_count + 1,
+                  }
+                : p,
+            ),
+          )
+        }
+      } catch (err) {
+        console.error('Failed to toggle like:', err)
+      }
+    },
+    [user],
+  )
 
   const renderItem = ({ item }: { item: TPost }) => {
     const handleLikePress = () => {

@@ -8,7 +8,7 @@ import { usePost } from '../../../../hooks'
 import { Text, Title } from '../../../system'
 import { theme } from '../../../theme'
 
-const ExpendedDescription = () => {
+export const ExpendedDescription = () => {
   const { expendedDescription, setExpendedDescription } = usePost()
   const bottomSheetRef = useRef<BottomSheet>(null)
 
@@ -71,5 +71,3 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing['400'],
   },
 })
-
-export default ExpendedDescription

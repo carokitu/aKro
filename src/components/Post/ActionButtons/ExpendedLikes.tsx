@@ -4,12 +4,12 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
 
-import { usePost, useUser } from '../../../../../hooks'
-import { type UserWithStats } from '../../../../../models/custom'
-import { client } from '../../../../../supabase'
-import { Title } from '../../../../system'
-import { theme } from '../../../../theme'
-import { UserList } from '../../Users'
+import { usePost, useUser } from '../../../../hooks'
+import { type UserWithStats } from '../../../../models/custom'
+import { client } from '../../../../supabase'
+import { Title } from '../../../system'
+import { theme } from '../../../theme'
+import { UserList } from '../../Lists/Users'
 
 export const ExpendedLikes = () => {
   const { expendedLikesPostId, setExpendedLikesPostId } = usePost()

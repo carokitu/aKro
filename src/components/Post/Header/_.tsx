@@ -5,13 +5,12 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import { router } from 'expo-router'
 
-import { type User } from '../../../../models'
+import { type Post as TPost, type User } from '../../../../models'
 import { client } from '../../../../supabase'
 import { Avatar, Label, Text } from '../../../system'
 import { theme } from '../../../theme'
 import { formatRelativeDate } from '../../../utils'
 import Description from './Description'
-import { type EnhancedFeedPost } from './types'
 
 export const deletePost = async (postId: string): Promise<{ error?: string; success: boolean }> => {
   try {
@@ -31,7 +30,7 @@ export const deletePost = async (postId: string): Promise<{ error?: string; succ
 }
 
 export const Header = memo(
-  ({ item, triggerRefresh, user }: { item: EnhancedFeedPost; triggerRefresh: () => void; user: User }) => {
+  ({ item, triggerRefresh, user }: { item: TPost; triggerRefresh: () => void; user: User }) => {
     const isCurrentUserPost = user.id === item.user_id
     const { showActionSheetWithOptions } = useActionSheet()
 

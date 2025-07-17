@@ -98,6 +98,13 @@ export const ShareModal = ({ onClose, track }: Props) => {
   }
 
   const artists = track.artists.map((a) => a.name).join(', ')
+  const item = {
+    album_cover_url: track.album.images[0].url,
+    artist_name: artists,
+    preview_url: track.preview_url ?? undefined,
+    spotify_track_id: track.id,
+    track_name: track.name,
+  }
 
   return (
     <Modal animationType="fade" onRequestClose={onClose} transparent>
@@ -115,15 +122,10 @@ export const ShareModal = ({ onClose, track }: Props) => {
               keyboardShouldPersistTaps="handled"
               ref={scrollViewRef}
             >
-              <Post
-                item={{
-                  album_cover_url: track.album.images[0].url,
-                  artist_name: artists,
-                  preview_url: track.preview_url ?? undefined,
-                  spotify_track_id: track.id,
-                  track_name: track.name,
-                }}
-              />
+              <Post.Container>
+                <Post.Track item={item} />
+                <Post.Footer item={item} />
+              </Post.Container>
               <Label size="large" style={styles.descriptionLabel}>
                 Ajouter une légende
               </Label>

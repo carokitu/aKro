@@ -12,13 +12,9 @@ import { client } from '../../../../supabase'
 import { Error } from '../../../system'
 import { theme } from '../../../theme'
 import { Post } from '../../Post'
-import { ActionButtons, ExpendedLikes } from './ActionButtons'
-import ExpendedDescription from './ExpendedDescription'
-import { Header } from './Header'
 import { Toast, type ToastProps } from './Toast'
-import { type EnhancedFeedPost } from './types'
 
-type Props = Omit<FlashListProps<EnhancedFeedPost>, 'data' | 'renderItem'> & {
+type Props = Omit<FlashListProps<TPost>, 'data' | 'renderItem'> & {
   fetchPosts: ({ limit, offset }: { limit: number; offset: number }) => Promise<{ data: TPost[]; error: Error | null }>
   loadNewPost?: boolean
   onReset?: () => void
@@ -41,19 +37,31 @@ const List = ({
   const { expendedDescription, expendedLikesPostId, setExpendedDescription, setExpendedLikesPostId } = usePost()
   const { mute, temporaryMute } = useMute()
 
-  const [posts, setPosts] = useState<EnhancedFeedPost[]>([])
+  const [error, setError] = useState<Error | null>(null)
+  const [hasNewPosts, setHasNewPosts] = useState(false)
+  const [latestPostTimestamp, setLatestPostTimestamp] = useState<null | string>(null)
   const [loading, setLoading] = useState(false)
   const [offset, setOffset] = useState(0)
-  const [latestPostTimestamp, setLatestPostTimestamp] = useState<null | string>(null)
-  const [hasNewPosts, setHasNewPosts] = useState(false)
+  const [posts, setPosts] = useState<TPost[]>([])
   const [resetPending, setResetPending] = useState(false)
-  const [error, setError] = useState<Error | null>(null)
-  const [triggerRefresh, setTriggerRefresh] = useState(false)
   const [sound, setSound] = useState<Audio.Sound | null>(null)
+  const [triggerRefresh, setTriggerRefresh] = useState(false)
 
-  const LIMIT = 20
   const hasMounted = useRef(false)
-  const listRef = useRef<FlashList<EnhancedFeedPost>>(null)
+  const LIMIT = 20
+  const listRef = useRef<FlashList<TPost>>(null)
+
+  const stopPreview = useCallback(async () => {
+    if (sound) {
+      try {
+        await sound.stopAsync()
+        await sound.unloadAsync()
+        setSound(null)
+      } catch (err) {
+        console.error('Error stopping preview:', err)
+      }
+    }
+  }, [sound])
 
   const playPreviewFromISRC = useCallback(
     async (isrc: string) => {
@@ -67,7 +75,7 @@ const List = ({
         }
 
         if (sound) {
-          await sound.unloadAsync()
+          await stopPreview()
         }
 
         const { sound: newSound } = await Audio.Sound.createAsync(
@@ -80,7 +88,7 @@ const List = ({
         console.error('Error playing Deezer preview:', err)
       }
     },
-    [mute, sound],
+    [mute, sound, stopPreview],
   )
 
   useFocusEffect(
@@ -111,22 +119,8 @@ const List = ({
     }, [mute, sound]),
   )
 
-  const stopPreview = useCallback(async () => {
-    if (sound) {
-      try {
-        await sound.stopAsync()
-        await sound.unloadAsync()
-        setSound(null)
-      } catch (err) {
-        console.error('Error stopping preview:', err)
-      }
-    }
-  }, [sound])
-
   useEffect(() => {
     const applyMute = async () => {
-      console.log('mute', mute)
-      console.log('temporaryMute', temporaryMute)
       if (!sound) {
         return
       }
@@ -189,17 +183,6 @@ const List = ({
     }
   }, [spotifyLoading])
 
-  const checkLikedTracks = useCallback(
-    async (trackIds: string[]) => {
-      if (!spotifyApi || trackIds.length === 0) {
-        return []
-      }
-
-      return await spotifyApi.currentUser.tracks.hasSavedTracks(trackIds)
-    },
-    [spotifyApi],
-  )
-
   const fetchPosts = useCallback(
     async (reset = false) => {
       if (!user) {
@@ -218,15 +201,7 @@ const List = ({
       }
 
       const feedPosts = data as TPost[]
-      const trackIds = feedPosts.map((p) => p.spotify_track_id)
-      const likedTracks = await checkLikedTracks(trackIds)
-
-      const postsWithStatus: EnhancedFeedPost[] = feedPosts.map((p, i) => ({
-        ...p,
-        isOnSpotifyLibrary: likedTracks[i] || false,
-      }))
-
-      setPosts((prev) => (reset ? postsWithStatus : [...prev, ...postsWithStatus]))
+      setPosts((prev) => (reset ? feedPosts : [...prev, ...feedPosts]))
 
       if (reset) {
         setOffset(LIMIT)
@@ -240,7 +215,7 @@ const List = ({
 
       setLoading(false)
     },
-    [checkLikedTracks, fetchPostFromProps, offset, onReset, user],
+    [fetchPostFromProps, offset, onReset, user],
   )
 
   useEffect(() => {
@@ -282,9 +257,8 @@ const List = ({
   const handleToast = () => fetchPosts(true)
 
   const viewabilityCallback = useCallback(
-    ({ viewableItems }: { viewableItems: Array<{ item: EnhancedFeedPost }> }) => {
+    ({ viewableItems }: { viewableItems: Array<{ item: TPost }> }) => {
       const focusedPost = viewableItems?.[0]?.item
-      console.log('Focused post:', focusedPost?.track_name)
 
       if (focusedPost?.isrc) {
         playPreviewFromISRC(focusedPost.isrc)
@@ -305,14 +279,70 @@ const List = ({
     },
   ])
 
-  const renderItem = ({ item }: { item: EnhancedFeedPost }) => (
-    <Post
-      ActionButtons={<ActionButtons item={item} user={user} />}
-      Header={<Header item={item} triggerRefresh={() => setTriggerRefresh(true)} user={user} />}
-      item={item}
-      style={styles.post}
-    />
+  const handleLike = useCallback(
+    async (post: TPost) => {
+      if (!user) {
+        return
+      }
+
+      try {
+        if (post.is_liked_by_current_user) {
+          await client.from('post_likes').delete().eq('post_id', post.id).eq('user_id', user.id)
+          setPosts((prev) =>
+            prev.map((p) =>
+              p.id === post.id
+                ? {
+                    ...p,
+                    is_liked_by_current_user: false,
+                    likes_count: p.likes_count - 1,
+                  }
+                : p,
+            ),
+          )
+        } else {
+          await client.from('post_likes').insert({ post_id: post.id, user_id: user.id })
+          setPosts((prev) =>
+            prev.map((p) =>
+              p.id === post.id
+                ? {
+                    ...p,
+                    is_liked_by_current_user: true,
+                    likes_count: p.likes_count + 1,
+                  }
+                : p,
+            ),
+          )
+        }
+      } catch (err) {
+        console.error('Failed to toggle like:', err)
+      }
+    },
+    [user],
   )
+
+  const renderItem = ({ item }: { item: TPost }) => {
+    const handleLikePress = () => {
+      if (!item.is_liked_by_current_user) {
+        handleLike(item)
+      }
+    }
+
+    return (
+      <Post.InteractiveContainer handleLike={handleLikePress} style={styles.post}>
+        <Post.Header item={item} triggerRefresh={() => setTriggerRefresh(true)} user={user} />
+        <Post.Track item={item} size="medium">
+          <Post.ActionButtons
+            isLikedByCurrentUser={item.is_liked_by_current_user}
+            item={item}
+            likesCount={item.likes_count}
+            onLikePress={() => handleLike(item)}
+            user={user}
+          />
+        </Post.Track>
+        <Post.Footer item={item} />
+      </Post.InteractiveContainer>
+    )
+  }
 
   if (!user) {
     return null
@@ -353,8 +383,8 @@ const List = ({
       {!toast && hasNewPosts && (
         <Toast Icon={ArrowUp} message="Nouveaux posts" onPress={handleToast} variant="default" />
       )}
-      <ExpendedDescription />
-      <ExpendedLikes />
+      <Post.ExpendedDescription />
+      <Post.ExpendedLikes />
     </>
   )
 }

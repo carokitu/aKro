@@ -3,15 +3,15 @@ import { StyleSheet } from 'react-native'
 
 import { LinearGradient } from 'expo-linear-gradient'
 
-import { client } from '../../supabase'
-import { Label } from '../system'
-import { theme } from '../theme'
+import { client } from '../../../supabase'
+import { Label } from '../../system'
+import { theme } from '../../theme'
 
 type Props = {
   username: string
 }
 
-type TUserRank = {
+type UserRank = {
   avatar_url: string
   rank_all: number
   rank_week: number
@@ -21,8 +21,8 @@ type TUserRank = {
   username: string
 }
 
-export const UserRank = ({ username }: Props) => {
-  const [rank, setRank] = useState<null | TUserRank>(null)
+export const UserRanking = ({ username }: Props) => {
+  const [rank, setRank] = useState<null | UserRank>(null)
 
   useEffect(() => {
     const getUserRank = async () => {
@@ -50,7 +50,7 @@ export const UserRank = ({ username }: Props) => {
       style={styles.container}
     >
       <Label size="small" style={styles.label}>
-        🏆 Classement contributeur : #{rank.rank_all}
+        🏆 Classement contributeur : #{rank.rank_week}
       </Label>
     </LinearGradient>
   )

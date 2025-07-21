@@ -9,7 +9,7 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { useUser } from '../../../hooks'
 import { type Post, type User } from '../../../models'
 import { PostsList } from '../../../src'
-import { FollowButton, NavBar, UserRank } from '../../../src/components'
+import { FollowButton, NavBar, UserRanking } from '../../../src/components'
 import { Avatar, Error as ErrorScreen, Text, Title } from '../../../src/system'
 import { theme } from '../../../src/theme'
 import { client } from '../../../supabase'
@@ -146,7 +146,7 @@ const UserInfos = ({
         <Avatar avatar={user.avatar_url} size="xl" />
         <View style={styles.infosContent}>
           <Title>{user.name}</Title>
-          <UserRank username={user.username} />
+          <UserRanking username={user.username} />
         </View>
       </View>
       {user.bio && (

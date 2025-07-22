@@ -4,17 +4,10 @@ import { Image, Pressable, StyleSheet, View } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import { router } from 'expo-router'
 
+import { type Rank } from '../../../models'
 import { client } from '../../../supabase'
 import { Avatar, Text, Title } from '../../system'
 import { theme } from '../../theme'
-
-type Rank = {
-  avatar_url: string
-  rank: number
-  total_likes: number
-  user_id: string
-  username: string
-}
 
 const getCrownImage = (rank: number) => {
   switch (rank) {

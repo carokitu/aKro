@@ -8,6 +8,7 @@ import { Label } from '../../system'
 import { theme } from '../../theme'
 
 type Props = {
+  isCurrentUser?: boolean
   period?: 'all' | 'week'
   username: string
 }
@@ -22,7 +23,7 @@ type UserRank = {
   username: string
 }
 
-export const UserRanking = ({ period = 'week', username }: Props) => {
+export const UserRanking = ({ isCurrentUser = false, period = 'week', username }: Props) => {
   const [rank, setRank] = useState<null | UserRank>(null)
 
   useEffect(() => {
@@ -51,7 +52,8 @@ export const UserRanking = ({ period = 'week', username }: Props) => {
       style={styles.container}
     >
       <Label size="small" style={styles.label}>
-        🏆 Classement contributeur : #{period === 'week' ? rank.rank_week : rank.rank_all}
+        🏆 {isCurrentUser ? 'Ton classement' : 'Classement'} contributeur : #
+        {period === 'week' ? rank.rank_week : rank.rank_all}
       </Label>
     </LinearGradient>
   )

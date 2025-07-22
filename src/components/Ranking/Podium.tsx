@@ -141,8 +141,8 @@ const styles = StyleSheet.create({
     width: 20,
   },
   customIcon: {
-    height: 20,
-    width: 20,
+    height: 15,
+    width: 15,
   },
   gradientBorder: {
     borderRadius: theme.radius.full,

@@ -1,5 +1,5 @@
 import { Crown } from 'lucide-react-native'
-import { Image, Pressable, StyleSheet, View } from 'react-native'
+import { Image, Pressable, type StyleProp, StyleSheet, View, type ViewStyle } from 'react-native'
 
 import { router } from 'expo-router'
 
@@ -7,7 +7,7 @@ import { type Rank } from '../../../models'
 import { Avatar, Label, Text } from '../../system'
 import { theme } from '../../theme'
 
-export const Item = ({ user }: { user: Rank }) => {
+export const Item = ({ style, user }: { style?: StyleProp<ViewStyle>; user: Rank }) => {
   const crownColor = ['#B49247', '#878787', '#A36927']
 
   return (
@@ -16,6 +16,7 @@ export const Item = ({ user }: { user: Rank }) => {
       style={({ pressed }) => [
         styles.itemContainer,
         { backgroundColor: pressed ? theme.surface.base.secondary : theme.surface.base.default },
+        style,
       ]}
     >
       <View style={styles.item}>
@@ -39,8 +40,8 @@ export const Item = ({ user }: { user: Rank }) => {
 
 const styles = StyleSheet.create({
   customIcon: {
-    height: 20,
-    width: 20,
+    height: 15,
+    width: 15,
   },
   item: {
     alignItems: 'center',

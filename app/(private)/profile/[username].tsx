@@ -146,7 +146,7 @@ const UserInfos = ({
         <Avatar avatar={user.avatar_url} size="xl" />
         <View style={styles.infosContent}>
           <Title>{user.name}</Title>
-          <UserRanking username={user.username} />
+          <UserRanking isCurrentUser={isCurrentUserProfile} username={user.username} />
         </View>
       </View>
       {user.bio && (

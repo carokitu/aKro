@@ -6,7 +6,6 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { FlashList } from '@shopify/flash-list'
 import { LinearGradient } from 'expo-linear-gradient'
-import { router } from 'expo-router'
 
 import { useUser } from '../../hooks'
 import { type Rank } from '../../models'
@@ -18,9 +17,29 @@ import { client } from '../../supabase'
 
 const LIMIT = 30
 
-const List = ({ period }: { period: 'all' | 'week' }) => {
+const List = () => {
+  const { user } = useUser()
   const [users, setUsers] = useState<Rank[]>([])
   const [offset, setOffset] = useState(0)
+  const [period, setPeriod] = useState<'all' | 'week'>('week')
+  const { showActionSheetWithOptions } = useActionSheet()
+
+  const handlePeriodPress = () => {
+    showActionSheetWithOptions(
+      {
+        message: 'Choisi entre voir le score sur les 7 derniers jours ou depuis toujours',
+        options: ['Classement 7 derniers jours', 'Classement depuis toujours'],
+        title: 'Temporalité du classement',
+      },
+      (index) => {
+        if (index === 0) {
+          setPeriod('week')
+        } else {
+          setPeriod('all')
+        }
+      },
+    )
+  }
 
   const fetchUsers = useCallback(
     async (reset = false) => {
@@ -49,77 +68,69 @@ const List = ({ period }: { period: 'all' | 'week' }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [period])
 
-  return (
-    <FlashList
-      data={users}
-      decelerationRate="fast"
-      estimatedItemSize={80}
-      keyExtractor={(item) => item.user_id}
-      onEndReached={() => fetchUsers()}
-      renderItem={({ item }) => <RankingItem user={item} />}
-      showsVerticalScrollIndicator={false}
-    />
-  )
-}
-
-const Ranking = () => {
-  const { user } = useUser()
-  const [period, setPeriod] = useState<'all' | 'week'>('week')
-  const { showActionSheetWithOptions } = useActionSheet()
-
-  const handlePeriodPress = () => {
-    showActionSheetWithOptions(
-      {
-        message: 'Choisi entre voir le score sur les 7 derniers jours ou depuis toujours',
-        options: ['Classement 7 derniers jours', 'Classement depuis toujours'],
-        title: 'Temporalité du classement',
-      },
-      (index) => {
-        if (index === 0) {
-          setPeriod('week')
-        } else {
-          setPeriod('all')
-        }
-      },
-    )
-  }
-
   if (!user) {
     return null
   }
 
   return (
-    <LinearGradient colors={['#D0D9EC', '#E6EAF2', '#EDECE7']} locations={[0, 0.2, 0.8]} style={styles.container}>
-      <SafeAreaView edges={['top']} style={styles.container}>
-        <NavBar rightIcon={{ handlePress: () => router.back(), Icon: CalendarRange }} title="Top contributeurs" />
-        <Button
-          afterElement={<CalendarRange color={theme.text.base.invert} size={16} />}
-          onPress={handlePeriodPress}
-          size="sm"
-          style={styles.button}
-          title={period === 'week' ? '7 derniers jours' : 'depuis toujours'}
-        />
-        <Podium period={period} />
-        <View style={styles.list}>
-          <UserRanking period={period} username={user.username} />
-          <List period={period} />
+    <FlashList
+      data={users}
+      decelerationRate="fast"
+      estimatedItemSize={50}
+      keyExtractor={(item) => item.user_id}
+      ListHeaderComponent={
+        <View style={styles.container}>
+          <Button
+            afterElement={<CalendarRange color={theme.text.base.invert} size={16} />}
+            onPress={handlePeriodPress}
+            size="sm"
+            style={styles.button}
+            title={period === 'week' ? '7 derniers jours' : 'depuis toujours'}
+          />
+          <Podium period={period} />
+          <View style={styles.list}>
+            <UserRanking isCurrentUser period={period} username={user.username} />
+          </View>
         </View>
-      </SafeAreaView>
-    </LinearGradient>
+      }
+      onEndReached={() => fetchUsers()}
+      renderItem={({ index, item }) => {
+        if (index < 3) {
+          return null
+        }
+
+        return <RankingItem style={styles.item} user={item} />
+      }}
+      showsVerticalScrollIndicator={false}
+    />
   )
 }
+
+const Ranking = () => (
+  <LinearGradient
+    colors={['#D0D9EC', '#E6EAF2', '#EDECE7', '#FBFAF4']}
+    locations={[0, 0.2, 0.8, 0.9]}
+    style={styles.container}
+  >
+    <SafeAreaView edges={['top']} style={styles.container}>
+      <NavBar title="Top contributeurs" />
+      <List />
+    </SafeAreaView>
+  </LinearGradient>
+)
 
 const styles = StyleSheet.create({
   button: { alignSelf: 'center', marginTop: theme.spacing[200] },
   container: {
     flex: 1,
   },
+  item: {
+    paddingHorizontal: theme.spacing[400],
+  },
   list: {
     backgroundColor: theme.surface.base.default,
     borderTopLeftRadius: theme.radius.medium,
     borderTopRightRadius: theme.radius.medium,
-    flex: 1,
-    gap: theme.spacing[200],
     padding: theme.spacing[400],
   },
 })

@@ -9,7 +9,7 @@ import { router, useLocalSearchParams } from 'expo-router'
 import { useUser } from '../../../hooks'
 import { type Post, type User } from '../../../models'
 import { PostsList } from '../../../src'
-import { FollowButton, NavBar } from '../../../src/components'
+import { FollowButton, NavBar, UserRanking } from '../../../src/components'
 import { Avatar, Error as ErrorScreen, Text, Title } from '../../../src/system'
 import { theme } from '../../../src/theme'
 import { client } from '../../../supabase'
@@ -146,16 +146,15 @@ const UserInfos = ({
         <Avatar avatar={user.avatar_url} size="xl" />
         <View style={styles.infosContent}>
           <Title>{user.name}</Title>
-          {user.bio && (
-            <Text numberOfLines={4} size="small">
-              {user.bio}
-            </Text>
-          )}
+          <UserRanking isCurrentUser={isCurrentUserProfile} username={user.username} />
         </View>
       </View>
-      {isCurrentUserProfile ? (
-        <View style={styles.hiddenFollowButton} />
-      ) : (
+      {user.bio && (
+        <Text numberOfLines={4} size="small" style={styles.bio}>
+          {user.bio}
+        </Text>
+      )}
+      {!isCurrentUserProfile && (
         <FollowButton
           currentUserId={currentUser.id}
           follows_me={user.follows_me}
@@ -267,6 +266,9 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     width: 34,
   },
+  bio: {
+    marginTop: theme.spacing['300'],
+  },
   container: {
     flex: 1,
   },
@@ -298,9 +300,6 @@ const styles = StyleSheet.create({
   },
   footer: {
     marginBottom: theme.spacing['600'],
-  },
-  hiddenFollowButton: {
-    marginVertical: theme.spacing['200'],
   },
   infos: {
     alignItems: 'center',

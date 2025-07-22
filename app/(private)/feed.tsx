@@ -10,7 +10,7 @@ import { router } from 'expo-router'
 import { useFeed, useUser } from '../../hooks'
 import { type Post as TPost, type User } from '../../models'
 import { Drawer } from '../../src'
-import { PostsList } from '../../src/components'
+import { PostsList, TopRanking } from '../../src/components'
 import { Avatar, Button, IconButton, Text, Title } from '../../src/system'
 import { theme } from '../../src/theme'
 import { client } from '../../supabase'
@@ -112,6 +112,7 @@ const Feed = () => {
         <PostsList
           fetchPosts={fetchPosts}
           ListFooterComponent={FooterComponent}
+          ListHeaderComponent={TopRanking}
           loadNewPost
           onScrollBeginDrag={() => setMinimizeDrawer(true)}
           setShowFeedDrawer={setShowDrawer}

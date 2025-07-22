@@ -1,6 +1,6 @@
 import { ChevronRight, Crown } from 'lucide-react-native'
 import { useEffect, useState } from 'react'
-import { Image, Pressable, StyleSheet, View } from 'react-native'
+import { Image, Pressable, StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import { router } from 'expo-router'
 
@@ -79,10 +79,10 @@ export const Top = () => {
     <View>
       <View style={styles.title}>
         <Title size="large">Top contributeurs</Title>
-        <View style={styles.seeMore}>
+        <TouchableOpacity onPress={() => router.push('/ranking')} style={styles.seeMore}>
           <Label>Tout voir</Label>
           <ChevronRight color={theme.text.base.default} size={18} />
-        </View>
+        </TouchableOpacity>
       </View>
       <View style={styles.list}>
         {ranking.map((user) => (

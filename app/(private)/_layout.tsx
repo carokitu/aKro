@@ -27,6 +27,7 @@ export const PrivateLayout = () => {
           <Stack.Screen name="search-users" options={{ headerShown: false }} />
           <Stack.Screen name="profile" options={{ headerShown: false }} />
           <Stack.Screen name="post" options={{ headerShown: false }} />
+          <Stack.Screen name="ranking" options={{ headerShown: false }} />
         </Stack>
       </MuteProvider>
     </FeedProvider>

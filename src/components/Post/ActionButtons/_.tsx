@@ -55,11 +55,7 @@ export const ActionButtons = memo(({ isLikedByCurrentUser, item, likesCount, onL
       <View style={styles.composed}>
         <TouchableOpacity onPress={onLikePress}>
           {isLikedByCurrentUser ? (
-            <Image
-              source={require('../../../../assets/images/icons/heart-filled.png')}
-              style={styles.customIcon}
-              tintColor={theme.text.base.invert}
-            />
+            <Image source={require('../../../../assets/images/icons/heart-filled.png')} style={styles.customIcon} />
           ) : (
             <Heart color={theme.surface.base.default} size={30} />
           )}

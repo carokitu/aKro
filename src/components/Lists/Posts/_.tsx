@@ -12,6 +12,7 @@ import { client } from '../../../../supabase'
 import { Error } from '../../../system'
 import { theme } from '../../../theme'
 import { Post } from '../../Post'
+import { type InteractiveContainerRef } from '../../Post/InteractiveContainer'
 import { Toast, type ToastProps } from './Toast'
 
 type Props = Omit<FlashListProps<TPost>, 'data' | 'renderItem'> & {
@@ -48,6 +49,7 @@ const List = ({
 
   const LIMIT = 20
   const listRef = useRef<FlashList<TPost>>(null)
+  const interactiveRefs = useRef<Map<string, InteractiveContainerRef | null>>(new Map())
 
   const stopPreview = useCallback(async () => {
     if (sound) {
@@ -310,21 +312,32 @@ const List = ({
   )
 
   const renderItem = ({ item }: { item: TPost }) => {
-    const handleLikePress = () => {
+    const handleDoubleTap = () => {
       if (!item.is_liked_by_current_user) {
         handleLike(item)
       }
     }
 
+    const handleLikePress = () => {
+      handleLike(item)
+      if (!item.is_liked_by_current_user) {
+        interactiveRefs.current.get(item.id)?.triggerOverlay()
+      }
+    }
+
     return (
-      <Post.InteractiveContainer handleLike={handleLikePress} style={styles.post}>
+      <Post.InteractiveContainer
+        handleLike={handleDoubleTap}
+        ref={(ref) => interactiveRefs.current.set(item.id, ref)}
+        style={styles.post}
+      >
         <Post.Header item={item} triggerRefresh={() => setTriggerRefresh(true)} user={user} />
         <Post.Track item={item} size="medium">
           <Post.ActionButtons
             isLikedByCurrentUser={item.is_liked_by_current_user}
             item={item}
             likesCount={item.likes_count}
-            onLikePress={() => handleLike(item)}
+            onLikePress={handleLikePress}
             user={user}
           />
         </Post.Track>

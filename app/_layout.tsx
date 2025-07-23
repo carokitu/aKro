@@ -5,17 +5,14 @@ import { Outfit_400Regular, Outfit_600SemiBold } from '@expo-google-fonts/outfit
 import { useFonts } from 'expo-font'
 import { Stack } from 'expo-router'
 
-import { SpotifyAuthProvider, UserProvider, useSpotifyAuth, useUser } from '../hooks'
+import { UserProvider, useUser } from '../hooks'
 import { SplashScreen } from '../src/components'
 import { theme } from '../src/theme'
 
 const Layout = () => {
   const { loading: userLoading, user } = useUser()
-  const { accessToken, loading: accessTokenLoading } = useSpotifyAuth()
 
-  const isSignedIn = !!(user && accessToken)
-
-  if (userLoading || accessTokenLoading) {
+  if (userLoading) {
     return <SplashScreen />
   }
 
@@ -33,7 +30,7 @@ const Layout = () => {
           },
         }}
       >
-        {isSignedIn ? (
+        {user ? (
           <Stack.Screen
             name="(private)"
             options={{
@@ -65,11 +62,9 @@ export const RootLayout = () => {
 
   return (
     <UserProvider>
-      <SpotifyAuthProvider>
-        <ActionSheetProvider>
-          <Layout />
-        </ActionSheetProvider>
-      </SpotifyAuthProvider>
+      <ActionSheetProvider>
+        <Layout />
+      </ActionSheetProvider>
     </UserProvider>
   )
 }

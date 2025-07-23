@@ -1,17 +1,9 @@
 import React from 'react'
 
-import { useSpotifyAuth } from '../../hooks'
-import ProviderSignIn from './provider-sign-in'
-import SignIn from './sign-in'
+import { Redirect } from 'expo-router'
 
-export const Index = () => {
-  const { accessToken } = useSpotifyAuth()
-
-  if (!accessToken) {
-    return <ProviderSignIn />
-  }
-
-  return <SignIn />
+const Index = () => {
+  return <Redirect href="/provider-sign-in" />
 }
 
 export default Index

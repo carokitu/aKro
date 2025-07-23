@@ -1,7 +1,5 @@
 export * from './feed'
 export { PostProvider, usePost } from './post'
 export { useDoubleTap } from './useDoubleTap'
-export { useSpotifyApi } from './useSpotifyApi'
-export { SpotifyAuthProvider, useSpotifyAuth } from './useSpotifyAuth'
 export { UserProvider, useUser } from './useUser'
 export { UserRegistrationProvider, useUserRegistration } from './useUserRegistration'

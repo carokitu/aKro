@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { StyleSheet } from 'react-native'
+import { type StyleProp, StyleSheet, type ViewStyle } from 'react-native'
 
 import { LinearGradient } from 'expo-linear-gradient'
 
@@ -10,6 +10,7 @@ import { theme } from '../../theme'
 type Props = {
   isCurrentUser?: boolean
   period?: 'all' | 'week'
+  style?: StyleProp<ViewStyle>
   username: string
 }
 
@@ -23,7 +24,7 @@ type UserRank = {
   username: string
 }
 
-export const UserRanking = ({ isCurrentUser = false, period = 'week', username }: Props) => {
+export const UserRanking = ({ isCurrentUser = false, period = 'week', style, username }: Props) => {
   const [rank, setRank] = useState<null | UserRank>(null)
 
   useEffect(() => {
@@ -49,7 +50,7 @@ export const UserRanking = ({ isCurrentUser = false, period = 'week', username }
       colors={['#D0D9EC', '#E6EAF2', '#EDECE7']}
       end={{ x: 1, y: 0 }}
       start={{ x: 0, y: 0 }}
-      style={styles.container}
+      style={[styles.container, style]}
     >
       <Label size="small" style={styles.label}>
         🏆 {isCurrentUser ? 'Ton classement' : 'Classement'} contributeur : #

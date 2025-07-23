@@ -1,26 +1,15 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
 
-import { useSpotifyApi } from '../../../hooks'
 import { type Post } from '../../../models'
 import { Label, Text } from '../../system'
 import { theme } from '../../theme'
 
+const playOnSpotify = async () => {
+  console.log('playOnSpotify')
+}
+
 export const Footer = ({ item }: { item: Pick<Post, 'artist_name' | 'spotify_track_id' | 'track_name'> }) => {
-  const { spotifyApi } = useSpotifyApi()
-
-  const playOnSpotify = async () => {
-    if (!spotifyApi) {
-      return
-    }
-
-    try {
-      await spotifyApi.player.startResumePlayback('', undefined, [`spotify:track:${item.spotify_track_id}`])
-    } catch (error) {
-      console.error('Error playing on Spotify:', error)
-    }
-  }
-
   return (
     <View style={styles.footer}>
       <View style={styles.trackInfo}>

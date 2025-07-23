@@ -5,7 +5,7 @@ import { SafeAreaView, StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import { router } from 'expo-router'
 
-import { useSpotifyAuth, useUser } from '../../../../hooks'
+import { useUser } from '../../../../hooks'
 import { type User } from '../../../../models'
 import { NavBar } from '../../../../src'
 import { Avatar, Error, Text, Title } from '../../../../src/system'
@@ -44,10 +44,8 @@ const Card = ({ handlePress, Icon, title }: { handlePress: () => void; Icon: Luc
 const Settings = () => {
   const { logout: logoutFromUser, user } = useUser()
   const { showActionSheetWithOptions } = useActionSheet()
-  const { logout: logoutFromSpotify } = useSpotifyAuth()
 
   const logout = () => {
-    logoutFromSpotify()
     logoutFromUser()
   }
 

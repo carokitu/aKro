@@ -89,7 +89,7 @@ const List = () => {
           />
           <Podium period={period} />
           <View style={styles.list}>
-            <UserRanking isCurrentUser period={period} username={user.username} />
+            <UserRanking isCurrentUser period={period} style={styles.userRanking} username={user.username} />
           </View>
         </View>
       }
@@ -131,6 +131,8 @@ const styles = StyleSheet.create({
     backgroundColor: theme.surface.base.default,
     borderTopLeftRadius: theme.radius.medium,
     borderTopRightRadius: theme.radius.medium,
+  },
+  userRanking: {
     padding: theme.spacing[400],
   },
 })

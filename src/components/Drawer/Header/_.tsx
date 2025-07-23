@@ -3,20 +3,14 @@ import { StyleSheet, View } from 'react-native'
 
 import { Label } from '../../../system'
 import { theme } from '../../../theme'
-import { CurrentTrack } from './CurrentTrack'
-import { RecentTracks } from './RecentTracks'
 
 export const Header = () => (
-  <>
-    <CurrentTrack />
-    <RecentTracks />
-    <View style={styles.sectionTitle}>
-      <Heart color={theme.text.base.tertiary} size={theme.fontSize.xl} style={styles.icon} />
-      <Label color="tertiary" size="large">
-        TITRES LIKÉS
-      </Label>
-    </View>
-  </>
+  <View style={styles.sectionTitle}>
+    <Heart color={theme.text.base.tertiary} size={theme.fontSize.xl} style={styles.icon} />
+    <Label color="tertiary" size="large">
+      TITRES LIKÉS
+    </Label>
+  </View>
 )
 
 const styles = StyleSheet.create({

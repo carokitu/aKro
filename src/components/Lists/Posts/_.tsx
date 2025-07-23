@@ -6,7 +6,7 @@ import { type NativeScrollEvent, type NativeSyntheticEvent, StyleSheet } from 'r
 import { FlashList, type FlashListProps } from '@shopify/flash-list'
 import { Audio } from 'expo-av'
 
-import { PostProvider, useMute, usePost, useSpotifyApi } from '../../../../hooks'
+import { PostProvider, useMute, usePost } from '../../../../hooks'
 import { type Post as TPost, type User } from '../../../../models'
 import { client } from '../../../../supabase'
 import { Error } from '../../../system'
@@ -33,7 +33,6 @@ const List = ({
   user,
   ...flashListProps
 }: Props) => {
-  const { loading: spotifyLoading, spotifyApi } = useSpotifyApi()
   const { expendedDescription, expendedLikesPostId, setExpendedDescription, setExpendedLikesPostId } = usePost()
   const { mute, temporaryMute } = useMute()
 
@@ -47,7 +46,6 @@ const List = ({
   const [sound, setSound] = useState<Audio.Sound | null>(null)
   const [triggerRefresh, setTriggerRefresh] = useState(false)
 
-  const hasMounted = useRef(false)
   const LIMIT = 20
   const listRef = useRef<FlashList<TPost>>(null)
 
@@ -174,15 +172,6 @@ const List = ({
     return () => clearInterval(interval)
   }, [latestPostTimestamp, loadNewPost, user])
 
-  useEffect(() => {
-    if (spotifyLoading && !hasMounted.current) {
-      setLoading(true)
-    } else {
-      setLoading(false)
-      hasMounted.current = true
-    }
-  }, [spotifyLoading])
-
   const fetchPosts = useCallback(
     async (reset = false) => {
       if (!user) {
@@ -228,11 +217,11 @@ const List = ({
   }, [posts, resetPending])
 
   useEffect(() => {
-    if (posts.length === 0 && !spotifyLoading && spotifyApi && user) {
+    if (posts.length === 0 && user) {
       fetchPosts(true)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [spotifyApi, spotifyLoading, user])
+  }, [user])
 
   useEffect(() => {
     if (triggerRefresh) {

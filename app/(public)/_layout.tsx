@@ -3,15 +3,14 @@ import { View } from 'react-native'
 
 import { router, Stack } from 'expo-router'
 
-import { useSpotifyAuth, useUser } from '../../hooks'
+import { useUser } from '../../hooks'
 import { theme } from '../../src/theme'
 
 export const PublicLayout = () => {
   const { isLoggedIn, loading, user } = useUser()
-  const { accessToken } = useSpotifyAuth()
 
   const shouldCreateUser = useMemo(() => isLoggedIn && !user, [isLoggedIn, user])
-  const shouldRedirect = useMemo(() => isLoggedIn && user && accessToken, [accessToken, isLoggedIn, user])
+  const shouldRedirect = useMemo(() => isLoggedIn && user, [isLoggedIn, user])
 
   useEffect(() => {
     if (!loading && shouldCreateUser) {
@@ -21,7 +20,7 @@ export const PublicLayout = () => {
 
   useEffect(() => {
     if (!loading && shouldRedirect) {
-      router.replace('/(private)')
+      router.replace('/(private)/feed')
     }
   }, [loading, shouldRedirect])
 

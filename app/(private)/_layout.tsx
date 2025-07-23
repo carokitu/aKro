@@ -2,19 +2,18 @@ import { StatusBar } from 'react-native'
 
 import { Redirect, Stack } from 'expo-router'
 
-import { FeedProvider, MuteProvider, useSpotifyAuth, useUser } from '../../hooks'
+import { FeedProvider, MuteProvider, useUser } from '../../hooks'
 import { SplashScreen } from '../../src'
 import { theme } from '../../src/theme'
 
 export const PrivateLayout = () => {
   const { loading: userLoading, user } = useUser()
-  const { accessToken, loading: tokenLoading } = useSpotifyAuth()
 
-  if (userLoading || tokenLoading) {
+  if (userLoading) {
     return <SplashScreen />
   }
 
-  if (!user || !accessToken) {
+  if (!user) {
     return <Redirect href="/(public)" />
   }
 

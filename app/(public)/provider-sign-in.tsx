@@ -3,27 +3,12 @@ import { Dimensions, Image, StyleSheet, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { LinearGradient } from 'expo-linear-gradient'
+import { router } from 'expo-router'
 
-import { useSpotifyAuth } from '../../hooks'
-import { Button, H1, Label } from '../../src/system'
+import { Button, H1 } from '../../src/system'
 import { theme } from '../../src/theme'
 
 const { height, width } = Dimensions.get('window')
-
-const disabledProviders = [
-  {
-    icon: require('../../assets/images/icons/deezer-disabled.png'),
-    title: 'Se connecter à Deezer',
-  },
-  {
-    icon: require('../../assets/images/icons/apple-disabled.png'),
-    title: 'Se connecter à Apple Music',
-  },
-  {
-    icon: require('../../assets/images/icons/youtube-disabled.png'),
-    title: 'Se connecter à YouTube Music',
-  },
-]
 
 const Logo = () => (
   <View style={styles.logoContainer}>
@@ -43,38 +28,13 @@ const Background = () => (
 )
 
 const ProviderSignIn = () => {
-  const { login } = useSpotifyAuth()
-
   return (
     <SafeAreaView style={styles.container}>
       <Background />
       <Logo />
       <H1 style={styles.title}>Bienvenue sur akro</H1>
       <View style={styles.buttonSection}>
-        <Button
-          iconPath={require('../../assets/images/icons/spotify.png')}
-          onPress={login}
-          size="lg"
-          style={styles.button}
-          title="Se connecter à Spotify"
-        />
-        <View style={styles.separator}>
-          <View style={styles.separatorLine} />
-          <Label color="tertiary" size="small" style={styles.separatorLabel}>
-            Prochainement
-          </Label>
-          <View style={styles.separatorLine} />
-        </View>
-        {disabledProviders.map((provider) => (
-          <Button
-            disabled
-            iconPath={provider.icon}
-            key={provider.title}
-            size="lg"
-            style={styles.button}
-            title={provider.title}
-          />
-        ))}
+        <Button onPress={() => router.push('./sign-in')} size="lg" style={styles.button} title="Démarrer" />
       </View>
     </SafeAreaView>
   )
@@ -97,7 +57,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   headerBackground: {
-    height: height * 0.46,
+    height: height * 0.65,
     left: -180,
     position: 'absolute',
     top: -10,
@@ -113,22 +73,8 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    height: height * 0.45,
+    height: height * 0.66,
     justifyContent: 'flex-end',
-  },
-  separator: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  separatorLabel: {
-    textAlign: 'center',
-    width: 100,
-  },
-  separatorLine: {
-    backgroundColor: theme.border.base.default,
-    flex: 1,
-    height: 1,
   },
   title: {
     alignSelf: 'center',

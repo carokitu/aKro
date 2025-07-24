@@ -8,10 +8,10 @@ import { Title } from '../../system'
 import { theme } from '../../theme'
 import { colors } from '../../theme/colors'
 import { padding } from '../../theme/spacing'
-import { SearchInput } from './SearchInput'
+import { SearchInput, type SearchInputRef } from './SearchInput'
 import { TrackList } from './TrackList'
 
-const INDEX_ON_INIT = 1
+const INDEX_ON_INIT = 0
 
 export const Drawer = ({
   close,
@@ -24,8 +24,9 @@ export const Drawer = ({
 }) => {
   const [query, setQuery] = useState('')
   const { error, fetchMore, loading, tracks } = useDeezerSearch(query)
-  const snapPoints = useMemo(() => ['10%', '40%', '95%'], [])
+  const snapPoints = useMemo(() => ['10%', '95%'], [])
   const bottomSheetRef = useRef<BottomSheet>(null)
+  const searchInputRef = useRef<SearchInputRef>(null)
 
   useEffect(() => {
     if (close) {
@@ -45,7 +46,7 @@ export const Drawer = ({
   // Listen for keyboard events to expand drawer when keyboard opens
   useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      bottomSheetRef.current?.snapToIndex(2)
+      bottomSheetRef.current?.snapToIndex(1)
     })
 
     return () => {
@@ -59,13 +60,17 @@ export const Drawer = ({
       enableDynamicSizing={false}
       handleIndicatorStyle={styles.onHandleIndicator}
       index={INDEX_ON_INIT}
-      onAnimate={(toIndex) => {
-        if (toIndex !== 2 && toIndex !== -1) {
+      onAnimate={(_, toIndex) => {
+        if (toIndex === 1) {
+          searchInputRef.current?.focus()
+        } else {
           Keyboard.dismiss()
         }
       }}
       onChange={(index) => {
-        if (index !== 2) {
+        if (index === 1) {
+          searchInputRef.current?.focus()
+        } else {
           Keyboard.dismiss()
         }
       }}
@@ -82,7 +87,7 @@ export const Drawer = ({
           <Title size="large" style={styles.sectionTitle}>
             Faire découvrir un son
           </Title>
-          <SearchInput bottomSheetRef={bottomSheetRef} query={query} setQuery={setQuery} />
+          <SearchInput bottomSheetRef={bottomSheetRef} query={query} ref={searchInputRef} setQuery={setQuery} />
           <TrackList error={error} fetchMore={fetchMore} loading={loading} searchQuery={query} tracks={tracks} />
         </BottomSheetView>
       </KeyboardAvoidingView>

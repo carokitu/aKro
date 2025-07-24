@@ -1,5 +1,5 @@
 import React, { useRef } from 'react'
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
+import { ActivityIndicator, Keyboard, StyleSheet, Text, View } from 'react-native'
 
 import { FlashList } from '@shopify/flash-list'
 
@@ -37,6 +37,7 @@ export const TrackList = ({ error, fetchMore, loading, searchQuery, tracks }: Pr
     <View style={styles.container}>
       <FlashList
         data={tracks}
+        decelerationRate="fast"
         estimatedItemSize={60}
         keyExtractor={(item) => item.id.toString()}
         ListEmptyComponent={
@@ -48,6 +49,9 @@ export const TrackList = ({ error, fetchMore, loading, searchQuery, tracks }: Pr
         }
         onEndReached={fetchMore}
         onEndReachedThreshold={0.5}
+        onScrollBeginDrag={() => {
+          Keyboard.dismiss()
+        }}
         ref={flashListRef}
         renderItem={({ item }) => <Track track={item} />}
         showsVerticalScrollIndicator={false}

@@ -150,8 +150,8 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     alignItems: 'center',
+    alignSelf: 'flex-end',
     borderRadius: theme.radius.small,
-    flex: 1,
     gap: theme.spacing[300],
     justifyContent: 'flex-end',
     maxWidth: '33%',

@@ -2,11 +2,10 @@ import { AudioLines } from 'lucide-react-native'
 import { memo, useState } from 'react'
 import { Image, type StyleProp, StyleSheet, TouchableWithoutFeedback, View, type ViewStyle } from 'react-native'
 
-import { type Track as TTrack } from '@spotify/web-api-ts-sdk'
-
+import { type DeezerTrack } from '../../../models'
 import { Label } from '../../system'
 import { theme } from '../../theme'
-import { padding, spacing } from '../../theme/spacing'
+import { spacing } from '../../theme/spacing'
 import { ShareModal } from './ShareModal'
 
 type Props = {
@@ -14,11 +13,11 @@ type Props = {
   isFirst?: boolean
   isLast?: boolean
   style?: StyleProp<ViewStyle>
-  track: TTrack
+  track: DeezerTrack
 }
 
 export const Track = memo(({ current = false, isFirst, isLast, style: propsStyle, track }: Props) => {
-  const [trackToShare, setTrackToShare] = useState<null | TTrack>(null)
+  const [trackToShare, setTrackToShare] = useState<DeezerTrack | null>(null)
   const [pressed, setPressed] = useState(false)
 
   return (
@@ -30,22 +29,22 @@ export const Track = memo(({ current = false, isFirst, isLast, style: propsStyle
       >
         <View style={[styles.container, isFirst && styles.firstTrack, isLast && styles.lastTrack]}>
           <View style={[styles.trackContainer, propsStyle, pressed && styles.pressed]}>
-            <Image source={{ uri: track.album.images[0].url }} style={styles.albumCover} />
+            <Image source={{ uri: track.album.cover_medium }} style={styles.albumCover} />
             <View style={styles.textContainer}>
               <View style={styles.title}>
                 {current && <AudioLines color={theme.text.brand.secondary} size={theme.fontSize.xl} />}
                 <Label ellipsizeMode="tail" numberOfLines={1} size="large" style={styles.trackName}>
-                  {track.name}
+                  {track.title}
                 </Label>
               </View>
               <Label color="secondary" ellipsizeMode="tail" numberOfLines={1}>
-                {track.artists.map((artist) => artist.name).join(', ')}
+                {track.artist.name}
               </Label>
             </View>
           </View>
         </View>
       </TouchableWithoutFeedback>
-      <ShareModal onClose={() => setTrackToShare(null)} track={trackToShare} />
+      {/* <ShareModal onClose={() => setTrackToShare(null)} track={trackToShare} /> */}
     </>
   )
 })
@@ -59,8 +58,6 @@ const styles = StyleSheet.create({
   },
   container: {
     backgroundColor: theme.colors.neutral[50],
-    marginHorizontal: padding['400'],
-    paddingHorizontal: theme.padding['200'],
     paddingVertical: theme.padding['100'],
   },
   firstTrack: {

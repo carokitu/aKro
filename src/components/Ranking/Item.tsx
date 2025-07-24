@@ -7,15 +7,26 @@ import { type Rank } from '../../../models'
 import { Avatar, Label, Text } from '../../system'
 import { theme } from '../../theme'
 
-export const Item = ({ style, user }: { style?: StyleProp<ViewStyle>; user: Rank }) => {
+export const Item = ({
+  isCurrentUser,
+  style,
+  user,
+}: {
+  isCurrentUser?: boolean
+  style?: StyleProp<ViewStyle>
+  user: Rank
+}) => {
   const crownColor = ['#B49247', '#878787', '#A36927']
+  const backgroundColor = isCurrentUser ? theme.surface.brand.secondary : theme.surface.base.default
 
   return (
     <Pressable
       onPress={() => router.push(`/profile/${user.username}`)}
       style={({ pressed }) => [
         styles.itemContainer,
-        { backgroundColor: pressed ? theme.surface.base.secondary : theme.surface.base.default },
+        {
+          backgroundColor: pressed ? theme.surface.base.secondary : backgroundColor,
+        },
         style,
       ]}
     >

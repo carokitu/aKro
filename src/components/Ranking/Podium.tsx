@@ -26,7 +26,7 @@ const getCrownImage = (rank: number) => {
   }
 }
 
-const Item = ({ user }: { user: Rank }) => {
+const Item = ({ rank, user }: { rank: number; user: Rank }) => {
   const avatarGradients = [
     // 1ère place - Or
     ['#F3D583', '#EECC7C', '#B39449', '#F3DE8F', '#CDB475', '#9A792E'],
@@ -36,7 +36,7 @@ const Item = ({ user }: { user: Rank }) => {
     ['#F7CD9F', '#E1B686', '#B98A55', '#F1C79A', '#CD9F6C', '#B38550'],
   ]
 
-  const isFirst = user.rank === 1
+  const isFirst = rank === 1
 
   return (
     <Pressable
@@ -47,12 +47,12 @@ const Item = ({ user }: { user: Rank }) => {
       ]}
     >
       <Image
-        source={getCrownImage(user.rank)}
+        source={getCrownImage(rank)}
         style={[styles.customIcon, isFirst ? styles.crownLarge : styles.crownSmall]}
       />
       <View style={styles.avatarContainer}>
         <LinearGradient
-          colors={avatarGradients[user.rank - 1] as [string, string, ...string[]]}
+          colors={avatarGradients[rank - 1] as [string, string, ...string[]]}
           end={{ x: 1, y: 1 }}
           start={{ x: 0, y: 0 }}
           style={styles.gradientBorder}
@@ -62,7 +62,7 @@ const Item = ({ user }: { user: Rank }) => {
           </View>
         </LinearGradient>
       </View>
-      <Title size={isFirst ? 'large' : 'medium'}>{user.rank}</Title>
+      <Title size={isFirst ? 'large' : 'medium'}>{rank}</Title>
       <View style={styles.userInfo}>
         <Title>{user.username}</Title>
         <View style={styles.likes}>
@@ -110,9 +110,9 @@ export const Podium = ({ period }: { period: 'all' | 'week' }) => {
 
   return (
     <View style={styles.podium}>
-      <Item user={ranking[1]} />
-      <Item user={ranking[0]} />
-      <Item user={ranking[2]} />
+      <Item rank={2} user={ranking[1]} />
+      <Item rank={1} user={ranking[0]} />
+      <Item rank={3} user={ranking[2]} />
     </View>
   )
 }
@@ -151,8 +151,10 @@ const styles = StyleSheet.create({
   itemContainer: {
     alignItems: 'center',
     borderRadius: theme.radius.small,
+    flex: 1,
     gap: theme.spacing[300],
     justifyContent: 'flex-end',
+    maxWidth: '33%',
     padding: theme.spacing[400],
   },
   likes: {

@@ -95,11 +95,12 @@ const List = () => {
       }
       onEndReached={() => fetchUsers()}
       renderItem={({ index, item }) => {
+        const isCurrentUser = item.user_id === user.id
         if (index < 3) {
           return null
         }
 
-        return <RankingItem style={styles.item} user={item} />
+        return <RankingItem isCurrentUser={isCurrentUser} style={styles.item} user={item} />
       }}
       showsVerticalScrollIndicator={false}
     />

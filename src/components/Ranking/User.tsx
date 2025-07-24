@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import { type StyleProp, StyleSheet, type ViewStyle } from 'react-native'
+import { type StyleProp, StyleSheet, TouchableOpacity, type ViewStyle } from 'react-native'
 
 import { LinearGradient } from 'expo-linear-gradient'
+import { router } from 'expo-router'
 
 import { client } from '../../../supabase'
 import { Label } from '../../system'
@@ -46,17 +47,19 @@ export const UserRanking = ({ isCurrentUser = false, period = 'week', style, use
   }
 
   return (
-    <LinearGradient
-      colors={['#D0D9EC', '#E6EAF2', '#EDECE7']}
-      end={{ x: 1, y: 0 }}
-      start={{ x: 0, y: 0 }}
-      style={[styles.container, style]}
-    >
-      <Label size="small" style={styles.label}>
-        🏆 {isCurrentUser ? 'Ton classement' : 'Classement'} contributeur : #
-        {period === 'week' ? rank.rank_week : rank.rank_all}
-      </Label>
-    </LinearGradient>
+    <TouchableOpacity activeOpacity={0.8} onPress={() => router.push(`/ranking`)}>
+      <LinearGradient
+        colors={['#D0D9EC', '#E6EAF2', '#EDECE7']}
+        end={{ x: 1, y: 0 }}
+        start={{ x: 0, y: 0 }}
+        style={[styles.container, style]}
+      >
+        <Label size="small" style={styles.label}>
+          🏆 {isCurrentUser ? 'Ton classement' : 'Classement'} contributeur : #
+          {period === 'week' ? rank.rank_week : rank.rank_all}
+        </Label>
+      </LinearGradient>
+    </TouchableOpacity>
   )
 }
 

@@ -56,6 +56,10 @@ const NewComment = ({
   const handleSend = async () => {
     setLoading(true)
 
+    if (text.trim() === '') {
+      return
+    }
+
     const comment = {
       author_id: user.id,
       content: text.trim(),
@@ -92,11 +96,11 @@ const NewComment = ({
       <Avatar avatar={user.avatar_url} style={styles.newMessageIcon} />
       <TextInput
         maxLength={200}
-        multiline
         onChangeText={(t) => {
           const sanitized = t.replaceAll('\n', '').slice(0, 200)
           setText(sanitized)
         }}
+        onSubmitEditing={handleSend}
         placeholder="Ajouter un commentaire..."
         returnKeyType="done"
         style={styles.input}

@@ -327,6 +327,7 @@ const List = ({
 
     return (
       <Post.InteractiveContainer
+        albumCoverUrl={item.album_cover_url}
         handleLike={handleDoubleTap}
         ref={(ref) => interactiveRefs.current.set(item.id, ref)}
         style={styles.post}
@@ -361,7 +362,11 @@ const List = ({
         decelerationRate="fast"
         estimatedItemSize={400}
         keyExtractor={(item) => item.id}
-        onEndReached={() => fetchPosts()}
+        onEndReached={() => {
+          if (!loading) {
+            fetchPosts()
+          }
+        }}
         onEndReachedThreshold={0.8}
         onRefresh={() => fetchPosts(true)}
         onScrollBeginDrag={handleScrollBeginDrag}

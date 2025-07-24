@@ -1,4 +1,4 @@
-import { StyleSheet, type TextProps } from 'react-native'
+import { StyleSheet, type TextProps, TouchableOpacity } from 'react-native'
 
 import { theme } from '../../theme'
 import { colorStyles } from './styles'
@@ -10,7 +10,7 @@ type Props = TextProps & {
   size?: 'large' | 'medium' | 'small'
 }
 
-export const Label = ({ children, color = 'default', size = 'medium', style, ...props }: Props) => {
+export const Label = ({ children, color = 'default', onPress, size = 'medium', style, ...props }: Props) => {
   const labelStyles = [
     colorStyles[color],
     style,
@@ -19,6 +19,16 @@ export const Label = ({ children, color = 'default', size = 'medium', style, ...
     size === 'medium' && styles.medium,
     size === 'small' && styles.small,
   ]
+
+  if (onPress) {
+    return (
+      <TouchableOpacity activeOpacity={0.5} onPress={onPress}>
+        <Text {...props} style={labelStyles}>
+          {children}
+        </Text>
+      </TouchableOpacity>
+    )
+  }
 
   return (
     <Text {...props} style={labelStyles}>

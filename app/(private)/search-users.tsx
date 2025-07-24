@@ -102,6 +102,7 @@ const SearchUsers = () => {
               onChangeText={handleChange}
               placeholder="Rechercher un utilisateur"
               placeholderTextColor={theme.text.disabled}
+              returnKeyType="done"
               style={styles.input}
               value={query}
             />

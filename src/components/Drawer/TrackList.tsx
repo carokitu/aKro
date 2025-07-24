@@ -1,3 +1,4 @@
+import React, { useRef } from 'react'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 
 import { FlashList } from '@shopify/flash-list'
@@ -9,11 +10,21 @@ import { Track } from './Track'
 
 type Props = {
   error: null | string
+  fetchMore: () => void
   loading: boolean
+  searchQuery: string
   tracks: DeezerTrack[]
 }
 
-export const TrackList = ({ error, loading, tracks }: Props) => {
+export const TrackList = ({ error, fetchMore, loading, searchQuery, tracks }: Props) => {
+  const flashListRef = useRef<FlashList<DeezerTrack>>(null)
+
+  React.useEffect(() => {
+    if (searchQuery && flashListRef.current) {
+      flashListRef.current.scrollToOffset({ animated: true, offset: 0 })
+    }
+  }, [searchQuery])
+
   if (error) {
     return (
       <View style={styles.container}>
@@ -35,6 +46,9 @@ export const TrackList = ({ error, loading, tracks }: Props) => {
             <Text style={styles.message}>Aucun résultat</Text>
           )
         }
+        onEndReached={fetchMore}
+        onEndReachedThreshold={0.5}
+        ref={flashListRef}
         renderItem={({ item }) => <Track track={item} />}
         showsVerticalScrollIndicator={false}
       />
@@ -45,7 +59,6 @@ export const TrackList = ({ error, loading, tracks }: Props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    minHeight: 200,
   },
   loader: {
     paddingVertical: 24,

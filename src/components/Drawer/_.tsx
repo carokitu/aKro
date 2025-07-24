@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Keyboard, StyleSheet } from 'react-native'
+import { Keyboard, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native'
 
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
 
@@ -23,7 +23,7 @@ export const Drawer = ({
   setMinimize: (value: boolean) => void
 }) => {
   const [query, setQuery] = useState('')
-  const { error, loading, tracks } = useDeezerSearch(query)
+  const { error, fetchMore, loading, tracks } = useDeezerSearch(query)
   const snapPoints = useMemo(() => ['10%', '40%', '95%'], [])
   const bottomSheetRef = useRef<BottomSheet>(null)
 
@@ -73,13 +73,19 @@ export const Drawer = ({
       snapPoints={snapPoints}
       style={styles.container}
     >
-      <BottomSheetView style={styles.bottomSheetView}>
-        <Title size="large" style={styles.sectionTitle}>
-          Faire découvrir un son
-        </Title>
-        <SearchInput bottomSheetRef={bottomSheetRef} query={query} setQuery={setQuery} />
-        <TrackList error={error} loading={loading} tracks={tracks} />
-      </BottomSheetView>
+      <KeyboardAvoidingView
+        behavior="padding"
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+        style={styles.bottomSheetView}
+      >
+        <BottomSheetView style={styles.bottomSheetView}>
+          <Title size="large" style={styles.sectionTitle}>
+            Faire découvrir un son
+          </Title>
+          <SearchInput bottomSheetRef={bottomSheetRef} query={query} setQuery={setQuery} />
+          <TrackList error={error} fetchMore={fetchMore} loading={loading} searchQuery={query} tracks={tracks} />
+        </BottomSheetView>
+      </KeyboardAvoidingView>
     </BottomSheet>
   )
 }

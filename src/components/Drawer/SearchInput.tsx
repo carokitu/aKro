@@ -36,6 +36,7 @@ const styles = StyleSheet.create({
   input: {
     fontSize: theme.fontSize.lg,
     fontWeight: theme.weight.medium,
+    width: '100%',
   },
   searchContainer: {
     alignItems: 'center',

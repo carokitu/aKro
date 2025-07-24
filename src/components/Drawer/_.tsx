@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Keyboard, KeyboardAvoidingView, Platform, StyleSheet } from 'react-native'
+import { Keyboard, StyleSheet } from 'react-native'
 
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
 
@@ -78,19 +78,13 @@ export const Drawer = ({
       snapPoints={snapPoints}
       style={styles.container}
     >
-      <KeyboardAvoidingView
-        behavior="padding"
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
-        style={styles.bottomSheetView}
-      >
-        <BottomSheetView style={styles.bottomSheetView}>
-          <Title size="large" style={styles.sectionTitle}>
-            Faire découvrir un son
-          </Title>
-          <SearchInput bottomSheetRef={bottomSheetRef} query={query} ref={searchInputRef} setQuery={setQuery} />
-          <TrackList error={error} fetchMore={fetchMore} loading={loading} searchQuery={query} tracks={tracks} />
-        </BottomSheetView>
-      </KeyboardAvoidingView>
+      <BottomSheetView style={styles.bottomSheetView}>
+        <Title size="large" style={styles.sectionTitle}>
+          Faire découvrir un son
+        </Title>
+        <SearchInput bottomSheetRef={bottomSheetRef} query={query} ref={searchInputRef} setQuery={setQuery} />
+        <TrackList error={error} fetchMore={fetchMore} loading={loading} searchQuery={query} tracks={tracks} />
+      </BottomSheetView>
     </BottomSheet>
   )
 }
@@ -112,6 +106,7 @@ const styles = StyleSheet.create({
   },
   bottomSheetView: {
     flex: 1,
+    minHeight: 0,
   },
   container: {
     flex: 1,

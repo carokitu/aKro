@@ -44,7 +44,7 @@ export const Track = memo(({ current = false, isFirst, isLast, style: propsStyle
           </View>
         </View>
       </TouchableWithoutFeedback>
-      {/* <ShareModal onClose={() => setTrackToShare(null)} track={trackToShare} /> */}
+      {trackToShare && <ShareModal onClose={() => setTrackToShare(null)} track={trackToShare} />}
     </>
   )
 })

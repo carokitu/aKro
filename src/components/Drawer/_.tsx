@@ -106,7 +106,6 @@ const styles = StyleSheet.create({
   },
   bottomSheetView: {
     flex: 1,
-    minHeight: 0,
   },
   container: {
     flex: 1,

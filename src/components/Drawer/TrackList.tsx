@@ -80,9 +80,4 @@ const styles = StyleSheet.create({
   loader: {
     paddingVertical: 24,
   },
-  message: {
-    color: theme.text.base.secondary,
-    paddingVertical: 24,
-    textAlign: 'center',
-  },
 })

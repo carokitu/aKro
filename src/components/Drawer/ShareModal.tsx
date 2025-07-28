@@ -12,9 +12,9 @@ import {
   View,
 } from 'react-native'
 
-import { type Track as TTrack } from '@spotify/web-api-ts-sdk'
-
 import { useFeed, useMute, useUser } from '../../../hooks'
+import { useFetchOrSaveDeezerTrack } from '../../../hooks/useDeezerTrack'
+import { type DeezerTrack } from '../../../models'
 import { client } from '../../../supabase'
 import { Button, IconButton, Label, Title } from '../../system'
 import { theme } from '../../theme'
@@ -22,7 +22,7 @@ import { Post } from '../Post'
 
 type Props = {
   onClose: () => void
-  track: null | TTrack
+  track: DeezerTrack
 }
 
 export const ShareModal = ({ onClose, track }: Props) => {
@@ -35,6 +35,7 @@ export const ShareModal = ({ onClose, track }: Props) => {
   const [error, setError] = useState<null | string>(null)
   const scrollViewRef = useRef<ScrollView>(null)
   const inputRef = useRef<TextInput>(null)
+  const { fetchAndSaveTrack } = useFetchOrSaveDeezerTrack(track.id)
 
   useEffect(() => {
     const showSub = Keyboard.addListener('keyboardDidShow', () => {
@@ -72,16 +73,18 @@ export const ShareModal = ({ onClose, track }: Props) => {
     }
 
     setIsSharing(true)
+    const isrc = await fetchAndSaveTrack()
+
+    if (!isrc) {
+      setError('Une erreur est survenue lors de la publication')
+      setIsSharing(false)
+      return
+    }
 
     try {
       const { error: shareError } = await client.from('posts').insert({
-        album_cover_url: track.album.images[0].url,
-        artist_name: track.artists.map((artist) => artist.name).join(', '),
         description,
-        isrc: track.external_ids.isrc,
-        preview_url: track.preview_url,
-        spotify_track_id: track.id,
-        track_name: track.name,
+        isrc,
         user_id: user.id,
       })
 
@@ -97,18 +100,13 @@ export const ShareModal = ({ onClose, track }: Props) => {
     }
   }
 
-  const artists = track.artists.map((a) => a.name).join(', ')
-  const item = {
-    album_cover_url: track.album.images[0].url,
-    artist_name: artists,
-    preview_url: track.preview_url ?? undefined,
-    spotify_track_id: track.id,
-    track_name: track.name,
-  }
-
   return (
     <Modal animationType="fade" onRequestClose={onClose} transparent>
-      <View style={styles.modalContainer}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 20 : 0} // ajuste si besoin
+        style={styles.modalContainer}
+      >
         <SafeAreaView style={styles.modalContent}>
           <View style={styles.titleRow}>
             <Title size="large" style={styles.titleText}>
@@ -116,50 +114,48 @@ export const ShareModal = ({ onClose, track }: Props) => {
             </Title>
             <IconButton Icon={X} onPress={onClose} size="lg" style={styles.closeButton} variant="tertiary" />
           </View>
-          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} keyboardVerticalOffset={10}>
-            <ScrollView
-              contentContainerStyle={{ paddingBottom: theme.spacing['400'] }}
-              keyboardShouldPersistTaps="handled"
-              ref={scrollViewRef}
-            >
-              <Post.Container>
-                <Post.Track item={item} />
-                <Post.Footer item={item} />
-              </Post.Container>
-              <Label size="large" style={styles.descriptionLabel}>
-                Ajouter une légende
+          <ScrollView keyboardShouldPersistTaps="handled" ref={scrollViewRef}>
+            <Post.Container coverUrl={track.album.cover_medium}>
+              <Post.Track coverUrl={track.album.cover_medium} />
+              <Post.Footer artistName={track.artist.name} trackName={track.title} />
+            </Post.Container>
+            <Label size="large" style={styles.descriptionLabel}>
+              Ajouter une légende
+            </Label>
+            <TextInput
+              maxLength={500}
+              multiline
+              numberOfLines={5}
+              onChangeText={setDescription}
+              placeholder="Pourquoi ce son vous fait vibrer ?"
+              placeholderTextColor={theme.text.disabled}
+              ref={inputRef}
+              style={styles.input}
+              value={description}
+            />
+            {error && (
+              <Label color="danger" style={styles.error}>
+                {error}
               </Label>
-              <TextInput
-                maxLength={500}
-                multiline
-                numberOfLines={5}
-                onChangeText={setDescription}
-                placeholder="Pourquoi ce son vous fait vibrer ?"
-                placeholderTextColor={theme.text.disabled}
-                ref={inputRef}
-                style={styles.input}
-                value={description}
-              />
-            </ScrollView>
-          </KeyboardAvoidingView>
-          {error && <Label color="danger">{error}</Label>}
-          <View style={styles.buttonsContainer}>
-            <View style={styles.button}>
-              <Button fullWidth onPress={onClose} size="lg" title="Annuler" variant="secondary" />
+            )}
+            <View style={styles.buttonsContainer}>
+              <View style={styles.button}>
+                <Button fullWidth onPress={onClose} size="lg" title="Annuler" variant="secondary" />
+              </View>
+              <View style={styles.button}>
+                <Button
+                  disabled={isSharing}
+                  fullWidth
+                  onPress={handleShare}
+                  size="lg"
+                  title={isSharing ? 'Partage en cours...' : 'Publier'}
+                  variant="primary"
+                />
+              </View>
             </View>
-            <View style={styles.button}>
-              <Button
-                disabled={isSharing}
-                fullWidth
-                onPress={handleShare}
-                size="lg"
-                title={isSharing ? 'Partage en cours...' : 'Publier'}
-                variant="primary"
-              />
-            </View>
-          </View>
+          </ScrollView>
         </SafeAreaView>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   )
 }
@@ -171,7 +167,8 @@ const styles = StyleSheet.create({
   buttonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: theme.spacing['800'],
+    marginBottom: theme.spacing['300'],
+    marginTop: theme.spacing['600'],
   },
   closeButton: {
     position: 'absolute',
@@ -180,6 +177,9 @@ const styles = StyleSheet.create({
   descriptionLabel: {
     marginBottom: theme.spacing['200'],
     marginTop: theme.spacing['800'],
+  },
+  error: {
+    marginTop: theme.spacing['200'],
   },
   input: {
     backgroundColor: theme.surface.base.secondary,

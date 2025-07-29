@@ -36,6 +36,7 @@ const SignIn = () => {
   return (
     <SafeAreaView style={styles.container}>
       <H1 style={styles.title}>Quel est ton numéro de téléphone ?</H1>
+      {/* @ts-expect-error as the phoneInput lib is in js */}
       <PhoneInput
         autoFocus
         containerStyle={styles.input}

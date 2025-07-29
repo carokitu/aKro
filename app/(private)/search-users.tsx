@@ -76,7 +76,7 @@ const Users = ({ query }: UserListProps) => {
 const SearchUsers = () => {
   const [query, setQuery] = useState('')
   const [debouncedQuery, setDebouncedQuery] = useState('')
-  const debounceRef = useRef<(val: string) => void>()
+  const debounceRef = useRef<(val: string) => void>(() => {})
 
   useEffect(() => {
     debounceRef.current = debounce((val: string) => {

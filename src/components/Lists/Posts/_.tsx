@@ -329,11 +329,13 @@ const List = ({
       <Post.InteractiveContainer
         albumCoverUrl={item.album_cover_small}
         handleLike={handleDoubleTap}
-        ref={(ref) => interactiveRefs.current.set(item.id, ref)}
+        ref={(ref) => {
+          interactiveRefs.current.set(item.id, ref)
+        }}
         style={styles.post}
       >
         <Post.Header item={item} triggerRefresh={() => setTriggerRefresh(true)} user={user} />
-        <Post.Track coverUrl={item.album_cover_medium} size="medium">
+        <Post.Track coverUrl={item.album_cover_big} size="medium">
           <Post.ActionButtons
             isLikedByCurrentUser={item.is_liked_by_current_user}
             item={item}

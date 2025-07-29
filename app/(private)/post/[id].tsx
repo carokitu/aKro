@@ -40,7 +40,7 @@ const NewComment = ({
   postId,
   setComments,
 }: {
-  listRef: React.RefObject<FlashList<TComment>>
+  listRef?: React.RefObject<FlashList<TComment> | null>
   postId: string
   setComments: React.Dispatch<React.SetStateAction<TComment[]>>
 }) => {
@@ -83,7 +83,7 @@ const NewComment = ({
     updateCommentCount(postId, newCount)
 
     setTimeout(() => {
-      listRef.current?.scrollToEnd({ animated: true })
+      listRef?.current?.scrollToEnd({ animated: true })
     }, 100)
   }
 

@@ -110,9 +110,9 @@ export const Podium = ({ period }: { period: 'all' | 'week' }) => {
 
   return (
     <View style={styles.podium}>
-      <Item rank={2} user={ranking[1]} />
-      <Item rank={1} user={ranking[0]} />
-      <Item rank={3} user={ranking[2]} />
+      {ranking[1] && <Item rank={2} user={ranking[1]} />}
+      {ranking[0] && <Item rank={1} user={ranking[0]} />}
+      {ranking[2] && <Item rank={3} user={ranking[2]} />}
     </View>
   )
 }

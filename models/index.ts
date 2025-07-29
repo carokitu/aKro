@@ -1,4 +1,5 @@
 export * from './Comment'
+export * from './DeezerTrack'
 export * from './Post'
 export * from './Rank'
 export * from './User'

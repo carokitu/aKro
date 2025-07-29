@@ -2,29 +2,25 @@ import { Image, StyleSheet, View } from 'react-native'
 
 import { BlurView } from 'expo-blur'
 
-import { type Post } from '../../../models'
 import { theme } from '../../theme'
 
 export const Track = ({
   children,
-  item,
+  coverUrl,
   size = 'large',
 }: {
   children?: React.ReactNode
-  item: Pick<Post, 'album_cover_url'>
+  coverUrl: string
   size?: 'large' | 'medium'
 }) => {
   return (
     <View style={styles.track}>
       <View>
         <View style={size === 'large' ? styles.largeDiskContainer : styles.diskContainer}>
-          <Image
-            source={{ uri: item.album_cover_url }}
-            style={size === 'large' ? styles.largeDiskImage : styles.diskImage}
-          />
+          <Image source={{ uri: coverUrl }} style={size === 'large' ? styles.largeDiskImage : styles.diskImage} />
           <BlurView intensity={80} style={size === 'large' ? styles.largeDiskBlur : styles.diskBlur} tint="light" />
         </View>
-        <Image source={{ uri: item.album_cover_url }} style={size === 'large' ? styles.largeCover : styles.cover} />
+        <Image source={{ uri: coverUrl }} style={size === 'large' ? styles.largeCover : styles.cover} />
       </View>
       {children}
     </View>
@@ -74,10 +70,8 @@ const styles = StyleSheet.create({
   },
   largeDiskContainer: {
     borderRadius: theme.radius.full,
-    height: 290,
     marginLeft: 50,
     overflow: 'hidden',
-    position: 'absolute',
     width: 290,
   },
   largeDiskImage: {

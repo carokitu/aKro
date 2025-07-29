@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
 
-import { type Post } from '../../../models'
 import { Label, Text } from '../../system'
 import { theme } from '../../theme'
 
@@ -9,15 +8,15 @@ const playOnSpotify = async () => {
   console.log('playOnSpotify')
 }
 
-export const Footer = ({ item }: { item: Pick<Post, 'artist_name' | 'spotify_track_id' | 'track_name'> }) => {
+export const Footer = ({ artistName, trackName }: { artistName: string; trackName: string }) => {
   return (
     <View style={styles.footer}>
       <View style={styles.trackInfo}>
         <Label color="invert" ellipsizeMode="tail" numberOfLines={1} size="large">
-          {item.track_name}
+          {trackName}
         </Label>
         <Text color="invert" ellipsizeMode="tail" numberOfLines={1} size="small">
-          {item.artist_name}
+          {artistName}
         </Text>
       </View>
       <TouchableOpacity onPress={playOnSpotify} style={styles.spotify}>

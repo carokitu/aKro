@@ -1,5 +1,6 @@
 export * from './feed'
 export { PostProvider, usePost } from './post'
+export { useDebouncedValue } from './useDebouncedValue'
 export { useDoubleTap } from './useDoubleTap'
 export { UserProvider, useUser } from './useUser'
 export { UserRegistrationProvider, useUserRegistration } from './useUserRegistration'

@@ -327,13 +327,13 @@ const List = ({
 
     return (
       <Post.InteractiveContainer
-        albumCoverUrl={item.album_cover_url}
+        albumCoverUrl={item.album_cover_small}
         handleLike={handleDoubleTap}
         ref={(ref) => interactiveRefs.current.set(item.id, ref)}
         style={styles.post}
       >
         <Post.Header item={item} triggerRefresh={() => setTriggerRefresh(true)} user={user} />
-        <Post.Track item={item} size="medium">
+        <Post.Track coverUrl={item.album_cover_medium} size="medium">
           <Post.ActionButtons
             isLikedByCurrentUser={item.is_liked_by_current_user}
             item={item}
@@ -342,7 +342,7 @@ const List = ({
             user={user}
           />
         </Post.Track>
-        <Post.Footer item={item} />
+        <Post.Footer artistName={item.artist_name} trackName={item.title} />
       </Post.InteractiveContainer>
     )
   }

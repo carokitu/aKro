@@ -12,7 +12,7 @@
       "ES2022"                                 // ECMAScript 2022 definitions
     ],
     "module": "ES2022",                        // Specify module code generation method
-    "moduleResolution": "node",                // Determine how modules get resolved
+    "moduleResolution": "bundler",             // Determine how modules get resolved
     "noEmit": true,                           // Do not emit outputs (Expo handles this)
     "noFallthroughCasesInSwitch": true,       // Report errors for fallthrough cases in switch statement
     "paths": {                                // Configure module path aliases

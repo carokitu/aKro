@@ -104,7 +104,7 @@ export const ShareModal = ({ onClose, track }: Props) => {
     <Modal animationType="fade" onRequestClose={onClose} transparent>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 20 : 0} // ajuste si besoin
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 20 : 0}
         style={styles.modalContainer}
       >
         <SafeAreaView style={styles.modalContent}>
@@ -116,7 +116,7 @@ export const ShareModal = ({ onClose, track }: Props) => {
           </View>
           <ScrollView keyboardShouldPersistTaps="handled" ref={scrollViewRef}>
             <Post.Container coverUrl={track.album.cover_medium}>
-              <Post.Track coverUrl={track.album.cover_medium} />
+              <Post.Track coverUrl={track.album.cover_big} />
               <Post.Footer artistName={track.artist.name} trackName={track.title} />
             </Post.Container>
             <Label size="large" style={styles.descriptionLabel}>

@@ -14,7 +14,7 @@ export const SearchInput = forwardRef<
   SearchInputRef,
   {
     autoFocus?: boolean
-    bottomSheetRef: React.RefObject<BottomSheet>
+    bottomSheetRef?: React.RefObject<BottomSheet | null>
     query: string
     setQuery: (query: string) => void
   }
@@ -28,7 +28,7 @@ export const SearchInput = forwardRef<
   }))
 
   const handleInputFocus = () => {
-    bottomSheetRef.current?.snapToIndex(1)
+    bottomSheetRef?.current?.snapToIndex(1)
   }
 
   return (

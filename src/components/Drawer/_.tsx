@@ -65,6 +65,7 @@ export const Drawer = ({
           searchInputRef.current?.focus()
         } else {
           Keyboard.dismiss()
+          setQuery('')
         }
       }}
       onChange={(index) => {

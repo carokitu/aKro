@@ -43,17 +43,6 @@ export const Drawer = ({
     }
   }, [minimize, setMinimize])
 
-  // Listen for keyboard events to expand drawer when keyboard opens
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      bottomSheetRef.current?.snapToIndex(1)
-    })
-
-    return () => {
-      keyboardDidShowListener?.remove()
-    }
-  }, [])
-
   return (
     <BottomSheet
       backgroundStyle={styles.background}

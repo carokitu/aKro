@@ -1,5 +1,6 @@
 export const fontFamily = {
   body: 'Outfit',
+  bold: 'Outfit-Bold',
   regular: 'Outfit',
   title: 'Outfit',
 } as const

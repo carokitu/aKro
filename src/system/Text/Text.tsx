@@ -1,4 +1,4 @@
-import { Text as RNText, StyleSheet, type TextProps } from 'react-native'
+import { Platform, Text as RNText, StyleSheet, type TextProps } from 'react-native'
 
 import { theme } from '../../theme'
 import { colorStyles } from './styles'
@@ -7,9 +7,17 @@ import { type TextColor } from './types'
 type Props = TextProps & {
   color?: TextColor
   size?: 'extraSmall' | 'large' | 'medium' | 'small'
+  weight?: 'bold' | 'regular'
 }
 
-export const Text = ({ children, color = 'default', size = 'medium', style, ...props }: Props) => {
+export const Text = ({
+  children,
+  color = 'default',
+  size = 'medium',
+  style,
+  weight = 'regular',
+  ...props
+}: Props) => {
   const textStyles = [
     colorStyles[color],
     styles.text,
@@ -17,6 +25,7 @@ export const Text = ({ children, color = 'default', size = 'medium', style, ...p
     size === 'large' && styles.large,
     size === 'medium' && styles.medium,
     size === 'small' && styles.small,
+    weight === 'bold' && styles.bold,
     style,
   ]
 
@@ -28,6 +37,17 @@ export const Text = ({ children, color = 'default', size = 'medium', style, ...p
 }
 
 const styles = StyleSheet.create({
+  bold: {
+    ...Platform.select({
+      android: {
+        fontFamily: theme.fontFamily.bold,
+        fontWeight: 'normal',
+      },
+      ios: {
+        fontWeight: theme.weight.bold as any,
+      },
+    }),
+  },
   extraSmall: {
     fontSize: theme.fontSize['xs'],
     lineHeight: theme.lineHeight['xs'],
@@ -45,7 +65,14 @@ const styles = StyleSheet.create({
     lineHeight: theme.lineHeight['sm'],
   },
   text: {
-    fontFamily: theme.fontFamily.body,
-    fontWeight: theme.weight.regular,
+    ...Platform.select({
+      android: {
+        fontFamily: theme.fontFamily.body,
+      },
+      ios: {
+        fontFamily: theme.fontFamily.body,
+        fontWeight: theme.weight.regular as any,
+      },
+    }),
   },
 })

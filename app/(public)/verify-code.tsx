@@ -1,6 +1,6 @@
 import { CircleX } from 'lucide-react-native'
 import React, { useCallback, useEffect, useState } from 'react'
-import { KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, TextInput, View } from 'react-native'
+import { KeyboardAvoidingView, Platform, StyleSheet, TextInput, View } from 'react-native'
 
 import { router, useLocalSearchParams } from 'expo-router'
 import { parsePhoneNumberFromString } from 'libphonenumber-js'
@@ -9,6 +9,7 @@ import { NavBar } from '../../src'
 import { Button, H1, Text } from '../../src/system'
 import { theme } from '../../src/theme'
 import { client } from '../../supabase'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 const RESEND_DELAY = 30
 

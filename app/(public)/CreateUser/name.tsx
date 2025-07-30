@@ -1,12 +1,13 @@
 import { CircleX } from 'lucide-react-native'
 import { useState } from 'react'
-import { KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, TextInput, View } from 'react-native'
+import { KeyboardAvoidingView, Platform, StyleSheet, TextInput, View } from 'react-native'
 
 import { router } from 'expo-router'
 
 import { useUserRegistration } from '../../../hooks'
 import { Button, H1, Text } from '../../../src/system'
 import { theme } from '../../../src/theme'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 // eslint-disable-next-line regexp/no-obscure-range, unicorn/better-regex
 const NAME_REGEX = /^[A-Za-zÀ-ÖØ-öø-ÿ'’ -]{2,50}$/

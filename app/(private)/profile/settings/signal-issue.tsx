@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Platform, SafeAreaView, StyleSheet, View } from 'react-native'
+import { Platform, StyleSheet, View } from 'react-native'
 
 import Constants from 'expo-constants'
 
@@ -8,6 +8,7 @@ import { NavBar } from '../../../../src'
 import { Button, Input } from '../../../../src/system'
 import { theme } from '../../../../src/theme'
 import { client } from '../../../../supabase'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 const SignalIssue = () => {
   const [issue, setIssue] = useState('')

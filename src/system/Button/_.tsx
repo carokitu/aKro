@@ -4,12 +4,13 @@ import {
   type ImageSourcePropType,
   Pressable,
   type PressableProps,
-  SafeAreaView,
   type StyleProp,
   StyleSheet,
   View,
   type ViewStyle,
 } from 'react-native'
+
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { theme } from '../../theme'
 import { Label } from '../Text'

@@ -23,7 +23,7 @@ export const Label = ({ children, color = 'default', onPress, size = 'medium', s
   if (onPress) {
     return (
       <TouchableOpacity activeOpacity={0.5} onPress={onPress}>
-        <Text {...props} style={labelStyles}>
+        <Text {...props} style={labelStyles} weight="bold">
           {children}
         </Text>
       </TouchableOpacity>
@@ -31,7 +31,7 @@ export const Label = ({ children, color = 'default', onPress, size = 'medium', s
   }
 
   return (
-    <Text {...props} style={labelStyles}>
+    <Text {...props} style={labelStyles} weight="bold">
       {children}
     </Text>
   )
@@ -50,8 +50,5 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize['sm'],
     lineHeight: theme.lineHeight['sm'],
   },
-  text: {
-    fontFamily: theme.fontFamily.body,
-    fontWeight: theme.weight.medium,
-  },
+  text: {},
 })

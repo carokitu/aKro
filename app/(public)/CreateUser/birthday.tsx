@@ -1,7 +1,7 @@
 import DateTimePicker, { type DateTimePickerEvent } from '@react-native-community/datetimepicker'
 import { CircleX } from 'lucide-react-native'
 import React, { useEffect, useMemo, useState } from 'react'
-import { KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { KeyboardAvoidingView, Platform, StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import { router } from 'expo-router'
 
@@ -9,6 +9,7 @@ import { useUserRegistration } from '../../../hooks'
 import { NavBar } from '../../../src'
 import { Button, H1, Text } from '../../../src/system'
 import { theme } from '../../../src/theme'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 const validateAge = (date: Date) => {
   const minimumDate = new Date()

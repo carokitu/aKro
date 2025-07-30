@@ -1,6 +1,6 @@
 import { CircleCheck, CircleX, Loader } from 'lucide-react-native'
 import React, { useEffect, useState } from 'react'
-import { KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, TextInput, View } from 'react-native'
+import { KeyboardAvoidingView, Platform, StyleSheet, TextInput, View } from 'react-native'
 
 import { router } from 'expo-router'
 
@@ -9,6 +9,7 @@ import { NavBar } from '../../../src'
 import { Button, H1, Text } from '../../../src/system'
 import { theme } from '../../../src/theme'
 import { client } from '../../../supabase'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 const USERNAME_REGEX = /^\w{3,20}$/
 const DEBOUNCE_DELAY = 300

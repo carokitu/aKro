@@ -36,14 +36,13 @@ export const TrackList = ({ error, fetchMore, loading, searchQuery, tracks }: Pr
 
   if (error) {
     return (
-      <View style={styles.container}>
+      <View style={styles.errorContainer}>
         <Error />
       </View>
     )
   }
 
   return (
-    <View style={styles.container}>
       <FlashList
         data={tracks}
         decelerationRate="fast"
@@ -51,6 +50,7 @@ export const TrackList = ({ error, fetchMore, loading, searchQuery, tracks }: Pr
         keyExtractor={(item) => item.id.toString()}
         ListEmptyComponent={loading ? <ActivityIndicator size="large" style={styles.loader} /> : <EmptyList />}
         onEndReached={fetchMore}
+        ListFooterComponent={<View style={styles.last} />}
         onEndReachedThreshold={0.5}
         onScrollBeginDrag={() => {
           Keyboard.dismiss()
@@ -59,12 +59,11 @@ export const TrackList = ({ error, fetchMore, loading, searchQuery, tracks }: Pr
         renderItem={({ item }) => <Track track={item} />}
         showsVerticalScrollIndicator={false}
       />
-    </View>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
+  errorContainer: {
     flex: 1,
     minHeight: 200,
   },
@@ -79,5 +78,8 @@ const styles = StyleSheet.create({
   },
   loader: {
     paddingVertical: 24,
+  },
+  last: {
+    paddingVertical: theme.spacing[400],
   },
 })

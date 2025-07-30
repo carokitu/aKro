@@ -1,10 +1,16 @@
-export const mergeUnique = <T extends { id: number | string }>(list: T[], newList: T[]): T[] => {
-  const existingIds = new Set(list.map((item) => item.id))
+export const mergeUnique = <T extends Record<string, any>>(
+  list: T[],
+  newList: T[],
+  key = 'id',
+): T[] => {
+  const existingIds = new Set(list.map((item) => item[key]))
   const merged = [...list]
+
   newList.forEach((item) => {
-    if (!existingIds.has(item.id)) {
+    if (!existingIds.has(item[key])) {
       merged.push(item)
     }
   })
+  
   return merged
 }

@@ -44,7 +44,8 @@ const styles = StyleSheet.create({
         fontWeight: 'normal',
       },
       ios: {
-        fontWeight: theme.weight.bold as any,
+        fontFamily: theme.fontFamily.body,
+        fontWeight: theme.weight.bold,
       },
     }),
   },
@@ -71,7 +72,7 @@ const styles = StyleSheet.create({
       },
       ios: {
         fontFamily: theme.fontFamily.body,
-        fontWeight: theme.weight.regular as any,
+        fontWeight: theme.weight.regular,
       },
     }),
   },

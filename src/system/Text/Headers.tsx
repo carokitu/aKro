@@ -21,7 +21,7 @@ const Heading = ({ children, color = 'default', level, style, ...props }: Props)
   ]
 
   return (
-    <Text {...props} style={headingStyles}>
+    <Text {...props} weight="bold" style={headingStyles}>
       {children}
     </Text>
   )

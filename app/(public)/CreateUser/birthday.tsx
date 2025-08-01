@@ -102,7 +102,7 @@ const Birthday = () => {
               size="lg"
               style={styles.button}
               title="Suivant"
-              />
+            />
           </View>
         </View>
       </KeyboardAvoidingView>

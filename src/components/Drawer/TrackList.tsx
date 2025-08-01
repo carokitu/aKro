@@ -51,9 +51,9 @@ export const TrackList = ({ error, fetchMore, loading, searchQuery, tracks }: Pr
         estimatedItemSize={60}
         keyExtractor={(item) => item.id.toString()}
         ListEmptyComponent={loading ? <ActivityIndicator size="large" style={styles.loader} /> : <EmptyList />}
-        onEndReached={() => {console.log('fetchMore'); fetchMore()}}
         ListFooterComponent={<View style={styles.last} />}
-        onEndReachedThreshold={0.8}
+        onEndReached={fetchMore}
+        onEndReachedThreshold={0.5}
         onScrollBeginDrag={() => {
           Keyboard.dismiss()
         }}

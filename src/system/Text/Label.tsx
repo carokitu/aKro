@@ -14,7 +14,6 @@ export const Label = ({ children, color = 'default', onPress, size = 'medium', s
   const labelStyles = [
     colorStyles[color],
     style,
-    styles.text,
     size === 'large' && styles.large,
     size === 'medium' && styles.medium,
     size === 'small' && styles.small,
@@ -50,5 +49,4 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize['sm'],
     lineHeight: theme.lineHeight['sm'],
   },
-  text: {},
 })

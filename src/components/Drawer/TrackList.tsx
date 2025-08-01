@@ -42,8 +42,6 @@ export const TrackList = ({ error, fetchMore, loading, searchQuery, tracks }: Pr
     )
   }
 
-  console.log('tracks', tracks.length)
-
   return (
       <FlashList
         data={tracks}

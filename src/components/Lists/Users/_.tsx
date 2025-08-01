@@ -6,6 +6,7 @@ import { type User as TUser } from '../../../../models'
 import { type UserWithStats } from '../../../../models/custom'
 import { Error } from '../../../system'
 import { User } from './User'
+import { Keyboard } from 'react-native'
 
 type UserListProps = Omit<FlashListProps<UserWithStats>, 'data' | 'renderItem'> & {
   currentUser: TUser
@@ -47,6 +48,8 @@ export const UserList = ({
       estimatedItemSize={80}
       keyboardShouldPersistTaps="handled"
       keyExtractor={(item) => item.id}
+      showsVerticalScrollIndicator={false}
+      onScrollBeginDrag={() => Keyboard.dismiss()}
       ListEmptyComponent={<Error />}
       onEndReached={infinieScroll ? fetchUsers : undefined}
       renderItem={renderItem}

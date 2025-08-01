@@ -14,7 +14,6 @@ export const Title = ({ children, color = 'default', size = 'medium', style, ...
   const titleStyles = [
     colorStyles[color],
     style,
-    styles.text,
     size === 'large' && styles.large,
     size === 'medium' && styles.medium,
     size === 'small' && styles.small,
@@ -40,5 +39,4 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize['md'],
     lineHeight: theme.lineHeight['md'],
   },
-  text: {},
 })

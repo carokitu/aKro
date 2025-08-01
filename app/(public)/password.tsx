@@ -73,30 +73,29 @@ const Password = () => {
     <SafeAreaView style={styles.container}>
       <NavBar />
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
+        behavior='padding'
         style={styles.keyboardAvoidingView}
       >
         <View style={styles.formContainer}>
           <H1 style={styles.title}>{hasAccount ? 'Entre ton mot de passe' : 'Choisis un mot de passe'}</H1>
           <View style={styles.inputContainer}>
             <TextInput
-              autoFocus
+              {...Platform.OS === 'ios' && { autoFocus: true }}
               maxLength={30}
               onChangeText={setPassword}
-              placeholder="motdepasse123"
+              placeholder="Motdepasse123"
               placeholderTextColor={theme.text.disabled}
               secureTextEntry={!showPassword}
               style={styles.input}
               value={password}
             />
-            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+            {Platform.OS === 'ios' && <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
               {showPassword ? (
                 <Eye color={theme.text.base.tertiary} size={theme.fontSize.lg} />
               ) : (
                 <EyeOff color={theme.text.base.tertiary} size={theme.fontSize.lg} />
               )}
-            </TouchableOpacity>
+            </TouchableOpacity>}
           </View>
           <View style={styles.feedback}>
             {error && (
@@ -108,12 +107,12 @@ const Password = () => {
               </>
             )}
             {!error && password.length > 0 && (
-              <>
+              <View style={styles.feedback}>
                 <CircleCheck color={theme.text.success.default} size={theme.fontSize.sm} style={styles.icon} />
                 <Text color="success" style={styles.feedbackText}>
                   Mot de passe valide
                 </Text>
-              </>
+              </View>
             )}
           </View>
           <Button
@@ -176,20 +175,26 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing[50],
   },
   input: {
+    ...Platform.select({
+      android: {
+        paddingVertical: 0,
+      },
+    }),
+    flex: 1,
     fontSize: theme.fontSize.lg,
     fontWeight: theme.weight.medium,
-    width: '100%',
   },
   inputContainer: {
+    alignItems: 'center',
     backgroundColor: theme.surface.base.secondary,
     borderRadius: theme.radius.base,
     display: 'flex',
     flexDirection: 'row',
     marginBottom: theme.spacing[300],
-    marginHorizontal: theme.spacing[100],
     marginTop: theme.spacing[600],
     paddingHorizontal: theme.padding[600],
     paddingVertical: theme.padding[400],
+    width: '100%',
   },
   keyboardAvoidingView: {
     flex: 1,

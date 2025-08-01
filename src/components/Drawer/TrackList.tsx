@@ -42,6 +42,8 @@ export const TrackList = ({ error, fetchMore, loading, searchQuery, tracks }: Pr
     )
   }
 
+  console.log('tracks', tracks.length)
+
   return (
       <FlashList
         data={tracks}
@@ -49,9 +51,9 @@ export const TrackList = ({ error, fetchMore, loading, searchQuery, tracks }: Pr
         estimatedItemSize={60}
         keyExtractor={(item) => item.id.toString()}
         ListEmptyComponent={loading ? <ActivityIndicator size="large" style={styles.loader} /> : <EmptyList />}
-        onEndReached={fetchMore}
+        onEndReached={() => {console.log('fetchMore'); fetchMore()}}
         ListFooterComponent={<View style={styles.last} />}
-        onEndReachedThreshold={0.5}
+        onEndReachedThreshold={0.8}
         onScrollBeginDrag={() => {
           Keyboard.dismiss()
         }}

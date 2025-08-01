@@ -83,11 +83,7 @@ const VerifyCode = () => {
   return (
     <SafeAreaView style={styles.container}>
       <NavBar />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-        style={styles.keyboardAvoidingView}
-      >
+      <KeyboardAvoidingView behavior='padding' style={styles.keyboardAvoidingView} >
         <View style={styles.formContainer}>
           <H1 style={styles.title}>Entre le code envoyé au {phoneNumber}</H1>
           <TextInput

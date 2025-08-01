@@ -68,11 +68,7 @@ const Birthday = () => {
   return (
     <SafeAreaView style={styles.container}>
       <NavBar />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
-        style={styles.keyboardAvoidingView}
-      >
+      <KeyboardAvoidingView behavior='padding' style={styles.keyboardAvoidingView} >
         <View style={styles.formContainer}>
           <H1 style={styles.title}>Indique ta date de naissance</H1>
           {Platform.OS === 'android' && (
@@ -82,12 +78,12 @@ const Birthday = () => {
           )}
           {showPicker && (
             <DateTimePicker
-              display="spinner"
-              mode="date"
-              onChange={handleDateChange}
-              style={styles.datePicker}
-              textColor={theme.text.base.default}
-              value={birthday}
+            display="spinner"
+            mode="date"
+            onChange={handleDateChange}
+            style={styles.datePicker}
+            textColor={theme.text.base.default}
+            value={birthday}
             />
           )}
           {!isOldEnough && (
@@ -106,7 +102,7 @@ const Birthday = () => {
               size="lg"
               style={styles.button}
               title="Suivant"
-            />
+              />
           </View>
         </View>
       </KeyboardAvoidingView>

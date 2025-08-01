@@ -1,6 +1,6 @@
 import { SearchIcon } from 'lucide-react-native'
 import { forwardRef, useImperativeHandle, useRef } from 'react'
-import { StyleSheet, TextInput, View } from 'react-native'
+import { Platform, StyleSheet, TextInput, View } from 'react-native'
 
 import type BottomSheet from '@gorhom/bottom-sheet'
 
@@ -61,6 +61,7 @@ const styles = StyleSheet.create({
     gap: theme.spacing['200'],
     marginBottom: theme.spacing['300'],
     marginTop: theme.spacing['200'],
-    padding: theme.padding['400'],
+    paddingHorizontal: theme.padding['400'],
+    paddingVertical: Platform.OS === 'ios' ? theme.padding[400] : theme.padding[200],
   },
 })

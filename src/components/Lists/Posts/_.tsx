@@ -11,6 +11,7 @@ import { type Post as TPost, type User } from '../../../../models'
 import { client } from '../../../../supabase'
 import { Error } from '../../../system'
 import { theme } from '../../../theme'
+import { mergeUnique } from '../../../utils'
 import { Post } from '../../Post'
 import { type InteractiveContainerRef } from '../../Post/InteractiveContainer'
 import { Toast, type ToastProps } from './Toast'
@@ -192,7 +193,7 @@ const List = ({
       }
 
       const feedPosts = data as TPost[]
-      setPosts((prev) => (reset ? feedPosts : [...prev, ...feedPosts]))
+      setPosts((prev) => (reset ? feedPosts : mergeUnique(prev, feedPosts)))
 
       if (reset) {
         setOffset(LIMIT)

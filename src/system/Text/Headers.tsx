@@ -17,11 +17,10 @@ const Heading = ({ children, color = 'default', level, style, ...props }: Props)
     level === 2 && styles.h2,
     level === 3 && styles.h3,
     style,
-    styles.text,
   ]
 
   return (
-    <Text {...props} style={headingStyles}>
+    <Text {...props} weight="bold" style={headingStyles}>
       {children}
     </Text>
   )
@@ -43,9 +42,5 @@ const styles = StyleSheet.create({
   h3: {
     fontSize: theme.fontSize['2xl'],
     lineHeight: theme.lineHeight['2xl'],
-  },
-  text: {
-    fontFamily: theme.fontFamily.title,
-    fontWeight: theme.weight.bold,
   },
 })

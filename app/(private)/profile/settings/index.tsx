@@ -1,7 +1,7 @@
 import { useActionSheet } from '@expo/react-native-action-sheet'
 import { ArrowRight, CircleAlert, Landmark, LogOut, type LucideIcon, Pencil } from 'lucide-react-native'
 import { useState } from 'react'
-import { SafeAreaView, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import { router } from 'expo-router'
 
@@ -10,6 +10,7 @@ import { type User } from '../../../../models'
 import { NavBar } from '../../../../src'
 import { Avatar, Error, Text, Title } from '../../../../src/system'
 import { theme } from '../../../../src/theme'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 const UserInfo = ({ user }: { user: User }) => (
   <View style={styles.userInfo}>

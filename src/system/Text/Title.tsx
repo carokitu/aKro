@@ -14,14 +14,13 @@ export const Title = ({ children, color = 'default', size = 'medium', style, ...
   const titleStyles = [
     colorStyles[color],
     style,
-    styles.text,
     size === 'large' && styles.large,
     size === 'medium' && styles.medium,
     size === 'small' && styles.small,
   ]
 
   return (
-    <Text {...props} style={titleStyles}>
+    <Text {...props} style={titleStyles} weight="bold">
       {children}
     </Text>
   )
@@ -39,9 +38,5 @@ const styles = StyleSheet.create({
   small: {
     fontSize: theme.fontSize['md'],
     lineHeight: theme.lineHeight['md'],
-  },
-  text: {
-    fontFamily: theme.fontFamily.title,
-    fontWeight: theme.weight.bold,
   },
 })

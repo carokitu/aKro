@@ -41,16 +41,19 @@ export const ActionButtons = memo(({ isLikedByCurrentUser, item, likesCount, onL
 
   return (
     <View style={styles.actions}>
-      <TouchableOpacity onPress={() => setMute(!mute)}>
-        {mute ? (
-          <VolumeOff color={theme.surface.base.default} size={30} />
-        ) : (
-          <Volume2 color={theme.surface.base.default} size={30} />
-        )}
-      </TouchableOpacity>
+      <View style={styles.composed}>
+        <TouchableOpacity onPress={() => setMute(!mute)}>
+          {mute ? (
+            <VolumeOff color={theme.surface.base.default} size={30} />
+          ) : (
+            <Volume2 color={theme.surface.base.default} size={30} />
+          )}
+        </TouchableOpacity>
+        <Text> </Text>
+      </View>
       <TouchableOpacity onPress={() => router.push(`/post/${item.id}`)} style={styles.composed}>
         <MessageSquareMore color={theme.surface.base.default} size={32} />
-        <Text color="invert">{commentsCount}</Text>
+        <Text color="invert">{commentsCount ?? 0}</Text>
       </TouchableOpacity>
       <View style={styles.composed}>
         <TouchableOpacity onPress={onLikePress}>
@@ -73,7 +76,8 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     gap: theme.spacing[1200],
     justifyContent: 'space-between',
-    paddingVertical: theme.spacing[800],
+    paddingTop: theme.spacing[100],
+    marginBottom: theme.spacing[800],
   },
   composed: {
     alignItems: 'center',

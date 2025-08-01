@@ -64,7 +64,7 @@ const Item = ({ rank, user }: { rank: number; user: Rank }) => {
       </View>
       <Title size={isFirst ? 'large' : 'medium'}>{rank}</Title>
       <View style={styles.userInfo}>
-        <Title>{user.username}</Title>
+        <Title numberOfLines={1} ellipsizeMode="tail">{user.username}</Title>
         <View style={styles.likes}>
           <Text color="secondary">{user.total_likes}</Text>
           <Image

@@ -28,10 +28,11 @@ const SignInWithEmail = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView behavior='padding' style={styles.keyboardAvoidingContainer}>
       <H1 style={styles.title}>Quel est ton mail ?</H1>
       <TextInput
         autoComplete="email"
-        autoFocus
+        {...Platform.OS === 'ios' && { autoFocus: true }}
         keyboardType="email-address"
         maxLength={150}
         onChangeText={setEmail}
@@ -55,7 +56,7 @@ const SignInWithEmail = () => {
         title="Continuer avec un numéro de téléphone"
         variant="tertiary"
       />
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.buttonContainer}>
+      <View style={styles.buttonContainer}>
         <Button
           disabled={!isValid}
           fullWidth
@@ -64,6 +65,7 @@ const SignInWithEmail = () => {
           style={{ marginBottom: theme.spacing['200'] }}
           title="Suivant"
         />
+        </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   )
@@ -80,6 +82,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     marginHorizontal: theme.spacing['400'],
+  },
+  keyboardAvoidingContainer: {
+    alignItems: 'center',
+    flex: 1,
+    width: '100%',
   },
   errorContainer: {
     alignItems: 'center',

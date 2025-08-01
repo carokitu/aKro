@@ -25,9 +25,6 @@ const Layout = () => {
             backgroundColor: theme.surface.base.default,
             flex: 1,
           },
-          headerTitleStyle: {
-            fontFamily: 'Outfit',
-          },
         }}
       >
         {user ? (

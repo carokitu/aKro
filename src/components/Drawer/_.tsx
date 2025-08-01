@@ -43,17 +43,6 @@ export const Drawer = ({
     }
   }, [minimize, setMinimize])
 
-  // Listen for keyboard events to expand drawer when keyboard opens
-  useEffect(() => {
-    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => {
-      bottomSheetRef.current?.snapToIndex(1)
-    })
-
-    return () => {
-      keyboardDidShowListener?.remove()
-    }
-  }, [])
-
   return (
     <BottomSheet
       backgroundStyle={styles.background}
@@ -65,6 +54,7 @@ export const Drawer = ({
           searchInputRef.current?.focus()
         } else {
           Keyboard.dismiss()
+          setQuery('')
         }
       }}
       onChange={(index) => {
@@ -106,6 +96,7 @@ const styles = StyleSheet.create({
   },
   bottomSheetView: {
     flex: 1,
+    height: '100%',
   },
   container: {
     flex: 1,

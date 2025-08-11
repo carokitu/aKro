@@ -1,6 +1,7 @@
 import { CircleX } from 'lucide-react-native'
 import { useState } from 'react'
 import { Keyboard, StyleSheet, TouchableWithoutFeedback, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 import type * as ImagePicker from 'expo-image-picker'
 
@@ -10,7 +11,6 @@ import { EditAvatar } from '../../../src/components/ActionButtons'
 import { Button, H1, Input, MAX_INPUT_LENGTH, Text } from '../../../src/system'
 import { theme } from '../../../src/theme'
 import { saveImage } from '../../../src/utils/image'
-import { SafeAreaView } from 'react-native-safe-area-context'
 
 const handleDismiss = () => Keyboard.dismiss()
 

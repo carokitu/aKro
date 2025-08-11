@@ -73,7 +73,7 @@ export const Drawer = ({
           Faire découvrir un son
         </Title>
         <SearchInput bottomSheetRef={bottomSheetRef} query={query} ref={searchInputRef} setQuery={setQuery} />
-        <TrackList error={error} fetchMore={fetchMore} loading={loading} searchQuery={query} tracks={tracks} />
+        <TrackList error={error} fetchMore={fetchMore} loading={loading} tracks={tracks} />
       </BottomSheetView>
     </BottomSheet>
   )

@@ -28,43 +28,43 @@ const SignInWithEmail = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView behavior='padding' style={styles.keyboardAvoidingContainer}>
-      <H1 style={styles.title}>Quel est ton mail ?</H1>
-      <TextInput
-        autoComplete="email"
-        {...Platform.OS === 'ios' && { autoFocus: true }}
-        keyboardType="email-address"
-        maxLength={150}
-        onChangeText={setEmail}
-        placeholder="exemple@email.com"
-        placeholderTextColor={theme.text.disabled}
-        style={styles.input}
-        value={email}
-      />
-      {showError && (
-        <View style={styles.errorContainer}>
-          <CircleX color={theme.text.danger.default} size={theme.fontSize.sm} />
-          <Text color="danger">Adresse mail invalide</Text>
-        </View>
-      )}
-      <Text color="tertiary" style={styles.text}>
-        En continuant, vous acceptez nos Conditions d'utilisation et notre Politique de confidentialité.
-      </Text>
-      <Button
-        onPress={() => router.push('/(public)/sign-in')}
-        size="sm"
-        title="Continuer avec un numéro de téléphone"
-        variant="tertiary"
-      />
-      <View style={styles.buttonContainer}>
-        <Button
-          disabled={!isValid}
-          fullWidth
-          onPress={handleNext}
-          size="lg"
-          style={{ marginBottom: theme.spacing['200'] }}
-          title="Suivant"
+      <KeyboardAvoidingView behavior="padding" style={styles.keyboardAvoidingContainer}>
+        <H1 style={styles.title}>Quel est ton mail ?</H1>
+        <TextInput
+          autoComplete="email"
+          {...(Platform.OS === 'ios' && { autoFocus: true })}
+          keyboardType="email-address"
+          maxLength={150}
+          onChangeText={setEmail}
+          placeholder="exemple@email.com"
+          placeholderTextColor={theme.text.disabled}
+          style={styles.input}
+          value={email}
         />
+        {showError && (
+          <View style={styles.errorContainer}>
+            <CircleX color={theme.text.danger.default} size={theme.fontSize.sm} />
+            <Text color="danger">Adresse mail invalide</Text>
+          </View>
+        )}
+        <Text color="tertiary" style={styles.text}>
+          En continuant, vous acceptez nos Conditions d'utilisation et notre Politique de confidentialité.
+        </Text>
+        <Button
+          onPress={() => router.push('/(public)/sign-in')}
+          size="sm"
+          title="Continuer avec un numéro de téléphone"
+          variant="tertiary"
+        />
+        <View style={styles.buttonContainer}>
+          <Button
+            disabled={!isValid}
+            fullWidth
+            onPress={handleNext}
+            size="lg"
+            style={{ marginBottom: theme.spacing['200'] }}
+            title="Suivant"
+          />
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -82,11 +82,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     marginHorizontal: theme.spacing['400'],
-  },
-  keyboardAvoidingContainer: {
-    alignItems: 'center',
-    flex: 1,
-    width: '100%',
   },
   errorContainer: {
     alignItems: 'center',
@@ -106,6 +101,11 @@ const styles = StyleSheet.create({
     marginTop: theme.spacing[600],
     paddingHorizontal: theme.padding[600],
     paddingVertical: theme.padding[400],
+    width: '100%',
+  },
+  keyboardAvoidingContainer: {
+    alignItems: 'center',
+    flex: 1,
     width: '100%',
   },
   text: {

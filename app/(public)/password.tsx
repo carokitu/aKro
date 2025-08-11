@@ -1,13 +1,7 @@
 import { CircleCheck, CircleX, Eye, EyeOff } from 'lucide-react-native'
 import React, { useEffect, useState } from 'react'
-import {
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { KeyboardAvoidingView, Platform, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { validate } from 'email-validator'
 import { router, useLocalSearchParams } from 'expo-router'
@@ -16,7 +10,6 @@ import { NavBar } from '../../src'
 import { Button, H1, Text } from '../../src/system'
 import { theme } from '../../src/theme'
 import { client } from '../../supabase'
-import { SafeAreaView } from 'react-native-safe-area-context'
 
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!$%&*?@])[\d!$%&*?@A-Za-z]{8,}$/
 
@@ -72,15 +65,12 @@ const Password = () => {
   return (
     <SafeAreaView style={styles.container}>
       <NavBar />
-      <KeyboardAvoidingView
-        behavior='padding'
-        style={styles.keyboardAvoidingView}
-      >
+      <KeyboardAvoidingView behavior="padding" style={styles.keyboardAvoidingView}>
         <View style={styles.formContainer}>
           <H1 style={styles.title}>{hasAccount ? 'Entre ton mot de passe' : 'Choisis un mot de passe'}</H1>
           <View style={styles.inputContainer}>
             <TextInput
-              {...Platform.OS === 'ios' && { autoFocus: true }}
+              {...(Platform.OS === 'ios' && { autoFocus: true })}
               maxLength={30}
               onChangeText={setPassword}
               placeholder="Motdepasse123"
@@ -89,13 +79,15 @@ const Password = () => {
               style={styles.input}
               value={password}
             />
-            {Platform.OS === 'ios' && <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
-              {showPassword ? (
-                <Eye color={theme.text.base.tertiary} size={theme.fontSize.lg} />
-              ) : (
-                <EyeOff color={theme.text.base.tertiary} size={theme.fontSize.lg} />
-              )}
-            </TouchableOpacity>}
+            {Platform.OS === 'ios' && (
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                {showPassword ? (
+                  <Eye color={theme.text.base.tertiary} size={theme.fontSize.lg} />
+                ) : (
+                  <EyeOff color={theme.text.base.tertiary} size={theme.fontSize.lg} />
+                )}
+              </TouchableOpacity>
+            )}
           </View>
           <View style={styles.feedback}>
             {error && (

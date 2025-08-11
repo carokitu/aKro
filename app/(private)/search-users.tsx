@@ -143,6 +143,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   search: {
+    alignItems: 'center',
     backgroundColor: theme.surface.base.secondary,
     borderRadius: theme.radius.base,
     display: 'flex',
@@ -150,7 +151,6 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing[600],
     marginTop: theme.spacing[200],
     paddingHorizontal: theme.padding[400],
-    alignItems: 'center',
     paddingVertical: Platform.OS === 'ios' ? theme.padding[400] : theme.padding[200],
   },
 })

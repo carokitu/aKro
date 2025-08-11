@@ -2,6 +2,7 @@ import DateTimePicker, { type DateTimePickerEvent } from '@react-native-communit
 import { CircleX } from 'lucide-react-native'
 import React, { useEffect, useMemo, useState } from 'react'
 import { KeyboardAvoidingView, Platform, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { router } from 'expo-router'
 
@@ -9,7 +10,6 @@ import { useUserRegistration } from '../../../hooks'
 import { NavBar } from '../../../src'
 import { Button, H1, Text } from '../../../src/system'
 import { theme } from '../../../src/theme'
-import { SafeAreaView } from 'react-native-safe-area-context'
 
 const validateAge = (date: Date) => {
   const minimumDate = new Date()
@@ -68,7 +68,7 @@ const Birthday = () => {
   return (
     <SafeAreaView style={styles.container}>
       <NavBar />
-      <KeyboardAvoidingView behavior='padding' style={styles.keyboardAvoidingView} >
+      <KeyboardAvoidingView behavior="padding" style={styles.keyboardAvoidingView}>
         <View style={styles.formContainer}>
           <H1 style={styles.title}>Indique ta date de naissance</H1>
           {Platform.OS === 'android' && (
@@ -78,12 +78,12 @@ const Birthday = () => {
           )}
           {showPicker && (
             <DateTimePicker
-            display="spinner"
-            mode="date"
-            onChange={handleDateChange}
-            style={styles.datePicker}
-            textColor={theme.text.base.default}
-            value={birthday}
+              display="spinner"
+              mode="date"
+              onChange={handleDateChange}
+              style={styles.datePicker}
+              textColor={theme.text.base.default}
+              value={birthday}
             />
           )}
           {!isOldEnough && (

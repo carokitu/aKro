@@ -1,4 +1,4 @@
-import auto from 'eslint-config-canonical/configurations/auto.js';
+import auto from 'eslint-config-canonical/auto';
 import react from 'eslint-plugin-react';
 import reactNative from 'eslint-plugin-react-native';
 

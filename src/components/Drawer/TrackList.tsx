@@ -13,7 +13,6 @@ type Props = {
   error: null | string
   fetchMore: () => void
   loading: boolean
-  searchQuery: string
   tracks: DeezerTrack[]
 }
 
@@ -25,8 +24,7 @@ const EmptyList = () => (
   </View>
 )
 
-export const TrackList = ({ error, fetchMore, loading, searchQuery, tracks }: Props) => {
-
+export const TrackList = ({ error, fetchMore, loading, tracks }: Props) => {
   if (error) {
     return (
       <View style={styles.errorContainer}>
@@ -36,32 +34,25 @@ export const TrackList = ({ error, fetchMore, loading, searchQuery, tracks }: Pr
   }
 
   return (
-      <BottomSheetFlashList<DeezerTrack>
-        data={tracks}
-        estimatedItemSize={60}
-        keyExtractor={(item) => item.id.toString()}
-        ListEmptyComponent={loading ? <ActivityIndicator size="large" style={styles.loader} /> : <EmptyList />}
-        ListFooterComponent={<View style={styles.last} />}
-        keyboardShouldPersistTaps="handled"
-        onEndReached={fetchMore}
-        onEndReachedThreshold={0.5}
-        onScrollBeginDrag={() => {
-          Keyboard.dismiss()
-        }}
-        renderItem={({ item }) => <Track track={item} />}
-        showsVerticalScrollIndicator={false}
-      />
+    <BottomSheetFlashList<DeezerTrack>
+      data={tracks}
+      estimatedItemSize={60}
+      keyboardShouldPersistTaps="handled"
+      keyExtractor={(item) => item.id.toString()}
+      ListEmptyComponent={loading ? <ActivityIndicator size="large" style={styles.loader} /> : <EmptyList />}
+      ListFooterComponent={<View style={styles.last} />}
+      onEndReached={fetchMore}
+      onEndReachedThreshold={0.5}
+      onScrollBeginDrag={() => {
+        Keyboard.dismiss()
+      }}
+      renderItem={({ item }) => <Track track={item} />}
+      showsVerticalScrollIndicator={false}
+    />
   )
 }
 
 const styles = StyleSheet.create({
-  errorContainer: {
-    flex: 1,
-    minHeight: 200,
-  },
-  container: {
-    flex: 1,
-  },
   emptyIcon: {
     marginBottom: theme.spacing[200],
   },
@@ -71,13 +62,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: theme.spacing[400],
   },
-  loader: {
-    paddingVertical: 24,
-  },
-  list: {
+  errorContainer: {
     flex: 1,
+    minHeight: 200,
   },
   last: {
     paddingVertical: theme.spacing[400],
+  },
+  loader: {
+    paddingVertical: 24,
   },
 })

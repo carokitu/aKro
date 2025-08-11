@@ -101,7 +101,7 @@ export const ShareModal = ({ onClose, track }: Props) => {
   }
 
   return (
-    <Modal animationType="fade" onRequestClose={onClose} transparent>
+    <Modal animationType="fade" onRequestClose={onClose}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 20 : 0}
@@ -126,11 +126,14 @@ export const ShareModal = ({ onClose, track }: Props) => {
               maxLength={500}
               multiline
               numberOfLines={5}
+              submitBehavior='blurAndSubmit'
+              returnKeyType="done"
               onChangeText={setDescription}
               placeholder="Pourquoi ce son vous fait vibrer ?"
               placeholderTextColor={theme.text.disabled}
               ref={inputRef}
               style={styles.input}
+              editable={!isSharing}
               value={description}
             />
             {error && (

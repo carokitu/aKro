@@ -36,9 +36,12 @@ const SignInWithEmail = () => {
           keyboardType="email-address"
           maxLength={150}
           onChangeText={setEmail}
+          onSubmitEditing={handleNext}
           placeholder="exemple@email.com"
           placeholderTextColor={theme.text.disabled}
+          returnKeyType="done"
           style={styles.input}
+          submitBehavior="blurAndSubmit"
           value={email}
         />
         {showError && (

@@ -46,9 +46,12 @@ const Name = () => {
           keyboardType="twitter"
           maxLength={50}
           onChangeText={onChangeText}
+          onSubmitEditing={handleNext}
           placeholder="Paul Dupont"
           placeholderTextColor={theme.text.disabled}
+          returnKeyType="done"
           style={styles.input}
+          submitBehavior="blurAndSubmit"
           value={name}
         />
         {error && (

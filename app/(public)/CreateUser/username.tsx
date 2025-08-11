@@ -82,9 +82,12 @@ const UserName = () => {
             keyboardType="twitter"
             maxLength={30}
             onChangeText={setUsername}
+            onSubmitEditing={handleNext}
             placeholder="pauldupont12"
             placeholderTextColor={theme.text.disabled}
+            returnKeyType="done"
             style={styles.input}
+            submitBehavior="blurAndSubmit"
             value={username}
           />
           <View style={styles.feedback}>

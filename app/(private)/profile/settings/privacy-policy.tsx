@@ -1,8 +1,9 @@
-import { SafeAreaView, ScrollView, StyleSheet } from 'react-native'
+import { ScrollView, StyleSheet } from 'react-native'
 
 import { NavBar } from '../../../../src'
 import { Text, Title } from '../../../../src/system'
 import { theme } from '../../../../src/theme'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 const PrivacyPolicy = () => (
   <SafeAreaView style={styles.area}>

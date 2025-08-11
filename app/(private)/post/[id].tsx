@@ -5,7 +5,6 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   StyleSheet,
   TextInput,
   TouchableOpacity,
@@ -22,6 +21,7 @@ import { Avatar, IconButton, Text, Title } from '../../../src/system'
 import { theme } from '../../../src/theme'
 import { formatRelativeDate } from '../../../src/utils'
 import { client } from '../../../supabase'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 const LIMIT = 20
 

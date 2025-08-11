@@ -14,6 +14,7 @@ import { Podium, RankingItem, UserRanking } from '../../src/components'
 import { Button } from '../../src/system'
 import { theme } from '../../src/theme'
 import { client } from '../../supabase'
+import { mergeUnique } from '../../src/utils'
 
 const LIMIT = 30
 
@@ -53,7 +54,7 @@ const List = () => {
         if (error) {
           console.error(error)
         } else {
-          setUsers(reset ? data : [...users, ...data])
+          setUsers(reset ? data : mergeUnique(users, data, 'user_id'))
           setOffset(reset ? 0 : offset + LIMIT)
         }
       } catch (error) {

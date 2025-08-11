@@ -1,12 +1,13 @@
 import { CircleX } from 'lucide-react-native'
 import { useState } from 'react'
-import { KeyboardAvoidingView, Platform, SafeAreaView, StyleSheet, TextInput, View } from 'react-native'
+import { KeyboardAvoidingView, StyleSheet, TextInput, View } from 'react-native'
 
 import { router } from 'expo-router'
 
 import { useUserRegistration } from '../../../hooks'
 import { Button, H1, Text } from '../../../src/system'
 import { theme } from '../../../src/theme'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 // eslint-disable-next-line regexp/no-obscure-range, unicorn/better-regex
 const NAME_REGEX = /^[A-Za-zÀ-ÖØ-öø-ÿ'’ -]{2,50}$/
@@ -37,6 +38,7 @@ const Name = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView behavior='padding' style={styles.keyboardAvoidingContainer}>
       <H1 style={styles.title}>Comment t'appelles-tu ?</H1>
       <TextInput
         autoComplete="name"
@@ -55,7 +57,7 @@ const Name = () => {
           <Text color="danger">{error}</Text>
         </View>
       )}
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.buttonContainer}>
+      <View style={styles.buttonContainer}>
         <Button
           disabled={name.length < 3 || !!error}
           fullWidth
@@ -64,6 +66,7 @@ const Name = () => {
           style={{ marginBottom: theme.spacing['200'] }}
           title="Suivant"
         />
+        </ View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   )
@@ -78,6 +81,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     marginHorizontal: theme.spacing['400'],
+  },
+  keyboardAvoidingContainer: {
+    alignItems: 'center',
+    flex: 1,
+    width: '100%',
   },
   errorContainer: {
     alignItems: 'flex-start',

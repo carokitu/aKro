@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import { type DeezerTrack } from '../models'
+import { mergeUnique } from '../src/utils'
 import { useDebouncedValue } from './useDebouncedValue'
 
 type DeezerApiResponse = {
@@ -23,7 +24,7 @@ export const useDeezerSearch = (query: string) => {
       const data: DeezerApiResponse = await res.json()
 
       if (append) {
-        setTracks((prev) => [...prev, ...data.data])
+        setTracks((prev) => mergeUnique(prev, data.data))
       } else {
         setTracks(data.data)
       }

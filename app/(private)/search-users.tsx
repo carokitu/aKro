@@ -1,6 +1,6 @@
 import { Search, UserX } from 'lucide-react-native'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Keyboard, StyleSheet, TextInput, TouchableWithoutFeedback, View } from 'react-native'
+import { Keyboard, Platform, StyleSheet, TextInput, TouchableWithoutFeedback, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { debounce } from 'lodash'
@@ -150,6 +150,7 @@ const styles = StyleSheet.create({
     marginBottom: theme.spacing[600],
     marginTop: theme.spacing[200],
     paddingHorizontal: theme.padding[400],
-    paddingVertical: theme.padding[400],
+    alignItems: 'center',
+    paddingVertical: Platform.OS === 'ios' ? theme.padding[400] : theme.padding[200],
   },
 })

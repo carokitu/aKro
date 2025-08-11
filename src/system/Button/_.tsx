@@ -4,10 +4,10 @@ import {
   type ImageSourcePropType,
   Pressable,
   type PressableProps,
-  SafeAreaView,
   type StyleProp,
   StyleSheet,
   View,
+  SafeAreaView,
   type ViewStyle,
 } from 'react-native'
 

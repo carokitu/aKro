@@ -133,7 +133,7 @@ export const ShareModal = ({ onClose, track }: Props) => {
               ref={inputRef}
               returnKeyType="done"
               style={styles.input}
-              submitBehavior='blurAndSubmit'
+              submitBehavior="blurAndSubmit"
               value={description}
             />
             {error && (

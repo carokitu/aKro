@@ -1,11 +1,6 @@
 import { CircleX } from 'lucide-react-native'
 import React, { useEffect, useRef, useState } from 'react'
-import {
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  View,
-} from 'react-native'
+import { KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native'
 import PhoneInput from 'react-native-phone-number-input'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
@@ -40,14 +35,11 @@ const SignIn = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        behavior='padding'
-        style={styles.keyboardAvoidingContainer}
-      >
+      <KeyboardAvoidingView behavior="padding" style={styles.keyboardAvoidingContainer}>
         <H1 style={styles.title}>Quel est ton numéro de téléphone ?</H1>
         {/* @ts-expect-error as the phoneInput lib is in js */}
         <PhoneInput
-          {...Platform.OS === 'ios' && { autoFocus: true }}
+          {...(Platform.OS === 'ios' && { autoFocus: true })}
           containerStyle={styles.input}
           defaultCode="FR"
           defaultValue={value}

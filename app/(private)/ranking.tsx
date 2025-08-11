@@ -13,8 +13,8 @@ import { NavBar } from '../../src'
 import { Podium, RankingItem, UserRanking } from '../../src/components'
 import { Button } from '../../src/system'
 import { theme } from '../../src/theme'
-import { client } from '../../supabase'
 import { mergeUnique } from '../../src/utils'
+import { client } from '../../supabase'
 
 const LIMIT = 30
 

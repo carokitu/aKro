@@ -1,8 +1,4 @@
-export const mergeUnique = <T extends Record<string, any>>(
-  list: T[],
-  newList: T[],
-  key = 'id',
-): T[] => {
+export const mergeUnique = <T extends Record<string, unknown>>(list: T[], newList: T[], key = 'id'): T[] => {
   const existingIds = new Set(list.map((item) => item[key]))
   const merged = [...list]
 
@@ -11,6 +7,6 @@ export const mergeUnique = <T extends Record<string, any>>(
       merged.push(item)
     }
   })
-  
+
   return merged
 }

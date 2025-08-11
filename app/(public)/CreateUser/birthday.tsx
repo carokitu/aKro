@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { router } from 'expo-router'
 
-import { useUserRegistration } from '../../../hooks'
+import { useUser } from '../../../hooks'
 import { NavBar } from '../../../src'
 import { Button, H1, Text } from '../../../src/system'
 import { theme } from '../../../src/theme'
@@ -22,7 +22,7 @@ const validateAge = (date: Date) => {
 }
 
 const Birthday = () => {
-  const { updateUserData } = useUserRegistration()
+  const { updateUserData } = useUser()
 
   const defaultDate = useMemo(() => {
     const d = new Date()

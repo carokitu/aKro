@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { router } from 'expo-router'
 
-import { useFeed, useUser } from '../../hooks'
+import { useFeed, useUserPrivate } from '../../hooks'
 import { type Post as TPost, type User } from '../../models'
 import { Drawer } from '../../src'
 import { PostsList, TopRanking } from '../../src/components'
@@ -52,7 +52,7 @@ const FooterComponent = () => (
 )
 
 const Feed = () => {
-  const { user } = useUser()
+  const user = useUserPrivate()
   const { newPostKey } = useFeed()
   const [minimizeDrawer, setMinimizeDrawer] = useState(false)
   const [showDrawer, setShowDrawer] = useState(true)
@@ -61,10 +61,6 @@ const Feed = () => {
 
   const fetchPosts = useCallback(
     async ({ limit, offset }: { limit: number; offset: number }): Promise<{ data: TPost[]; error: Error | null }> => {
-      if (!user) {
-        return { data: [], error: new Error('User not found') }
-      }
-
       const { data, error } = await client.rpc('get_user_feed', {
         p_limit: limit,
         p_offset: offset,
@@ -95,10 +91,6 @@ const Feed = () => {
       }, 3000)
     }
   }, [newPostFromUser])
-
-  if (!user) {
-    return null
-  }
 
   const onReset = () => {
     setNewPostFromUser(false)

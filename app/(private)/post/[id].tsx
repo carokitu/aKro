@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { FlashList } from '@shopify/flash-list'
 import { router, useLocalSearchParams } from 'expo-router'
 
-import { useFeed, useUser } from '../../../hooks'
+import { useFeed, useUserPrivate } from '../../../hooks'
 import { type Comment as TComment } from '../../../models'
 import { NavBar } from '../../../src'
 import { Avatar, IconButton, Text, Title } from '../../../src/system'
@@ -44,14 +44,10 @@ const NewComment = ({
   postId: string
   setComments: React.Dispatch<React.SetStateAction<TComment[]>>
 }) => {
-  const { user } = useUser()
+  const user = useUserPrivate()
   const { updateCommentCount } = useFeed()
   const [loading, setLoading] = useState(false)
   const [text, setText] = useState('')
-
-  if (!user) {
-    return null
-  }
 
   const handleSend = async () => {
     setLoading(true)
@@ -178,7 +174,7 @@ const Comment = ({ comment, currentUserId, postId }: { comment: TComment; curren
 
 const ExpendedComments = () => {
   const { id: postID } = useLocalSearchParams<{ id: string }>()
-  const { user } = useUser()
+  const user = useUserPrivate()
 
   const [comments, setComments] = useState<TComment[]>([])
   const [loading, setLoading] = useState(false)
@@ -186,19 +182,11 @@ const ExpendedComments = () => {
 
   const listRef = useRef<FlashList<TComment> | null>(null)
 
-  if (!user || !postID) {
+  if (!postID) {
     router.back()
   }
 
-  if (!user) {
-    return null
-  }
-
   const fetchComments = async () => {
-    if (!user) {
-      return { error: new Error('Current user not found') }
-    }
-
     setLoading(true)
 
     const { data, error: fetchError } = await client.rpc('get_comments_for_post', {

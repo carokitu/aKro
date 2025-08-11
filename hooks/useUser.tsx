@@ -1,116 +1,79 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useReducer } from 'react'
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react'
 
-import { type User as AuthUser } from '@supabase/supabase-js'
-
-import { isEqual } from 'lodash'
-
-import { type User } from '../models'
+import { type PrivateUser, type User } from '../models'
 import { client } from '../supabase'
 
-type LoginInput = {
-  email: string
-  password: string
-}
-
-type State = {
-  error: null | string
-  isLoggedIn: boolean
-  loading: boolean
-  user: null | User
-}
-
-type Action =
-  | { payload: boolean; type: 'SET_LOADING' }
-  | { payload: null | string; type: 'SET_ERROR' }
-  | { payload: null | User; type: 'SET_USER' }
-  | { type: 'CLEAR_USER' }
+type UserData = Pick<User, 'avatar_url' | 'bio' | 'birthday' | 'name' | 'username'>
 
 type UserContextType = {
+  createUser: (overrideData?: Partial<UserData>) => Promise<void>
   error: null | string
   isLoggedIn: boolean
   loading: boolean
-  login: (input: LoginInput) => Promise<void>
   logout: () => Promise<void>
-  refetchUser: () => Promise<void>
-  updateUser: (fields: Partial<User>) => Promise<void>
+  updateUserData: (data: Partial<UserData>) => void
   user: null | User
+  userData: UserData
+}
+
+const initialUserRegistrationData: UserData = {
+  avatar_url: null,
+  bio: null,
+  birthday: null,
+  name: '',
+  username: '',
 }
 
 const UserContext = createContext<undefined | UserContextType>(undefined)
 
-const initialState: State = {
-  error: null,
-  isLoggedIn: false,
-  loading: true,
-  user: null,
-}
-
-const reducer = (state: State, action: Action): State => {
-  switch (action.type) {
-    case 'CLEAR_USER':
-      return { ...state, error: null, isLoggedIn: false, user: null }
-    case 'SET_ERROR':
-      return { ...state, error: action.payload }
-    case 'SET_LOADING':
-      return { ...state, loading: action.payload }
-    case 'SET_USER':
-      return { ...state, error: null, isLoggedIn: true, user: action.payload }
-    default:
-      return state
-  }
-}
-
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-  const [state, dispatch] = useReducer(reducer, initialState)
+  const [user, setUser] = useState<null | User>(null)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<null | string>(null)
+  const [userRegistrationData, setUserRegistrationData] = useState<UserData>(initialUserRegistrationData)
 
-  const checkIfUserExists = useCallback(
-    async (authUser: AuthUser) => {
-      try {
-        const { data, error } = await client.from('users').select('*').eq('id', authUser.id).single<User>()
+  const fetchUserFromSession = useCallback(async () => {
+    setError(null)
 
-        if (error) {
-          // le user n'a pas encore été créé
-          if (error.code === 'PGRST116') {
-            dispatch({ payload: null, type: 'SET_USER' })
-          } else {
-            throw new Error(error.message)
-          }
-        }
+    const {
+      data: { session },
+      error: sessionError,
+    } = await client.auth.getSession()
 
-        const payload = isEqual(state.user, data) ? state.user : data
-        dispatch({ payload, type: 'SET_USER' })
-      } catch (err) {
-        dispatch({ payload: err instanceof Error ? err.message : 'Erreur utilisateur', type: 'SET_ERROR' })
-        dispatch({ type: 'CLEAR_USER' })
-      }
-    },
-    [state.user],
-  )
-
-  const init = useCallback(async () => {
-    dispatch({ payload: true, type: 'SET_LOADING' })
-
-    try {
-      const {
-        data: { session },
-      } = await client.auth.getSession()
-
-      if (session?.user) {
-        await checkIfUserExists(session.user)
-      } else {
-        dispatch({ type: 'CLEAR_USER' })
-      }
-    } catch {
-      dispatch({ payload: 'Erreur de session', type: 'SET_ERROR' })
-    } finally {
-      dispatch({ payload: false, type: 'SET_LOADING' })
+    if (sessionError || !session?.user) {
+      setUser(null)
+      setIsLoggedIn(false)
+      setLoading(false)
+      return
+    } else {
+      setIsLoggedIn(true)
     }
-  }, [checkIfUserExists])
+
+    const { data: dbUser, error: userError } = await client
+      .from('users')
+      .select('*')
+      .eq('id', session.user.id)
+      .single<User>()
+
+    if (userError) {
+      if (userError.code === 'PGRST116') {
+        setUser(null)
+      } else {
+        setError(userError.message)
+        setUser(null)
+      }
+    } else {
+      setUser(dbUser)
+    }
+
+    setLoading(false)
+  }, [])
 
   useEffect(() => {
     let isMounted = true
 
-    init()
+    fetchUserFromSession()
 
     const { data: listener } = client.auth.onAuthStateChange(async (_event, session) => {
       if (!isMounted) {
@@ -118,9 +81,25 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       if (session?.user) {
-        await checkIfUserExists(session.user)
+        setIsLoggedIn(true)
+
+        const { data: dbUser, error: userError } = await client
+          .from('users')
+          .select('*')
+          .eq('id', session.user.id)
+          .single<User>()
+
+        if (userError) {
+          setUser(null)
+          setError(userError.message)
+        } else {
+          setUser(dbUser)
+          setError(null)
+        }
       } else {
-        dispatch({ type: 'CLEAR_USER' })
+        setUser(null)
+        setError(null)
+        setIsLoggedIn(false)
       }
     })
 
@@ -128,83 +107,74 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
       isMounted = false
       listener?.subscription.unsubscribe()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const login = useCallback(
-    async (input: LoginInput) => {
-      dispatch({ payload: true, type: 'SET_LOADING' })
-      try {
-        const { error } = await client.auth.signInWithPassword(input)
-        if (error) {
-          throw new Error(error.message)
-        }
-
-        await init()
-      } catch (err) {
-        dispatch({ payload: err instanceof Error ? err.message : 'Erreur connexion', type: 'SET_ERROR' })
-      } finally {
-        dispatch({ payload: false, type: 'SET_LOADING' })
-      }
-    },
-    [init],
-  )
+  }, [fetchUserFromSession])
 
   const logout = useCallback(async () => {
-    dispatch({ payload: true, type: 'SET_LOADING' })
-
+    setError(null)
+    setLoading(true)
     try {
       await client.auth.signOut()
-      dispatch({ type: 'CLEAR_USER' })
-    } catch {
-      dispatch({ payload: 'Erreur de déconnexion', type: 'SET_ERROR' })
+      setUser(null)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erreur de déconnexion')
     } finally {
-      dispatch({ payload: false, type: 'SET_LOADING' })
+      setLoading(false)
     }
   }, [])
 
-  const refetchUser = useCallback(async () => {
-    await init()
-  }, [init])
+  const updateUserData = useCallback((data: Partial<UserData>) => {
+    setUserRegistrationData((prev) => ({ ...prev, ...data }))
+  }, [])
 
-  const updateUser = useCallback(
-    async (fields: Partial<User>) => {
-      if (!state.user) {
-        return
+  const createUser = useCallback(
+    async (overrideData?: Partial<UserData>) => {
+      setError(null)
+      setLoading(true)
+      try {
+        const {
+          data: { session },
+        } = await client.auth.getSession()
+
+        if (!session?.user) {
+          throw new Error('No authenticated user')
+        }
+
+        const input: Omit<PrivateUser, 'created_at'> = {
+          ...userRegistrationData,
+          ...overrideData,
+          email: session.user.email,
+          id: session.user.id,
+          phone: session.user.phone,
+        }
+
+        const { data: insertedUser, error: err } = await client.from('users').insert(input).select().single<User>()
+
+        if (err) {
+          throw err
+        }
+
+        setUser(insertedUser)
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Erreur inconnue')
+        throw err
+      } finally {
+        setLoading(false)
       }
-
-      const { data, error } = await client.from('users').update(fields).eq('id', state.user.id).select().single()
-
-      if (error) {
-        dispatch({ payload: error.message, type: 'SET_ERROR' })
-        throw new Error(error.message)
-      }
-
-      dispatch({ payload: data, type: 'SET_USER' })
     },
-    [state.user],
+    [userRegistrationData],
   )
 
-  const value = useMemo(
-    () => ({
-      error: state.error,
-      isLoggedIn: state.isLoggedIn,
-      loading: state.loading,
-      login,
-      logout,
-      refetchUser,
-      updateUser,
-      user: state.user,
-    }),
-    [login, logout, refetchUser, state, updateUser],
+  return (
+    <UserContext.Provider
+      value={{ createUser, error, isLoggedIn, loading, logout, updateUserData, user, userData: userRegistrationData }}
+    >
+      {children}
+    </UserContext.Provider>
   )
-
-  return <UserContext.Provider value={value}>{children}</UserContext.Provider>
 }
 
-export const useUser = () => {
+export const useUser = (): UserContextType => {
   const context = useContext(UserContext)
-
   if (!context) {
     throw new Error('useUser must be used within a UserProvider')
   }

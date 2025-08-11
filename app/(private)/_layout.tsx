@@ -1,21 +1,21 @@
+import { useEffect } from 'react'
 import { StatusBar } from 'react-native'
 
-import { Redirect, Stack } from 'expo-router'
+import { Audio } from 'expo-av'
+import { Stack } from 'expo-router'
 
-import { FeedProvider, MuteProvider, useUser } from '../../hooks'
-import { SplashScreen } from '../../src'
+import { FeedProvider, MuteProvider } from '../../hooks'
 import { theme } from '../../src/theme'
 
 export const PrivateLayout = () => {
-  const { loading: userLoading, user } = useUser()
-
-  if (userLoading) {
-    return <SplashScreen />
-  }
-
-  if (!user) {
-    return <Redirect href="/(public)" />
-  }
+  useEffect(() => {
+    Audio.setAudioModeAsync({
+      allowsRecordingIOS: false,
+      playsInSilentModeIOS: true,
+      playThroughEarpieceAndroid: false,
+      shouldDuckAndroid: true,
+    })
+  }, [])
 
   return (
     <FeedProvider>

@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { router, useLocalSearchParams } from 'expo-router'
 
-import { useUser } from '../../../hooks'
+import { useUser, useUserPrivate } from '../../../hooks'
 import { type Post, type User } from '../../../models'
 import { PostsList } from '../../../src'
 import { FollowButton, NavBar, UserRanking } from '../../../src/components'
@@ -184,16 +184,12 @@ const FooterComponent = () => <View style={styles.footer} />
 
 const UserProfile = () => {
   const { username } = useLocalSearchParams()
-  const { user: currentUser } = useUser()
+  const currentUser = useUserPrivate()
   const [user, setUser] = useState<EnhancedUser | null>(null)
   const isCurrentUserProfile = username === currentUser?.username
 
   useEffect(() => {
     const fetchProfile = async () => {
-      if (!currentUser) {
-        return
-      }
-
       const { data } = await client.rpc('get_user_profile', {
         p_username: username,
         p_viewer_id: currentUser.id,
@@ -225,7 +221,7 @@ const UserProfile = () => {
     [user, username],
   )
 
-  if (!user || !currentUser) {
+  if (!user) {
     return <ErrorScreen />
   }
 

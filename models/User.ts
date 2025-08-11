@@ -1,4 +1,4 @@
-type PrivateUser = {
+export type PrivateUser = {
   avatar_url?: null | string
   bio?: null | string
   birthday?: Date | null

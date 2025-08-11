@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 import Constants from 'expo-constants'
 
-import { useUser } from '../../../../hooks'
+import { useUserPrivate } from '../../../../hooks'
 import { NavBar } from '../../../../src'
 import { Button, Input } from '../../../../src/system'
 import { theme } from '../../../../src/theme'
@@ -12,13 +12,9 @@ import { client } from '../../../../supabase'
 
 const SignalIssue = () => {
   const [issue, setIssue] = useState('')
-  const { user } = useUser()
+  const user = useUserPrivate()
 
   const reportBug = async () => {
-    if (!user) {
-      return null
-    }
-
     const deviceInfo = {
       appVersion: Constants.manifest?.version,
       os: Platform.OS,

@@ -39,7 +39,9 @@ export const Input = ({
         onChangeText={handleBioChange}
         placeholder={placeholder}
         placeholderTextColor={theme.text.disabled}
+        returnKeyType="done"
         style={styles.input}
+        submitBehavior="blurAndSubmit"
         value={value}
       />
     </View>

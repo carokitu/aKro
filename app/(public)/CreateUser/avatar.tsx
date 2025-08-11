@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 import type * as ImagePicker from 'expo-image-picker'
 
-import { useUserRegistration } from '../../../hooks'
+import { useUser } from '../../../hooks'
 import { NavBar } from '../../../src'
 import { EditAvatar } from '../../../src/components/ActionButtons'
 import { Button, H1, Input, MAX_INPUT_LENGTH, Text } from '../../../src/system'
@@ -20,7 +20,7 @@ const Avatar = () => {
   const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null)
   const [uploading, setUploading] = useState(false)
 
-  const { createUser, userData } = useUserRegistration()
+  const { createUser, userData } = useUser()
 
   const handleNext = async () => {
     const avatarUrl = image && (await saveImage(image, userData.username))

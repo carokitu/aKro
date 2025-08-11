@@ -4,7 +4,7 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
 
-import { usePost, useUser } from '../../../../hooks'
+import { usePost, useUserPrivate } from '../../../../hooks'
 import { type UserWithStats } from '../../../../models/custom'
 import { client } from '../../../../supabase'
 import { Title } from '../../../system'
@@ -13,20 +13,16 @@ import { UserList } from '../../Lists/Users'
 
 export const ExpendedLikes = () => {
   const { expendedLikesPostId, setExpendedLikesPostId } = usePost()
-  const { user } = useUser()
+  const user = useUserPrivate()
   const [users, setUsers] = useState<UserWithStats[]>([])
   const [loading, setLoading] = useState(false)
   const bottomSheetRef = useRef<BottomSheet>(null)
 
-  if (!expendedLikesPostId || !user) {
+  if (!expendedLikesPostId) {
     return null
   }
 
   const fetch = async ({ limit, offset }: { limit: number; offset: number }) => {
-    if (!user) {
-      return { error: new Error('Current user not found') }
-    }
-
     setLoading(true)
 
     const { data, error: fetchError } = await client.rpc('get_post_likers_with_stats', {

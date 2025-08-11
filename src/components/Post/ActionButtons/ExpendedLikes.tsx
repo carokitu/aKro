@@ -4,7 +4,7 @@ import { StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
 
-import { usePost, useUserPrivate } from '../../../../hooks'
+import { usePost, useUser } from '../../../../hooks'
 import { type UserWithStats } from '../../../../models/custom'
 import { client } from '../../../../supabase'
 import { Title } from '../../../system'
@@ -13,7 +13,7 @@ import { UserList } from '../../Lists/Users'
 
 export const ExpendedLikes = () => {
   const { expendedLikesPostId, setExpendedLikesPostId } = usePost()
-  const user = useUserPrivate()
+  const user = useUser()
   const [users, setUsers] = useState<UserWithStats[]>([])
   const [loading, setLoading] = useState(false)
   const bottomSheetRef = useRef<BottomSheet>(null)

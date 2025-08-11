@@ -3,11 +3,11 @@ import { View } from 'react-native'
 
 import { router, Stack } from 'expo-router'
 
-import { useUser } from '../../hooks'
+import { useAuth } from '../../hooks'
 import { theme } from '../../src/theme'
 
 export const PublicLayout = () => {
-  const { isLoggedIn, loading, user } = useUser()
+  const { isLoggedIn, loading, user } = useAuth()
 
   const shouldCreateUser = useMemo(() => isLoggedIn && !user, [isLoggedIn, user])
   const shouldRedirect = useMemo(() => isLoggedIn && user, [isLoggedIn, user])

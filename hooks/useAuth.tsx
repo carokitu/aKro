@@ -5,7 +5,7 @@ import { client } from '../supabase'
 
 type UserData = Pick<User, 'avatar_url' | 'bio' | 'birthday' | 'name' | 'username'>
 
-type UserContextType = {
+type AuthContextType = {
   createUser: (overrideData?: Partial<UserData>) => Promise<void>
   error: null | string
   isLoggedIn: boolean
@@ -24,9 +24,9 @@ const initialUserRegistrationData: UserData = {
   username: '',
 }
 
-const UserContext = createContext<undefined | UserContextType>(undefined)
+const UserContext = createContext<AuthContextType | undefined>(undefined)
 
-export const UserProvider = ({ children }: { children: React.ReactNode }) => {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<null | User>(null)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -176,7 +176,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   )
 }
 
-export const useUser = (): UserContextType => {
+export const useAuth = (): AuthContextType => {
   const context = useContext(UserContext)
   if (!context) {
     throw new Error('useUser must be used within a UserProvider')

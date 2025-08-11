@@ -5,12 +5,12 @@ import { Outfit_400Regular, Outfit_600SemiBold } from '@expo-google-fonts/outfit
 import { useFonts } from 'expo-font'
 import { Stack } from 'expo-router'
 
-import { UserProvider, useUser } from '../hooks'
+import { AuthProvider, useAuth } from '../hooks'
 import { SplashScreen } from '../src/components'
 import { theme } from '../src/theme'
 
 const Layout = () => {
-  const { loading: userLoading, user } = useUser()
+  const { loading: userLoading, user } = useAuth()
 
   if (userLoading) {
     return <SplashScreen />
@@ -58,11 +58,11 @@ export const RootLayout = () => {
   }
 
   return (
-    <UserProvider>
+    <AuthProvider>
       <ActionSheetProvider>
         <Layout />
       </ActionSheetProvider>
-    </UserProvider>
+    </AuthProvider>
   )
 }
 

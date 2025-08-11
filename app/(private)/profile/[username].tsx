@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { router, useLocalSearchParams } from 'expo-router'
 
-import { useUser, useUserPrivate } from '../../../hooks'
+import { useAuth, useUser } from '../../../hooks'
 import { type Post, type User } from '../../../models'
 import { PostsList } from '../../../src'
 import { FollowButton, NavBar, UserRanking } from '../../../src/components'
@@ -125,7 +125,7 @@ const UserInfos = ({
   isCurrentUserProfile: boolean
   user: EnhancedUser
 }) => {
-  const { user: currentUser } = useUser()
+  const { user: currentUser } = useAuth()
   const [user, setUser] = useState<EnhancedUser>(userFromProps)
 
   const onFollow = () => {
@@ -184,7 +184,7 @@ const FooterComponent = () => <View style={styles.footer} />
 
 const UserProfile = () => {
   const { username } = useLocalSearchParams()
-  const currentUser = useUserPrivate()
+  const currentUser = useUser()
   const [user, setUser] = useState<EnhancedUser | null>(null)
   const isCurrentUserProfile = username === currentUser?.username
 

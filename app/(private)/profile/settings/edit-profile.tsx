@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { type ImagePickerAsset } from 'expo-image-picker'
 import { useNavigation } from 'expo-router'
 
-import { useUser, useUserPrivate } from '../../../../hooks'
+import { useAuth, useUser } from '../../../../hooks'
 import { NavBar } from '../../../../src'
 import { EditAvatar } from '../../../../src/components/ActionButtons'
 import { Button, Input } from '../../../../src/system'
@@ -13,8 +13,8 @@ import { theme } from '../../../../src/theme'
 import { saveImage } from '../../../../src/utils/image'
 
 const EditProfile = () => {
-  const { updateUserData } = useUser()
-  const user = useUserPrivate()
+  const { updateUserData } = useAuth()
+  const user = useUser()
   const [newAvatarImage, setNewAvatarImage] = useState<ImagePickerAsset | null>(null)
   const [bio, setBio] = useState<string>('')
   const [uploading, setUploading] = useState(false)

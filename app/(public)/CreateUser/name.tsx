@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { router } from 'expo-router'
 
-import { useUser } from '../../../hooks'
+import { useAuth } from '../../../hooks'
 import { Button, H1, Text } from '../../../src/system'
 import { theme } from '../../../src/theme'
 
@@ -17,7 +17,7 @@ const validateNameFormat = (value: string) => NAME_REGEX.test(value)
 const Name = () => {
   const [name, setName] = useState('')
   const [error, setError] = useState<null | string>(null)
-  const { updateUserData } = useUser()
+  const { updateUserData } = useAuth()
 
   const handleNext = () => {
     if (validateNameFormat(name)) {

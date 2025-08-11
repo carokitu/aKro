@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { useLocalSearchParams } from 'expo-router'
 
-import { useUser } from '../../../../hooks'
+import { useAuth } from '../../../../hooks'
 import { type UserWithStats } from '../../../../models/custom'
 import { NavBar } from '../../../../src/components'
 import { UserList } from '../../../../src/components/Lists'
@@ -14,7 +14,7 @@ import { client } from '../../../../supabase'
 
 const Followers = () => {
   const { username } = useLocalSearchParams()
-  const { user: currentUser } = useUser()
+  const { user: currentUser } = useAuth()
   const [nbFollowers, setNbFollowers] = useState(0)
   const [error, setError] = useState<Error | null>(null)
   const [followers, setFollowers] = useState<UserWithStats[]>([])

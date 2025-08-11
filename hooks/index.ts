@@ -1,6 +1,6 @@
 export * from './feed'
 export { PostProvider, usePost } from './post'
+export { AuthProvider, useAuth } from './useAuth'
 export { useDebouncedValue } from './useDebouncedValue'
 export { useDoubleTap } from './useDoubleTap'
-export { UserProvider, useUser } from './useUser'
-export { useUserPrivate } from './useUserPrivate'
+export { useUser } from './useUser'

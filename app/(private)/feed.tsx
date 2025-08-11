@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { router } from 'expo-router'
 
-import { useFeed, useUserPrivate } from '../../hooks'
+import { useFeed, useUser } from '../../hooks'
 import { type Post as TPost, type User } from '../../models'
 import { Drawer } from '../../src'
 import { PostsList, TopRanking } from '../../src/components'
@@ -52,7 +52,7 @@ const FooterComponent = () => (
 )
 
 const Feed = () => {
-  const user = useUserPrivate()
+  const user = useUser()
   const { newPostKey } = useFeed()
   const [minimizeDrawer, setMinimizeDrawer] = useState(false)
   const [showDrawer, setShowDrawer] = useState(true)

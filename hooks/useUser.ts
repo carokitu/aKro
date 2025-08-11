@@ -1,7 +1,7 @@
-import { useUser } from './useUser'
+import { useAuth } from './useAuth'
 
-export const useUserPrivate = () => {
-  const { user } = useUser()
+export const useUser = () => {
+  const { user } = useAuth()
 
   if (!user) {
     throw new Error('useRequiredUser must be used in private routes')

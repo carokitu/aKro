@@ -12,7 +12,7 @@ import {
   View,
 } from 'react-native'
 
-import { useFeed, useMute, useUserPrivate } from '../../../hooks'
+import { useFeed, useMute, useUser } from '../../../hooks'
 import { useFetchOrSaveDeezerTrack } from '../../../hooks/useDeezerTrack'
 import { type DeezerTrack } from '../../../models'
 import { client } from '../../../supabase'
@@ -26,7 +26,7 @@ type Props = {
 }
 
 export const ShareModal = ({ onClose, track }: Props) => {
-  const user = useUserPrivate()
+  const user = useUser()
   const { notifyNewPost } = useFeed()
   const { setTemporaryMute } = useMute()
   const [description, setDescription] = useState<string | undefined>(undefined)

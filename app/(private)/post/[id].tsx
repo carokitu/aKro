@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { FlashList } from '@shopify/flash-list'
 import { router, useLocalSearchParams } from 'expo-router'
 
-import { useFeed, useUserPrivate } from '../../../hooks'
+import { useFeed, useUser } from '../../../hooks'
 import { type Comment as TComment } from '../../../models'
 import { NavBar } from '../../../src'
 import { Avatar, IconButton, Text, Title } from '../../../src/system'
@@ -44,7 +44,7 @@ const NewComment = ({
   postId: string
   setComments: React.Dispatch<React.SetStateAction<TComment[]>>
 }) => {
-  const user = useUserPrivate()
+  const user = useUser()
   const { updateCommentCount } = useFeed()
   const [loading, setLoading] = useState(false)
   const [text, setText] = useState('')
@@ -174,7 +174,7 @@ const Comment = ({ comment, currentUserId, postId }: { comment: TComment; curren
 
 const ExpendedComments = () => {
   const { id: postID } = useLocalSearchParams<{ id: string }>()
-  const user = useUserPrivate()
+  const user = useUser()
 
   const [comments, setComments] = useState<TComment[]>([])
   const [loading, setLoading] = useState(false)

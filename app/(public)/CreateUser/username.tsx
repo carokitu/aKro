@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { router } from 'expo-router'
 
-import { useUser } from '../../../hooks'
+import { useAuth } from '../../../hooks'
 import { NavBar } from '../../../src'
 import { Button, H1, Text } from '../../../src/system'
 import { theme } from '../../../src/theme'
@@ -31,7 +31,7 @@ const UserName = () => {
   const [error, setError] = useState<null | string>(null)
   const [checking, setChecking] = useState(false)
 
-  const { updateUserData } = useUser()
+  const { updateUserData } = useAuth()
 
   useEffect(() => {
     if (username.trim().length === 0) {

@@ -7,7 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { FlashList } from '@shopify/flash-list'
 import { LinearGradient } from 'expo-linear-gradient'
 
-import { useUserPrivate } from '../../hooks'
+import { useUser } from '../../hooks'
 import { type Rank } from '../../models'
 import { NavBar } from '../../src'
 import { Podium, RankingItem, UserRanking } from '../../src/components'
@@ -19,7 +19,7 @@ import { client } from '../../supabase'
 const LIMIT = 30
 
 const List = () => {
-  const user = useUserPrivate()
+  const user = useUser()
   const [users, setUsers] = useState<Rank[]>([])
   const [offset, setOffset] = useState(0)
   const [period, setPeriod] = useState<'all' | 'week'>('week')

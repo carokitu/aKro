@@ -1,10 +1,10 @@
 import { Redirect, Stack } from 'expo-router'
 
-import { useUser } from '../../../hooks'
+import { useAuth } from '../../../hooks'
 import { theme } from '../../../src/theme'
 
 export const PrivateLayout = () => {
-  const { user } = useUser()
+  const { user } = useAuth()
 
   if (!user) {
     return <Redirect href="/(public)" />

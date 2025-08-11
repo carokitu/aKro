@@ -73,10 +73,13 @@ const Password = () => {
               {...(Platform.OS === 'ios' && { autoFocus: true })}
               maxLength={30}
               onChangeText={setPassword}
+              onSubmitEditing={handleNext}
               placeholder="Motdepasse123"
               placeholderTextColor={theme.text.disabled}
+              returnKeyType="done"
               secureTextEntry={!showPassword}
               style={styles.input}
+              submitBehavior="blurAndSubmit"
               value={password}
             />
             {Platform.OS === 'ios' && (

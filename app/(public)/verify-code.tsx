@@ -92,7 +92,10 @@ const VerifyCode = () => {
             keyboardType="number-pad"
             maxLength={6}
             onChangeText={setCode}
+            onSubmitEditing={handleVerify}
+            returnKeyType="done"
             style={styles.input}
+            submitBehavior="blurAndSubmit"
             value={code}
           />
           {error && (

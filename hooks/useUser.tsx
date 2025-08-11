@@ -29,12 +29,13 @@ const UserContext = createContext<undefined | UserContextType>(undefined)
 export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<null | User>(null)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<null | string>(null)
   const [userRegistrationData, setUserRegistrationData] = useState<UserData>(initialUserRegistrationData)
 
   const fetchUserFromSession = useCallback(async () => {
     setError(null)
+    setLoading(true)
 
     const {
       data: { session },
@@ -112,6 +113,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
   const logout = useCallback(async () => {
     setError(null)
     setLoading(true)
+
     try {
       await client.auth.signOut()
       setUser(null)
@@ -130,6 +132,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
     async (overrideData?: Partial<UserData>) => {
       setError(null)
       setLoading(true)
+
       try {
         const {
           data: { session },

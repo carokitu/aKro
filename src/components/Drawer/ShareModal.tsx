@@ -123,17 +123,17 @@ export const ShareModal = ({ onClose, track }: Props) => {
               Ajouter une légende
             </Label>
             <TextInput
+              editable={!isSharing}
               maxLength={500}
               multiline
               numberOfLines={5}
-              submitBehavior='blurAndSubmit'
-              returnKeyType="done"
               onChangeText={setDescription}
               placeholder="Pourquoi ce son vous fait vibrer ?"
               placeholderTextColor={theme.text.disabled}
               ref={inputRef}
+              returnKeyType="done"
               style={styles.input}
-              editable={!isSharing}
+              submitBehavior='blurAndSubmit'
               value={description}
             />
             {error && (

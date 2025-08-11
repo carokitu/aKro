@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: theme.radius.medium,
   },
   userRanking: {
-    padding: theme.spacing[400],
+    margin: theme.spacing[400],
   },
 })
 

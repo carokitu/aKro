@@ -5,15 +5,16 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { type ImagePickerAsset } from 'expo-image-picker'
 import { useNavigation } from 'expo-router'
 
-import { useUser } from '../../../../hooks'
+import { useAuth, useUser } from '../../../../hooks'
 import { NavBar } from '../../../../src'
 import { EditAvatar } from '../../../../src/components/ActionButtons'
-import { Button, Error, Input } from '../../../../src/system'
+import { Button, Input } from '../../../../src/system'
 import { theme } from '../../../../src/theme'
 import { saveImage } from '../../../../src/utils/image'
 
 const EditProfile = () => {
-  const { updateUser, user } = useUser()
+  const { updateUserData } = useAuth()
+  const user = useUser()
   const [newAvatarImage, setNewAvatarImage] = useState<ImagePickerAsset | null>(null)
   const [bio, setBio] = useState<string>('')
   const [uploading, setUploading] = useState(false)
@@ -28,10 +29,6 @@ const EditProfile = () => {
   }, [])
 
   const handleSave = useCallback(async () => {
-    if (!user) {
-      return
-    }
-
     const avatarUrl = newAvatarImage && (await saveImage(newAvatarImage, user.username))
 
     const updatePayload = {
@@ -39,21 +36,12 @@ const EditProfile = () => {
       ...(bio && { bio }),
     }
 
-    await updateUser(updatePayload)
+    await updateUserData(updatePayload)
     navigation.reset({
       index: 0,
       routes: [{ name: '[username]' as never, params: { username: user.username } }],
     })
-  }, [bio, navigation, newAvatarImage, updateUser, user])
-
-  if (!user) {
-    return (
-      <SafeAreaView style={styles.errorContainer}>
-        <NavBar title="Modifier mon profil" />
-        <Error />
-      </SafeAreaView>
-    )
-  }
+  }, [bio, navigation, newAvatarImage, updateUserData, user])
 
   return (
     <SafeAreaView style={styles.area}>
@@ -94,9 +82,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'space-between',
     width: '100%',
-  },
-  errorContainer: {
-    flex: 1,
   },
   formContainer: {
     marginHorizontal: theme.spacing[400],

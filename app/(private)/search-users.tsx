@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { debounce } from 'lodash'
 
-import { useUser } from '../../hooks'
+import { useAuth } from '../../hooks'
 import { type UserWithStats } from '../../models/custom'
 import { NavBar } from '../../src/components'
 import { UserList } from '../../src/components/Lists'
@@ -26,7 +26,7 @@ const EmptyList = () => (
 )
 
 const Users = ({ query }: UserListProps) => {
-  const { user: currentUser } = useUser()
+  const { user: currentUser } = useAuth()
   const [users, setUsers] = useState<UserWithStats[]>([])
   const [loading, setLoading] = useState(false)
 

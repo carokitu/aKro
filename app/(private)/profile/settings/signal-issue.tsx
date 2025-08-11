@@ -12,13 +12,9 @@ import { client } from '../../../../supabase'
 
 const SignalIssue = () => {
   const [issue, setIssue] = useState('')
-  const { user } = useUser()
+  const user = useUser()
 
   const reportBug = async () => {
-    if (!user) {
-      return null
-    }
-
     const deviceInfo = {
       appVersion: Constants.manifest?.version,
       os: Platform.OS,

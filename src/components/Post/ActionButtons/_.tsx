@@ -35,10 +35,6 @@ export const ActionButtons = memo(({ isLikedByCurrentUser, item, likesCount, onL
     }
   }, [commentUpdates, item.id])
 
-  if (!user) {
-    return null
-  }
-
   return (
     <View style={styles.actions}>
       <View style={styles.composed}>

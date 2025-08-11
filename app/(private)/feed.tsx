@@ -52,7 +52,7 @@ const FooterComponent = () => (
 )
 
 const Feed = () => {
-  const { user } = useUser()
+  const user = useUser()
   const { newPostKey } = useFeed()
   const [minimizeDrawer, setMinimizeDrawer] = useState(false)
   const [showDrawer, setShowDrawer] = useState(true)
@@ -61,10 +61,6 @@ const Feed = () => {
 
   const fetchPosts = useCallback(
     async ({ limit, offset }: { limit: number; offset: number }): Promise<{ data: TPost[]; error: Error | null }> => {
-      if (!user) {
-        return { data: [], error: new Error('User not found') }
-      }
-
       const { data, error } = await client.rpc('get_user_feed', {
         p_limit: limit,
         p_offset: offset,
@@ -95,10 +91,6 @@ const Feed = () => {
       }, 3000)
     }
   }, [newPostFromUser])
-
-  if (!user) {
-    return null
-  }
 
   const onReset = () => {
     setNewPostFromUser(false)

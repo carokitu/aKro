@@ -19,7 +19,7 @@ import { client } from '../../supabase'
 const LIMIT = 30
 
 const List = () => {
-  const { user } = useUser()
+  const user = useUser()
   const [users, setUsers] = useState<Rank[]>([])
   const [offset, setOffset] = useState(0)
   const [period, setPeriod] = useState<'all' | 'week'>('week')
@@ -68,10 +68,6 @@ const List = () => {
     fetchUsers(true)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [period])
-
-  if (!user) {
-    return null
-  }
 
   return (
     <FlashList

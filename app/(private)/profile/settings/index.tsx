@@ -6,10 +6,10 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { router } from 'expo-router'
 
-import { useUser } from '../../../../hooks'
+import { useAuth, useUser } from '../../../../hooks'
 import { type User } from '../../../../models'
 import { NavBar } from '../../../../src'
-import { Avatar, Error, Text, Title } from '../../../../src/system'
+import { Avatar, Text, Title } from '../../../../src/system'
 import { theme } from '../../../../src/theme'
 
 const UserInfo = ({ user }: { user: User }) => (
@@ -43,12 +43,9 @@ const Card = ({ handlePress, Icon, title }: { handlePress: () => void; Icon: Luc
 }
 
 const Settings = () => {
-  const { logout: logoutFromUser, user } = useUser()
+  const { logout } = useAuth()
+  const user = useUser()
   const { showActionSheetWithOptions } = useActionSheet()
-
-  const logout = () => {
-    logoutFromUser()
-  }
 
   const handleLogout = () => {
     showActionSheetWithOptions(
@@ -63,15 +60,6 @@ const Settings = () => {
           logout()
         }
       },
-    )
-  }
-
-  if (!user) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <NavBar title="Paramètres" />
-        <Error />
-      </SafeAreaView>
     )
   }
 

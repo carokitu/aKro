@@ -26,7 +26,7 @@ type Props = {
 }
 
 export const ShareModal = ({ onClose, track }: Props) => {
-  const { user } = useUser()
+  const user = useUser()
   const { notifyNewPost } = useFeed()
   const { setTemporaryMute } = useMute()
   const [description, setDescription] = useState<string | undefined>(undefined)
@@ -68,10 +68,6 @@ export const ShareModal = ({ onClose, track }: Props) => {
   }
 
   const handleShare = async () => {
-    if (!user) {
-      return
-    }
-
     setIsSharing(true)
     const isrc = await fetchAndSaveTrack()
 

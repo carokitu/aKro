@@ -157,7 +157,7 @@ const List = ({
   }, [expendedDescription, expendedLikesPostId, setShowFeedDrawer])
 
   useEffect(() => {
-    if (!latestPostTimestamp || !user || !loadNewPost) {
+    if (!latestPostTimestamp || !loadNewPost) {
       return
     }
 
@@ -177,10 +177,6 @@ const List = ({
 
   const fetchPosts = useCallback(
     async (reset = false) => {
-      if (!user) {
-        return
-      }
-
       setLoading(true)
       const { data, error: err } = await fetchPostFromProps({ limit: LIMIT, offset: reset ? 0 : offset })
 
@@ -273,10 +269,6 @@ const List = ({
 
   const handleLike = useCallback(
     async (post: TPost) => {
-      if (!user) {
-        return
-      }
-
       try {
         if (post.is_liked_by_current_user) {
           await client.from('post_likes').delete().eq('post_id', post.id).eq('user_id', user.id)
@@ -348,10 +340,6 @@ const List = ({
         <Post.Footer artistName={item.artist_name} trackName={item.title} />
       </Post.InteractiveContainer>
     )
-  }
-
-  if (!user) {
-    return null
   }
 
   if (error) {

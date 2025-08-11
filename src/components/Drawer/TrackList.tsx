@@ -1,8 +1,8 @@
 import { SearchX } from 'lucide-react-native'
-import React, { useRef } from 'react'
+import React from 'react'
 import { ActivityIndicator, Keyboard, StyleSheet, Text, View } from 'react-native'
 
-import { FlashList } from '@shopify/flash-list'
+import { BottomSheetFlashList } from '@gorhom/bottom-sheet'
 
 import { type DeezerTrack } from '../../../models'
 import { Error, Title } from '../../system'
@@ -26,13 +26,6 @@ const EmptyList = () => (
 )
 
 export const TrackList = ({ error, fetchMore, loading, searchQuery, tracks }: Props) => {
-  const flashListRef = useRef<FlashList<DeezerTrack>>(null)
-
-  React.useEffect(() => {
-    if (searchQuery && flashListRef.current) {
-      flashListRef.current.scrollToOffset({ animated: true, offset: 0 })
-    }
-  }, [searchQuery])
 
   if (error) {
     return (
@@ -43,19 +36,18 @@ export const TrackList = ({ error, fetchMore, loading, searchQuery, tracks }: Pr
   }
 
   return (
-      <FlashList
+      <BottomSheetFlashList<DeezerTrack>
         data={tracks}
-        decelerationRate="fast"
         estimatedItemSize={60}
         keyExtractor={(item) => item.id.toString()}
         ListEmptyComponent={loading ? <ActivityIndicator size="large" style={styles.loader} /> : <EmptyList />}
         ListFooterComponent={<View style={styles.last} />}
+        keyboardShouldPersistTaps="handled"
         onEndReached={fetchMore}
         onEndReachedThreshold={0.5}
         onScrollBeginDrag={() => {
           Keyboard.dismiss()
         }}
-        ref={flashListRef}
         renderItem={({ item }) => <Track track={item} />}
         showsVerticalScrollIndicator={false}
       />
@@ -66,6 +58,9 @@ const styles = StyleSheet.create({
   errorContainer: {
     flex: 1,
     minHeight: 200,
+  },
+  container: {
+    flex: 1,
   },
   emptyIcon: {
     marginBottom: theme.spacing[200],
@@ -78,6 +73,9 @@ const styles = StyleSheet.create({
   },
   loader: {
     paddingVertical: 24,
+  },
+  list: {
+    flex: 1,
   },
   last: {
     paddingVertical: theme.spacing[400],

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { type ImagePickerAsset } from 'expo-image-picker'
 import { useNavigation } from 'expo-router'
@@ -10,7 +11,6 @@ import { EditAvatar } from '../../../../src/components/ActionButtons'
 import { Button, Error, Input } from '../../../../src/system'
 import { theme } from '../../../../src/theme'
 import { saveImage } from '../../../../src/utils/image'
-import { SafeAreaView } from 'react-native-safe-area-context'
 
 const EditProfile = () => {
   const { updateUser, user } = useUser()

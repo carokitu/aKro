@@ -76,8 +76,8 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     gap: theme.spacing[1200],
     justifyContent: 'space-between',
-    paddingTop: theme.spacing[100],
     marginBottom: theme.spacing[800],
+    paddingTop: theme.spacing[100],
   },
   composed: {
     alignItems: 'center',

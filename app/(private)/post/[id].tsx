@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native'
+import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { FlashList } from '@shopify/flash-list'
 import { router, useLocalSearchParams } from 'expo-router'
@@ -21,7 +22,6 @@ import { Avatar, IconButton, Text, Title } from '../../../src/system'
 import { theme } from '../../../src/theme'
 import { formatRelativeDate } from '../../../src/utils'
 import { client } from '../../../supabase'
-import { SafeAreaView } from 'react-native-safe-area-context'
 
 const LIMIT = 20
 

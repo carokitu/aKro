@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { LinearGradient } from 'expo-linear-gradient'
 import { router } from 'expo-router'
 
-import { Button, H1, Title } from '../../src/system'
+import { Button, Title } from '../../src/system'
 import { theme } from '../../src/theme'
 
 const { height, width } = Dimensions.get('window')
@@ -32,7 +32,9 @@ const ProviderSignIn = () => {
     <SafeAreaView style={styles.container}>
       <Background />
       <Logo />
-      <Title size='large' style={styles.title}>Bienvenue sur akro</Title>
+      <Title size="large" style={styles.title}>
+        Bienvenue sur akro
+      </Title>
       <View style={styles.buttonSection}>
         <Button onPress={() => router.push('./sign-in')} size="lg" style={styles.button} title="Démarrer" />
       </View>

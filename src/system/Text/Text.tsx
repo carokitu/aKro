@@ -10,14 +10,7 @@ type Props = TextProps & {
   weight?: 'bold' | 'regular'
 }
 
-export const Text = ({
-  children,
-  color = 'default',
-  size = 'medium',
-  style,
-  weight = 'regular',
-  ...props
-}: Props) => {
+export const Text = ({ children, color = 'default', size = 'medium', style, weight = 'regular', ...props }: Props) => {
   const textStyles = [
     colorStyles[color],
     styles.text,

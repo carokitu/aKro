@@ -12,6 +12,7 @@ export type Post = {
   is_liked_by_current_user: boolean
   isrc: string
   likes_count: number
+  platform_links: Record<string, string>
   preview_url: string
   title: string
   user_id: string

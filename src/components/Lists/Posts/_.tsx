@@ -203,7 +203,7 @@ const List = ({
 
       setLoading(false)
     },
-    [fetchPostFromProps, offset, onReset, user],
+    [fetchPostFromProps, offset, onReset],
   )
 
   useEffect(() => {
@@ -337,7 +337,7 @@ const List = ({
             user={user}
           />
         </Post.Track>
-        <Post.Footer artistName={item.artist_name} trackName={item.title} />
+        <Post.Footer artistName={item.artist_name} platformLinks={item.platform_links} trackName={item.title} />
       </Post.InteractiveContainer>
     )
   }

@@ -1,14 +1,28 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
-import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { Image, Linking, StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import { Label, Text } from '../../system'
 import { theme } from '../../theme'
 
-const playOnSpotify = async () => {
-  console.log('playOnSpotify')
+const playOnSpotify = async (url?: string) => {
+  if (!url) {
+    return
+  }
+
+  Linking.openURL(url)
 }
 
-export const Footer = ({ artistName, trackName }: { artistName: string; trackName: string }) => {
+export const Footer = ({
+  artistName,
+  platformLinks,
+  trackName,
+}: {
+  artistName: string
+  platformLinks?: Record<string, string>
+  trackName: string
+}) => {
+  const platformLink = platformLinks?.spotify
+
   return (
     <View style={styles.footer}>
       <View style={styles.trackInfo}>
@@ -19,7 +33,7 @@ export const Footer = ({ artistName, trackName }: { artistName: string; trackNam
           {artistName}
         </Text>
       </View>
-      <TouchableOpacity onPress={playOnSpotify} style={styles.spotify}>
+      <TouchableOpacity onPress={() => playOnSpotify(platformLink)} style={styles.spotify}>
         <View>
           <Text color="invert" size="extraSmall">
             Écouter sur

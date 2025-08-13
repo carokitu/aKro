@@ -334,7 +334,6 @@ const List = ({
             item={item}
             likesCount={item.likes_count}
             onLikePress={handleLikePress}
-            user={user}
           />
         </Post.Track>
         <Post.Footer artistName={item.artist_name} platformLinks={item.platform_links} trackName={item.title} />

@@ -1,3 +1,5 @@
+import { type StreamingPlatforms } from '../constants'
+
 export type PrivateUser = {
   avatar_url?: null | string
   bio?: null | string
@@ -7,6 +9,7 @@ export type PrivateUser = {
   id: string
   name: string
   phone?: null | string
+  streaming_platform?: StreamingPlatforms
   username: string
 }
 

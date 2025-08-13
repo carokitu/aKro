@@ -2,12 +2,14 @@ import { useEffect } from 'react'
 import { StatusBar } from 'react-native'
 
 import { Audio } from 'expo-av'
-import { Stack } from 'expo-router'
+import { Redirect, Stack } from 'expo-router'
 
-import { FeedProvider, MuteProvider } from '../../hooks'
+import { FeedProvider, MuteProvider, useAuth } from '../../hooks'
 import { theme } from '../../src/theme'
 
 export const PrivateLayout = () => {
+  const { isLoggedIn, user } = useAuth()
+
   useEffect(() => {
     Audio.setAudioModeAsync({
       allowsRecordingIOS: false,
@@ -16,6 +18,10 @@ export const PrivateLayout = () => {
       shouldDuckAndroid: true,
     })
   }, [])
+
+  if (!isLoggedIn || !user) {
+    return <Redirect href="/(public)" />
+  }
 
   return (
     <FeedProvider>

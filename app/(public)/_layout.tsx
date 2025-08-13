@@ -32,6 +32,7 @@ export const PublicLayout = () => {
     <Stack screenOptions={{ contentStyle: { backgroundColor: theme.surface.base.default }, headerShown: false }}>
       <Stack.Screen name="index" />
       <Stack.Screen name="password" />
+      <Stack.Screen name="privacy-policy" />
       <Stack.Screen name="provider-sign-in" />
       <Stack.Screen name="sign-in" />
       <Stack.Screen name="sign-in-with-email" />

@@ -3,7 +3,7 @@ import { Redirect, Stack } from 'expo-router'
 import { FeedProvider, useAuth } from '../../../hooks'
 import { theme } from '../../../src/theme'
 
-export const PrivateLayout = () => {
+export const ProfileLayout = () => {
   const { user } = useAuth()
 
   if (!user) {
@@ -22,4 +22,4 @@ export const PrivateLayout = () => {
   )
 }
 
-export default PrivateLayout
+export default ProfileLayout

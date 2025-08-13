@@ -4,7 +4,7 @@ import { KeyboardAvoidingView, Platform, StyleSheet, View } from 'react-native'
 import PhoneInput from 'react-native-phone-number-input'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
-import { useRouter } from 'expo-router'
+import { Link, useRouter } from 'expo-router'
 import { parsePhoneNumberFromString } from 'libphonenumber-js'
 
 import { Button, H1, Text } from '../../src/system'
@@ -57,7 +57,10 @@ const SignIn = () => {
           </View>
         )}
         <Text color="tertiary" style={styles.text}>
-          En continuant, vous acceptez nos Conditions d'utilisation et notre Politique de confidentialité.
+          En continuant, vous acceptez nos{' '}
+          <Text color="tertiary" style={styles.link}>
+            <Link href="/privacy-policy">Conditions d'utilisation et notre Politique de confidentialité</Link>.
+          </Text>
         </Text>
         <Button
           onPress={() => router.push('/(public)/sign-in-with-email')}
@@ -117,6 +120,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     width: '100%',
+  },
+  link: {
+    textDecorationLine: 'underline',
   },
   text: {
     marginVertical: theme.spacing['300'],

@@ -6,7 +6,7 @@ import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
 import { router } from 'expo-router'
 
 import { useFeed, useMute, usePost } from '../../../../hooks'
-import { type Post as TPost, type User } from '../../../../models'
+import { type Post as TPost } from '../../../../models'
 import { Text } from '../../../system'
 import { theme } from '../../../theme'
 
@@ -15,10 +15,9 @@ type Props = {
   item: TPost
   likesCount: number
   onLikePress: () => void
-  user: User
 }
 
-export const ActionButtons = memo(({ isLikedByCurrentUser, item, likesCount, onLikePress, user }: Props) => {
+export const ActionButtons = memo(({ isLikedByCurrentUser, item, likesCount, onLikePress }: Props) => {
   const { setExpendedLikesPostId } = usePost()
   const { mute, setMute } = useMute()
   const { commentUpdates } = useFeed()

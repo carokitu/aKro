@@ -25,6 +25,51 @@ type Props = {
   track: DeezerTrack
 }
 
+const getTrackLinks = async (deezerUrl: string, isrc: string) => {
+  const { data: existing, error: selectError } = await client
+    .from('tracks')
+    .select('platform_links')
+    .eq('isrc', isrc)
+    .single()
+
+  if (selectError) {
+    throw selectError
+  }
+
+  if (existing?.platform_links) {
+    console.log(`ℹ️ Platform links already present for ${isrc}`)
+    return existing.platform_links
+  }
+
+  try {
+    const odesliUrl = `https://api.song.link/v1-alpha.1/links?url=${encodeURIComponent(deezerUrl)}`
+    const res = await fetch(odesliUrl)
+
+    if (!res.ok) {
+      throw new Error(`Odesli API error: ${res.statusText}`)
+    }
+
+    const data = await res.json()
+
+    const platformLinks: Record<string, string> = {}
+    for (const [platform, info] of Object.entries(data.linksByPlatform)) {
+      platformLinks[platform] = (info as unknown as { url: string }).url
+    }
+
+    const { error } = await client.from('tracks').update({ platform_links: platformLinks }).eq('isrc', isrc)
+
+    if (error) {
+      throw error
+    }
+
+    console.log(`✅ Updated track ${isrc} with platform links`)
+    return platformLinks
+  } catch (err) {
+    console.error('❌ Error updating platform links:', err)
+    throw err
+  }
+}
+
 export const ShareModal = ({ onClose, track }: Props) => {
   const user = useUser()
   const { notifyNewPost } = useFeed()
@@ -83,6 +128,8 @@ export const ShareModal = ({ onClose, track }: Props) => {
         isrc,
         user_id: user.id,
       })
+
+      await getTrackLinks(track.link, isrc)
 
       if (shareError) {
         throw shareError

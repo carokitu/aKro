@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { type NativeScrollEvent, type NativeSyntheticEvent, StyleSheet } from 'react-native'
 
 import { FlashList, type FlashListProps } from '@shopify/flash-list'
-import { Audio } from 'expo-av'
+import { type AudioPlayer, createAudioPlayer } from 'expo-audio'
 
 import { PostProvider, useMute, usePost } from '../../../../hooks'
 import { type Post as TPost, type User } from '../../../../models'
@@ -45,7 +45,7 @@ const List = ({
   const [offset, setOffset] = useState(0)
   const [posts, setPosts] = useState<TPost[]>([])
   const [resetPending, setResetPending] = useState(false)
-  const [sound, setSound] = useState<Audio.Sound | null>(null)
+  const [sound, setSound] = useState<AudioPlayer | null>(null)
   const [triggerRefresh, setTriggerRefresh] = useState(false)
 
   const LIMIT = 20
@@ -55,8 +55,8 @@ const List = ({
   const stopPreview = useCallback(async () => {
     if (sound) {
       try {
-        await sound.stopAsync()
-        await sound.unloadAsync()
+        sound.pause()
+        sound.remove()
         setSound(null)
       } catch (err) {
         console.error('Error stopping preview:', err)
@@ -79,10 +79,15 @@ const List = ({
           await stopPreview()
         }
 
-        const { sound: newSound } = await Audio.Sound.createAsync(
-          { uri: data.preview },
-          { isLooping: true, shouldPlay: !mute },
-        )
+        const newSound = createAudioPlayer({ uri: data.preview })
+        try {
+          newSound.loop = true
+          if (!mute) {
+            newSound.play()
+          }
+        } catch (err) {
+          console.error('Error configuring preview sound:', err)
+        }
 
         setSound(newSound)
       } catch (err) {
@@ -98,11 +103,8 @@ const List = ({
       const resumeAudio = async () => {
         try {
           if (sound && !mute) {
-            const status = await sound.getStatusAsync()
-            if (status.isLoaded) {
-              await sound.setPositionAsync(0)
-              await sound.playAsync()
-            }
+            await sound.seekTo(0)
+            sound.play()
           }
         } catch (err) {
           console.error('Erreur reprise son :', err)
@@ -114,7 +116,7 @@ const List = ({
       // Quand l’écran perd le focus
       return () => {
         if (sound) {
-          sound.pauseAsync()
+          sound.pause()
         }
       }
     }, [mute, sound]),
@@ -128,9 +130,9 @@ const List = ({
 
       try {
         if (mute || temporaryMute) {
-          await sound.pauseAsync()
+          sound.pause()
         } else {
-          await sound.playAsync()
+          sound.play()
         }
       } catch (err) {
         console.error('Error applying mute:', err)
@@ -143,7 +145,7 @@ const List = ({
   useEffect(() => {
     return () => {
       if (sound) {
-        sound.unloadAsync()
+        sound.remove()
       }
     }
   }, [sound])

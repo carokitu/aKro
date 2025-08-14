@@ -50,7 +50,8 @@
           },
           "photosPermission": "akro souhaite accéder à vos photos"
         }
-      ]
+      ],
+      "expo-audio"
     ],
     "scheme": "akro",
     "slug": "aKro",

@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { StatusBar } from 'react-native'
 
-import { Audio } from 'expo-av'
+import { setAudioModeAsync } from 'expo-audio'
 import { Redirect, Stack } from 'expo-router'
 
 import { FeedProvider, MuteProvider, useAuth } from '../../hooks'
@@ -11,11 +11,12 @@ export const PrivateLayout = () => {
   const { isLoggedIn, user } = useAuth()
 
   useEffect(() => {
-    Audio.setAudioModeAsync({
-      allowsRecordingIOS: false,
-      playsInSilentModeIOS: true,
-      playThroughEarpieceAndroid: false,
-      shouldDuckAndroid: true,
+    setAudioModeAsync({
+      allowsRecording: false,
+      interruptionMode: 'duckOthers',
+      interruptionModeAndroid: 'duckOthers',
+      playsInSilentMode: true,
+      shouldRouteThroughEarpiece: false,
     })
   }, [])
 

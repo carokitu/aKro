@@ -1,15 +1,7 @@
 import { useActionSheet } from '@expo/react-native-action-sheet'
 import { Ellipsis, MessageSquareOff, Send } from 'lucide-react-native'
 import { useRef, useState } from 'react'
-import {
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { ActivityIndicator, KeyboardAvoidingView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { FlashList } from '@shopify/flash-list'
@@ -85,7 +77,7 @@ const NewComment = ({
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior="padding"
       keyboardVerticalOffset={theme.spacing['400']}
       style={styles.inputContainer}
     >
@@ -103,7 +95,7 @@ const NewComment = ({
         value={text}
       />
       <IconButton
-        disabled={loading}
+        disabled={loading || text.trim() === ''}
         Icon={Send}
         onPress={handleSend}
         size="md"

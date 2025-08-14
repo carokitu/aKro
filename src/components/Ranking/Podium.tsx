@@ -106,10 +106,6 @@ export const Podium = ({ period }: { period: 'all' | 'week' }) => {
     fetchRanking()
   }, [period])
 
-  if (ranking.length === 0) {
-    return <Text>Aucun contributeur trouvé</Text>
-  }
-
   return (
     <View style={styles.podium}>
       {ranking[1] && <Item rank={2} user={ranking[1]} />}

@@ -1,143 +1,46 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { User } from 'lucide-react-native'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { Image, type StyleProp, StyleSheet, View, type ViewStyle } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 
-import { client } from '../../supabase'
+import { Image } from 'expo-image'
+
 import { theme } from '../theme'
 
-type Props = {
+type AvatarSize = 'lg' | 'md' | 'sm' | 'xl' | 'xxl'
+
+type AvatarProps = {
   avatar?: null | string
-  size?: 'lg' | 'md' | 'sm' | 'xl' | 'xxl'
-  style?: StyleProp<ViewStyle>
+  size?: AvatarSize
 }
 
-const SIZE_STYLES = {
-  lg: {
-    height: 48,
-    width: 48,
-  },
-  md: {
-    height: 32,
-    width: 32,
-  },
-  sm: {
-    height: 24,
-    width: 24,
-  },
-  xl: {
-    height: 88,
-    width: 88,
-  },
-  xxl: {
-    height: 100,
-    width: 100,
-  },
+const SIZES: Record<AvatarSize, number> = {
+  lg: 48,
+  md: 32,
+  sm: 24,
+  xl: 88,
+  xxl: 100,
 }
 
-// Calculate icon size based on container size (icon should be about 60% of container)
-const getIconSize = (size: keyof typeof SIZE_STYLES) => {
-  const containerSize = SIZE_STYLES[size].width
-  // For smaller sizes, use a slightly larger percentage to ensure good visibility
-  const percentage = containerSize <= 24 ? 0.7 : 0.6
-  const iconSize = Math.floor(containerSize * percentage)
-  // Ensure the icon size is even for better centering
-  return iconSize % 2 === 0 ? iconSize : iconSize - 1
-}
+export const Avatar = ({ avatar, size = 'md' }: AvatarProps) => {
+  const dimension = SIZES[size]
 
-const CACHE_EXPIRY_TIME = 1000 * 60 * 60 * 24 // 1 day
-
-// Caching functions
-const cacheAvatar = async (avatarUrl: string, avatarKey: string) => {
-  try {
-    const cachedData = { avatarUrl, timestamp: Date.now() }
-    await AsyncStorage.setItem(avatarKey, JSON.stringify(cachedData))
-  } catch (cause) {
-    console.error('Error saving avatar to AsyncStorage', cause)
-  }
-}
-
-const getCachedAvatar = async (avatarKey: string) => {
-  try {
-    const cachedData = await AsyncStorage.getItem(avatarKey)
-    if (cachedData) {
-      const { avatarUrl, timestamp } = JSON.parse(cachedData)
-
-      // Return null if cache has expired
-      if (Date.now() - timestamp > CACHE_EXPIRY_TIME) {
-        await AsyncStorage.removeItem(avatarKey)
-        return null
-      }
-
-      return avatarUrl
-    }
-
-    return null
-  } catch (cause) {
-    console.error('Error retrieving avatar from AsyncStorage', cause)
-    return null
-  }
-}
-
-export const Avatar = ({ avatar, size = 'md', style }: Props) => {
-  const [image, setImage] = useState<null | string>(null)
-  const [error, setError] = useState(false)
-  const fileReaderRef = useRef<FileReader | null>(null)
-
-  const loadAvatar = useCallback(async () => {
-    if (!avatar) {
-      return
-    }
-
-    const avatarKey = `avatar-${avatar}`
-    const cachedAvatar = await getCachedAvatar(avatarKey)
-
-    if (cachedAvatar) {
-      setImage(cachedAvatar)
-      return
-    }
-
-    try {
-      const { data, error: downloadError } = await client.storage.from('avatars').download(avatar)
-      if (downloadError || !data) {
-        throw new Error('Failed to download avatar')
-      }
-
-      // Use FileReader to convert image data to base64
-      const fr = new FileReader()
-      fileReaderRef.current = fr
-
-      fr.onload = () => {
-        const avatarUrl = fr.result as string
-
-        if (avatarUrl !== image) {
-          setImage(avatarUrl)
-          cacheAvatar(avatarUrl, avatarKey) // Cache the avatar for future use
-        }
-      }
-
-      fr.readAsDataURL(data)
-    } catch {
-      setError(true)
-    }
-  }, [avatar, image])
-
-  useEffect(() => {
-    loadAvatar()
-  }, [loadAvatar])
-
-  if (!image || !avatar || error) {
+  if (!avatar) {
     return (
-      <View style={[styles.iconContainer, SIZE_STYLES[size], style]}>
-        <User color={theme.colors.neutral['50']} size={getIconSize(size)} />
+      <View style={[styles.iconContainer, { height: dimension, width: dimension }]}>
+        <User color={theme.colors.neutral['50']} size={dimension * 0.65} />
       </View>
     )
   }
 
+  const publicUrl = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${avatar}`
+
   return (
-    <View style={[styles.avatarContainer, SIZE_STYLES[size], style]}>
-      <Image onError={() => setError(true)} resizeMode="cover" source={{ uri: image }} style={styles.avatar} />
-    </View>
+    <Image
+      cachePolicy="memory-disk"
+      contentFit="cover"
+      source={{ uri: publicUrl }}
+      style={[styles.avatar, { height: dimension, width: dimension }]}
+      transition={100}
+    />
   )
 }
 
@@ -146,10 +49,6 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.full,
     height: '100%',
     width: '100%',
-  },
-  avatarContainer: {
-    borderRadius: theme.radius.full,
-    overflow: 'hidden',
   },
   iconContainer: {
     alignItems: 'center',

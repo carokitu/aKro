@@ -21,7 +21,7 @@ export const ActionButtons = memo(({ isLikedByCurrentUser, item, likesCount, onL
   const { setExpendedLikesPostId } = usePost()
   const { mute, setMute } = useMute()
   const { commentUpdates } = useFeed()
-  const [commentsCount, setCommentsCount] = useState(0)
+  const [commentsCount, setCommentsCount] = useState(item.comments_count)
 
   useEffect(() => {
     setCommentsCount(item.comments_count)

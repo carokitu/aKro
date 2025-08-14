@@ -13,7 +13,7 @@ import { theme } from '../../../../src/theme'
 import { saveImage } from '../../../../src/utils/image'
 
 const EditProfile = () => {
-  const { updateUserData } = useAuth()
+  const { updateUser } = useAuth()
   const user = useUser()
   const [newAvatarImage, setNewAvatarImage] = useState<ImagePickerAsset | null>(null)
   const [bio, setBio] = useState<string>('')
@@ -36,12 +36,12 @@ const EditProfile = () => {
       ...(bio && { bio }),
     }
 
-    await updateUserData(updatePayload)
+    await updateUser(updatePayload)
     navigation.reset({
       index: 0,
       routes: [{ name: '[username]' as never, params: { username: user.username } }],
     })
-  }, [bio, navigation, newAvatarImage, updateUserData, user])
+  }, [bio, navigation, newAvatarImage, updateUser, user])
 
   return (
     <SafeAreaView style={styles.area}>

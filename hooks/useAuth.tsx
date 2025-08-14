@@ -11,6 +11,7 @@ type AuthContextType = {
   isLoggedIn: boolean
   loading: boolean
   logout: () => Promise<void>
+  updateUser: (data: Partial<UserData>) => Promise<void>
   updateUserData: (data: Partial<UserData>) => void
   user: null | User
   userData: UserData
@@ -128,6 +129,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setUserRegistrationData((prev) => ({ ...prev, ...data }))
   }, [])
 
+  const updateUser = useCallback(
+    async (fields: Partial<UserData>) => {
+      if (!user) {
+        return
+      }
+
+      const { data, error: updateError } = await client.from('users').update(fields).eq('id', user.id).select().single()
+
+      if (updateError) {
+        setError(updateError.message)
+        throw new Error(updateError.message)
+      }
+
+      setUser(data)
+    },
+    [user],
+  )
+
   const createUser = useCallback(
     async (overrideData?: Partial<UserData>) => {
       setError(null)
@@ -169,7 +188,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <UserContext.Provider
-      value={{ createUser, error, isLoggedIn, loading, logout, updateUserData, user, userData: userRegistrationData }}
+      value={{
+        createUser,
+        error,
+        isLoggedIn,
+        loading,
+        logout,
+        updateUser,
+        updateUserData,
+        user,
+        userData: userRegistrationData,
+      }}
     >
       {children}
     </UserContext.Provider>

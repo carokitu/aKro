@@ -8,7 +8,7 @@ import { theme } from '../theme'
 type AvatarSize = 'lg' | 'md' | 'sm' | 'xl' | 'xxl'
 
 type AvatarProps = {
-  avatar?: null | string // relative avatar in the public bucket
+  avatar?: null | string
   size?: AvatarSize
 }
 
@@ -34,15 +34,13 @@ export const Avatar = ({ avatar, size = 'md' }: AvatarProps) => {
   const publicUrl = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${avatar}`
 
   return (
-    <View style={{ height: dimension, width: dimension }}>
-      <Image
-        cachePolicy="memory-disk"
-        contentFit="cover"
-        source={{ uri: publicUrl }}
-        style={styles.avatar}
-        transition={100}
-      />
-    </View>
+    <Image
+      cachePolicy="memory-disk"
+      contentFit="cover"
+      source={{ uri: publicUrl }}
+      style={[styles.avatar, { height: dimension, width: dimension }]}
+      transition={100}
+    />
   )
 }
 

@@ -81,7 +81,7 @@ const NewComment = ({
       keyboardVerticalOffset={theme.spacing['400']}
       style={styles.inputContainer}
     >
-      <Avatar avatar={user.avatar_url} style={styles.newMessageIcon} />
+      <Avatar avatar={user.avatar_url} />
       <TextInput
         maxLength={200}
         onChangeText={(t) => {

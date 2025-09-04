@@ -1,11 +1,11 @@
 import React, { forwardRef, useImperativeHandle, useRef, useState } from 'react'
-import { Animated, Image, Pressable, type StyleProp, StyleSheet, View, type ViewStyle } from 'react-native'
+import { Animated, Pressable, type StyleProp, StyleSheet, View, type ViewStyle } from 'react-native'
 
-import { BlurView } from 'expo-blur'
 import { LinearGradient } from 'expo-linear-gradient'
 
 import { useDoubleTap } from '../../../hooks'
 import { theme } from '../../theme'
+import { useTrackColors } from './ColorProvider'
 
 export type InteractiveContainerRef = {
   triggerOverlay: () => void
@@ -14,14 +14,14 @@ export type InteractiveContainerRef = {
 export const InteractiveContainer = forwardRef<
   InteractiveContainerRef,
   {
-    albumCoverUrl: string
     children: React.ReactNode
     handleLike: () => void
     style?: StyleProp<ViewStyle>
   }
->(({ albumCoverUrl, children, handleLike, style }, ref) => {
+>(({ children, handleLike, style }, ref) => {
   const [showLikeOverlay, setShowLikeOverlay] = useState(false)
   const scale = useRef(new Animated.Value(0)).current
+  const { color } = useTrackColors()
 
   const triggerOverlay = () => {
     setShowLikeOverlay(true)
@@ -44,13 +44,14 @@ export const InteractiveContainer = forwardRef<
 
   return (
     <Pressable onPress={handleTap} style={[styles.post, style]}>
-      <View style={styles.backgroundContainer}>
-        <Image source={{ uri: albumCoverUrl }} style={styles.backgroundImage} />
-        <BlurView intensity={100} style={styles.blurOverlay} tint="regular" />
+      <View style={[styles.backgroundContainer, { backgroundColor: color }]}>
+        <LinearGradient colors={['rgba(13,26,38,0.4)', 'rgba(13,26,38,0.4)']} style={StyleSheet.absoluteFillObject} />
         <LinearGradient
-          colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.0)', 'rgba(0,0,0,0.25)', 'rgba(0,0,0,0.5)']}
-          locations={[0, 0.2, 0.7, 1]}
-          style={styles.gradientOverlay}
+          colors={['rgba(13,26,38,0.07)', 'rgba(13,26,38,0)', 'rgba(13,26,38,0.07)', 'rgba(13,26,38,0.2)']}
+          end={{ x: 0.5, y: 1 }}
+          locations={[0, 0.1154, 0.7981, 0.9038]}
+          start={{ x: 0.5, y: 0 }}
+          style={StyleSheet.absoluteFillObject}
         />
       </View>
       {children}

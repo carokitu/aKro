@@ -1,10 +1,10 @@
 import { CircleX } from 'lucide-react-native'
 import React, { useCallback, useEffect, useState } from 'react'
+import { parsePhoneNumber } from 'awesome-phonenumber'
 import { KeyboardAvoidingView, Platform, StyleSheet, TextInput, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { router, useLocalSearchParams } from 'expo-router'
-import { parsePhoneNumberFromString } from 'libphonenumber-js'
 
 import { NavBar } from '../../src'
 import { Button, H1, Text } from '../../src/system'
@@ -19,26 +19,27 @@ const VerifyCode = () => {
   const [timer, setTimer] = useState(RESEND_DELAY)
   const [error, setError] = useState<null | string>(null)
   const [isTimerActive, setIsTimerActive] = useState(true)
+  const [parsedNumber, setParsedNumber] = useState<string | null>(null)
 
   const isValidCode = code.trim().length === 6
 
   const sendCode = useCallback(async () => {
-    const formattedPhoneNumber = phoneNumber?.toString() ?? ''
-    const parsed = parsePhoneNumberFromString(phoneNumber?.toString())
+    const parsed = parsePhoneNumber( phoneNumber )
 
-    if (parsed?.isValid()) {
+    if (parsed.valid) {
       setError(null)
+      setParsedNumber(parsed.number.e164)
       try {
         await client.auth.signInWithOtp({
-          phone: formattedPhoneNumber,
+          phone: parsed.number.e164,
         })
         setIsTimerActive(true)
         setTimer(RESEND_DELAY)
       } catch {
-        setError('Erreur lors de l’envoi du code')
+        setError(`Erreur lors de l’envoi du code au ${phoneNumber}`)
       }
     } else {
-      setError(`Numéro invalide : ${formattedPhoneNumber}`)
+      setError(`Numéro invalide : ${phoneNumber}`)
     }
   }, [phoneNumber])
 
@@ -63,9 +64,11 @@ const VerifyCode = () => {
   }, [isTimerActive, timer])
 
   const handleVerify = async () => {
+    if (!parsedNumber) return
+
     try {
       const { error: err } = await client.auth.verifyOtp({
-        phone: phoneNumber?.toString(),
+        phone: parsedNumber,
         token: code.trim(),
         type: 'sms',
       })

@@ -5,32 +5,34 @@ import PhoneInput from 'react-native-phone-number-input'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { Link, useRouter } from 'expo-router'
-import { parsePhoneNumberFromString } from 'libphonenumber-js'
+import { parsePhoneNumber } from 'awesome-phonenumber'
 
 import { Button, H1, Text } from '../../src/system'
 import { theme } from '../../src/theme'
-
-const isPhoneValid = (phone: string): boolean => {
-  const parsed = parsePhoneNumberFromString(phone)
-  return parsed?.isValid() ?? false
-}
 
 const SignIn = () => {
   const phoneInput = useRef<PhoneInput>(null)
   const router = useRouter()
   const [value, setValue] = useState('')
-  const [isValid, setIsValid] = useState(false)
+  const [formattedNumber, setFormattedNumber] = useState<string | undefined>(undefined)
 
-  const showError = !isValid && value.length > 0
+  const showError = !formattedNumber && value.length > 0
 
   const handleNext = () => {
-    if (isValid) {
+    if (formattedNumber) {
       router.push({ params: { phoneNumber: value }, pathname: '/(public)/verify-code' })
     }
   }
 
   useEffect(() => {
-    setIsValid(isPhoneValid(value))
+    if (value.length > 7) {
+      const pn = parsePhoneNumber( value );
+      if (pn.valid) {
+        setFormattedNumber(pn.number?.e164)
+      } else {
+        setFormattedNumber(undefined)
+      }
+    }
   }, [value])
 
   return (
@@ -42,13 +44,10 @@ const SignIn = () => {
           {...(Platform.OS === 'ios' && { autoFocus: true })}
           containerStyle={styles.input}
           defaultCode="FR"
-          defaultValue={value}
           flagButtonStyle={styles.flagButton}
-          layout="first"
           onChangeFormattedText={(text) => setValue(text)}
           ref={phoneInput}
           textContainerStyle={styles.textContainer}
-          withShadow
         />
         {showError && (
           <View style={styles.errorContainer}>
@@ -70,7 +69,7 @@ const SignIn = () => {
         />
         <View style={styles.buttonContainer}>
           <Button
-            disabled={!isValid}
+            disabled={!formattedNumber}
             fullWidth
             onPress={handleNext}
             size="lg"
@@ -106,6 +105,7 @@ const styles = StyleSheet.create({
   flagButton: {
     backgroundColor: theme.surface.base.secondary,
     borderRadius: theme.radius.base,
+    width: 50,
     marginRight: theme.spacing['200'],
   },
   input: {

@@ -4,6 +4,7 @@ import reactNative from 'eslint-plugin-react-native';
 
 export default [
   ...auto,
+  {env: {'node': true}},
   {
     plugins: {
       react,

@@ -1,5 +1,6 @@
 app-example
 node_modules
+service-account-file.json
 
 .env
 .expo

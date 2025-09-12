@@ -8,6 +8,8 @@
       "package": "com.kro.aKro",
       "permissions": [
         "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS"
       ]
     },
@@ -77,6 +79,12 @@
       "bundler": "metro",
       "favicon": "./assets/images/favicon.png",
       "output": "static"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/eeb912f0-fd9e-4842-af4f-8a2dd703d700"
     }
   }
 }

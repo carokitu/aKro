@@ -158,10 +158,12 @@ export const ShareModal = ({ onClose, track }: Props) => {
             <IconButton Icon={X} onPress={onClose} size="lg" style={styles.closeButton} variant="tertiary" />
           </View>
           <ScrollView keyboardShouldPersistTaps="handled" ref={scrollViewRef}>
-            <Post.Container coverUrl={track.album.cover_medium}>
-              <Post.Track coverUrl={track.album.cover_big} />
-              <Post.Footer artistName={track.artist.name} trackName={track.title} />
-            </Post.Container>
+            <Post.ColorProvider coverUrl={track.album.cover_big}>
+              <Post.Container>
+                <Post.Track coverUrl={track.album.cover_big} />
+                <Post.Footer artistName={track.artist.name} trackName={track.title} />
+              </Post.Container>
+            </Post.ColorProvider>
             <Label size="large" style={styles.descriptionLabel}>
               Ajouter une légende
             </Label>

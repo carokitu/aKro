@@ -1,0 +1,53 @@
+{
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "APP_VARIANT": "development"
+      },
+      "android": {
+        "image": "latest"
+      },
+      "ios": {
+        "image": "latest"
+      },
+      "channel": "development"
+    },
+    "ios-simulator": {
+      "extends": "development",
+      "ios": {
+        "simulator": true
+      },
+    },
+    "preview": {
+      "distribution": "internal",
+      "env": {
+        "APP_VARIANT": "preview"
+      },
+      "channel": "preview"
+    },
+    "production": {
+      "autoIncrement": true,
+      "channel": "production",
+      "env": {
+        "APP_VARIANT": "production"
+      }
+    }
+  },
+  "cli": {
+    "appVersionSource": "remote",
+    "version": ">= 15.0.14"
+  },
+  "submit": {
+    "production": {
+      "android": {
+        "serviceAccountKeyPath": "./service-account-file.json",
+        "track": "internal"
+      },
+      "ios": {
+        "companyName": "akro"
+      }
+    }
+  }
+}

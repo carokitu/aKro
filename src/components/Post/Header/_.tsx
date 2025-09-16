@@ -29,28 +29,79 @@ export const deletePost = async (postId: string): Promise<{ error?: string; succ
   }
 }
 
+export const reportPost = async ({
+  postId,
+  userId,
+}: {
+  postId: string
+  userId: string
+}): Promise<{ error?: string; success: boolean }> => {
+  try {
+    const { error } = await client.from('post_reports').insert({ post_id: postId, user_id: userId })
+
+    if (error) {
+      return { error: error.message, success: false }
+    }
+
+    return { success: true }
+  } catch (err) {
+    return {
+      error: err instanceof Error ? err.message : 'Unknown error',
+      success: false,
+    }
+  }
+}
+
 export const Header = memo(
   ({ item, triggerRefresh, user }: { item: TPost; triggerRefresh: () => void; user: User }) => {
     const isCurrentUserPost = user.id === item.user_id
     const { showActionSheetWithOptions } = useActionSheet()
 
-    const handleEllipsisPress = async () => {
+    const ownPostOptions = () =>
       showActionSheetWithOptions(
         {
-          destructiveButtonIndex: 1,
+          cancelButtonIndex: 1,
+          destructiveButtonIndex: 0,
           message: 'Cette action est irréversible. Êtes-vous sûr de vouloir continuer ?',
-          options: ['Conserver mon post', 'Supprimer mon post'],
+          options: ['Supprimer mon post', 'Conserver mon post'],
           title: 'Supprimer ce post ?',
         },
         async (index) => {
-          if (index === 1) {
+          if (index === 0) {
             const { success } = await deletePost(item.id)
+
             if (success) {
               triggerRefresh()
             }
           }
         },
       )
+
+    const otherPostOptions = () =>
+      showActionSheetWithOptions(
+        {
+          cancelButtonIndex: 1,
+          destructiveButtonIndex: 0,
+          message: 'Aidez-nous à maintenir une communauté sûre.',
+          options: ['Signaler', 'Annuler'],
+          title: 'Signaler ce post ?',
+        },
+        async (index) => {
+          if (index === 0) {
+            const { success } = await reportPost({ postId: item.id, userId: user.id })
+            if (success) {
+              console.log('Post signalé')
+            }
+          }
+        },
+      )
+
+    const handleEllipsisPress = async () => {
+      if (isCurrentUserPost) {
+        ownPostOptions()
+      } else {
+        otherPostOptions()
+      }
     }
 
     return (
@@ -65,9 +116,7 @@ export const Header = memo(
             <Label color="invert">{item.username}</Label>
             <Text color="invert">{formatRelativeDate(item.created_at)}</Text>
           </View>
-          {isCurrentUserPost && (
-            <EllipsisVertical color={theme.text.base.invert} onPress={handleEllipsisPress} style={styles.ellipsis} />
-          )}
+          <EllipsisVertical color={theme.text.base.invert} onPress={handleEllipsisPress} style={styles.ellipsis} />
         </TouchableOpacity>
         <Description description={item.description} />
       </>
@@ -85,6 +134,5 @@ const styles = StyleSheet.create({
   user: {
     alignItems: 'center',
     flexDirection: 'row',
-    // marginBottom: theme.spacing[1000],
   },
 })

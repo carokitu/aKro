@@ -1,7 +1,15 @@
 import { useActionSheet } from '@expo/react-native-action-sheet'
 import { Ellipsis, MessageSquareOff, Send } from 'lucide-react-native'
 import { useRef, useState } from 'react'
-import { ActivityIndicator, KeyboardAvoidingView, StyleSheet, TextInput, TouchableOpacity, View } from 'react-native'
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { FlashList } from '@shopify/flash-list'
@@ -76,12 +84,8 @@ const NewComment = ({
   }
 
   return (
-    <KeyboardAvoidingView
-      behavior="padding"
-      keyboardVerticalOffset={theme.spacing['400']}
-      style={styles.inputContainer}
-    >
-      <Avatar avatar={user.avatar_url} style={styles.newMessageIcon} />
+    <View style={styles.inputContainer}>
+      <Avatar avatar={user.avatar_url} style={styles.avatar} />
       <TextInput
         maxLength={200}
         onChangeText={(t) => {
@@ -102,7 +106,7 @@ const NewComment = ({
         style={styles.newMessageIcon}
         variant="tertiary"
       />
-    </KeyboardAvoidingView>
+    </View>
   )
 }
 
@@ -112,16 +116,17 @@ const Comment = ({ comment, currentUserId, postId }: { comment: TComment; curren
   const { showActionSheetWithOptions } = useActionSheet()
   const { updateCommentCount } = useFeed()
 
-  const onPress = async () => {
+  const ownCommentOptions = () => {
     showActionSheetWithOptions(
       {
-        destructiveButtonIndex: 1,
+        cancelButtonIndex: 1,
+        destructiveButtonIndex: 0,
         message: 'Cette action est irréversible. Êtes-vous sûr de vouloir continuer ?',
-        options: ['Conserver', 'Supprimer'],
+        options: ['Supprimer', 'Conserver'],
         title: 'Supprimer ce commentaire ?',
       },
       async (index) => {
-        if (index === 1) {
+        if (index === 0) {
           const { error } = await client.from('comments').delete().eq('id', comment.id)
           if (!error) {
             setIsDeleted(true)
@@ -134,6 +139,38 @@ const Comment = ({ comment, currentUserId, postId }: { comment: TComment; curren
         }
       },
     )
+  }
+
+  const otherCommentOptions = () => {
+    showActionSheetWithOptions(
+      {
+        cancelButtonIndex: 1,
+        destructiveButtonIndex: 0,
+        message: 'Aidez-nous à maintenir une communauté sûre.',
+        options: ['Signaler', 'Annuler'],
+        title: 'Signaler ce commentaire ?',
+      },
+      async (index) => {
+        if (index === 0) {
+          const { error } = await client.from('comment_reports').insert({
+            comment_id: comment.id,
+            user_id: currentUserId,
+          })
+          console.log(error)
+          if (!error) {
+            console.log('Commentaire signalé')
+          }
+        }
+      },
+    )
+  }
+
+  const onPress = async () => {
+    if (isCurrentUser) {
+      ownCommentOptions()
+    } else {
+      otherCommentOptions()
+    }
   }
 
   if (isDeleted) {
@@ -152,11 +189,9 @@ const Comment = ({ comment, currentUserId, postId }: { comment: TComment; curren
             <Text color="disabled">•</Text>
             <Text color="disabled">{formatRelativeDate(comment.created_at)}</Text>
           </View>
-          {isCurrentUser && (
-            <TouchableOpacity onPress={onPress}>
-              <Ellipsis color={theme.text.base.default} size="18" />
-            </TouchableOpacity>
-          )}
+          <TouchableOpacity onPress={onPress}>
+            <Ellipsis color={theme.text.base.default} size="18" />
+          </TouchableOpacity>
         </View>
         <Text style={styles.content}>{comment.content}</Text>
       </View>
@@ -207,19 +242,24 @@ const ExpendedComments = () => {
   return (
     <SafeAreaView style={styles.container}>
       <NavBar title="Commentaires" />
-      <FlashList
-        data={comments}
-        estimatedItemSize={80}
-        keyExtractor={(item) => item.id}
-        ListEmptyComponent={loading ? <ActivityIndicator size="large" style={styles.loader} /> : <EmptyState />}
-        onEndReached={fetchComments}
-        onEndReachedThreshold={0.8}
-        ref={listRef}
-        refreshing={loading}
-        renderItem={({ item }) => <Comment comment={item} currentUserId={user.id} postId={postID} />}
-        showsVerticalScrollIndicator={false}
-      />
-      <NewComment listRef={listRef} postId={postID} setComments={setComments} />
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'padding'}
+        style={styles.keyboardAvoidingView}
+      >
+        <FlashList
+          data={comments}
+          estimatedItemSize={80}
+          keyExtractor={(item) => item.id}
+          ListEmptyComponent={loading ? <ActivityIndicator size="large" style={styles.loader} /> : <EmptyState />}
+          onEndReached={fetchComments}
+          onEndReachedThreshold={0.8}
+          ref={listRef}
+          refreshing={loading}
+          renderItem={({ item }) => <Comment comment={item} currentUserId={user.id} postId={postID} />}
+          showsVerticalScrollIndicator={false}
+        />
+        <NewComment listRef={listRef} postId={postID} setComments={setComments} />
+      </KeyboardAvoidingView>
     </SafeAreaView>
   )
 }
@@ -227,6 +267,9 @@ const ExpendedComments = () => {
 export default ExpendedComments
 
 const styles = StyleSheet.create({
+  avatar: {
+    alignSelf: 'center',
+  },
   comment: {
     flexDirection: 'row',
     gap: theme.spacing['400'],
@@ -279,6 +322,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: theme.spacing['400'],
     padding: theme.spacing['400'],
+  },
+  keyboardAvoidingView: {
+    flex: 1,
   },
   loader: {
     marginVertical: theme.spacing['400'],

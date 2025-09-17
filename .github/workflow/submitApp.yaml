@@ -1,0 +1,54 @@
+name: Submit App
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to submit'
+        required: true
+        default: 'ios'
+
+jobs:
+  build-and-submit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      # Step Supabase CLI
+      - name: Install Supabase CLI
+        run: npm install -g supabase
+
+      - name: Apply Supabase migrations if changed
+        run: |
+          # Vérifier si des migrations ont changé
+          if ! git diff --quiet main -- supabase/migrations; then
+            echo "Migrations detected, applying to production..."
+            supabase login --token ${{ secrets.SUPABASE_ACCESS_TOKEN_PROD }}
+            supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_REF_PROD }}
+            supabase db push --yes
+          else
+            echo "No migration changes detected."
+          fi
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN_PROD }}
+
+      - uses: expo/expo-github-action@v7
+        with:
+          expo-version: latest
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build & Submit
+        run: |
+          if [ "${{ github.event.inputs.platform }}" = "ios" ]; then
+            eas build --platform ios --profile production
+            eas submit --platform ios
+          else
+            eas build --platform android --profile production
+            eas submit --platform android
+          fi
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
+          GOOGLE_PLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_PLAY_JSON }}

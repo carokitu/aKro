@@ -1,2 +1,6 @@
 [db]
 major_version = 15
+
+[db.seed]
+enabled = true
+sql_paths = ['./seeds/users.sql', './seeds/tracks.sql', './seeds/posts.sql', './seeds/post_likes.sql', './seeds/follows.sql', './seeds/comments.sql']

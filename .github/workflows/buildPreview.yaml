@@ -1,0 +1,53 @@
+name: Build Preview App
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to build'
+        required: true
+        default: 'all' # ios, android, ou all
+
+jobs:
+  build-preview:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout code
+      - uses: actions/checkout@v3
+
+      # 2️⃣ Installer Node & dépendances
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      # 3️⃣ Installer Expo CLI et EAS CLI
+      - name: Install Expo CLI
+        run: npm install -g expo-cli eas-cli
+
+      # 4️⃣ Build Preview
+      - name: Build Preview App
+        run: |
+          if [ "${{ github.event.inputs.platform }}" = "ios" ]; then
+            echo "🔄 Building iOS preview..."
+            eas build --platform ios --profile preview --non-interactive
+            echo "✅ iOS preview built"
+          elif [ "${{ github.event.inputs.platform }}" = "android" ]; then
+            echo "🔄 Building Android preview..."
+            eas build --platform android --profile preview --non-interactive
+            echo "✅ Android preview built"
+          else
+            echo "🔄 Building both iOS and Android previews..."
+            eas build --platform ios --profile preview --non-interactive
+            echo "✅ iOS preview built"
+            eas build --platform android --profile preview --non-interactive
+            echo "✅ Android preview built"
+            echo "✅ Both iOS and Android previews built"
+          fi
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          APP_STORE_CONNECT_API_KEY: ${{ secrets.APP_STORE_CONNECT_API_KEY }}

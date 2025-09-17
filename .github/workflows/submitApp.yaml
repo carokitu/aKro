@@ -20,19 +20,9 @@ jobs:
 
       - name: Apply Supabase migrations if changed
         run: |
-          # Vérifier si des migrations ont changé
-          echo "👀 Checking if migrations changed..."
-          if ! git diff --quiet main -- supabase/migrations; then
-            echo "🔄 Migrations detected, applying to production..."
-            echo "🔄 Logging in to Supabase..."
-            supabase login --token ${{ secrets.SUPABASE_ACCESS_TOKEN_PROD }}
-            supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_REF_PROD }}
-            echo "🔄 Pushing migrations..."
-            supabase db push --yes
-            echo "✅ Migrations applied to production."
-          else
-            echo "✅ No migration changes detected."
-          fi
+          echo "🔄 Pushing migrations..."
+          supabase db push --project-ref ${{ secrets.SUPABASE_PROJECT_REF_PROD }} --token ${{ secrets.SUPABASE_ACCESS_TOKEN_PROD }} --yes
+          echo "✅ Migrations applied to production."
         env:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN_PROD }}
 

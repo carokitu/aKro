@@ -23,13 +23,14 @@ jobs:
       - name: Check if migrations or seeds changed
         id: changes
         run: |
+          echo "👀 Checking if migrations or seeds changed..."
           git fetch origin main
           CHANGED=$(git diff --name-only origin/main HEAD | grep -E '^(migrations/|seeds/)' || true)
           echo "changed_files=$CHANGED" >> $GITHUB_OUTPUT
           if [ -z "$CHANGED" ]; then
-            echo "No migrations or seeds changed. Skipping DB update."
+            echo "✅ No migrations or seeds changed. Skipping DB update."
           else
-            echo "Detected changes in migrations/seeds:"
+            echo "🔄 Detected changes in migrations/seeds:"
             echo "$CHANGED"
           fi
 
@@ -40,17 +41,8 @@ jobs:
           SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN_PREVIEW }}
           SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF_PREVIEW }}
         run: |
-          echo "🔄 Resetting preview DB..."
-          supabase db reset --project-ref $SUPABASE_PROJECT_REF --force
-
-          echo "⬆️ Pushing migrations..."
-          supabase db push --project-ref $SUPABASE_PROJECT_REF
-
+          echo "🚮 Resetting preview DB,"
+          echo "⬆️ Pushing migrations,"
           echo "🌱 Seeding preview DB..."
-          # Si tu as plusieurs fichiers seeds, tu peux faire une boucle
-          for seed_file in seeds/*.sql; do
-            echo "Seeding $seed_file..."
-            supabase db query --file $seed_file --project-ref $SUPABASE_PROJECT_REF
-          done
-
+          supabase db reset --project-ref $SUPABASE_PROJECT_REF --force
           echo "✅ Preview DB updated successfully!"

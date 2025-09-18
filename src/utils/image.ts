@@ -1,6 +1,7 @@
 import { decode } from 'base64-arraybuffer'
 import * as FileSystem from 'expo-file-system'
 import { type ImagePickerAsset } from 'expo-image-picker'
+import * as Sentry from '@sentry/react-native'
 
 import { client } from '../../supabase'
 
@@ -16,6 +17,7 @@ export const saveImage = async (image: ImagePickerAsset, username: string): Prom
     const { error: uploadError } = await client.storage.from('avatars').upload(filePath, binary, { contentType })
 
     if (uploadError) {
+      Sentry.captureException(uploadError)
       throw uploadError
     }
 

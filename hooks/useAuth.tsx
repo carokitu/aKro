@@ -3,6 +3,8 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 import { type PrivateUser, type User } from '../models'
 import { client } from '../supabase'
 
+import * as Sentry from '@sentry/react-native'
+
 type UserData = Pick<User, 'avatar_url' | 'bio' | 'birthday' | 'name' | 'username'>
 
 type AuthContextType = {
@@ -120,6 +122,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setUser(null)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur de déconnexion')
+      Sentry.captureException(err)
     } finally {
       setLoading(false)
     }
@@ -139,7 +142,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       if (updateError) {
         setError(updateError.message)
-        throw new Error(updateError.message)
+        Sentry.captureException(updateError)
       }
 
       setUser(data)
@@ -158,6 +161,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         } = await client.auth.getSession()
 
         if (!session?.user) {
+          Sentry.captureException(new Error('No authenticated user'))
           throw new Error('No authenticated user')
         }
 
@@ -172,13 +176,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         const { data: insertedUser, error: err } = await client.from('users').insert(input).select().single<User>()
 
         if (err) {
-          throw err
+          Sentry.captureException(err)
+          setError('Une erreur est survenue lors de la création du compte')
         }
 
         setUser(insertedUser)
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Erreur inconnue')
-        throw err
+        setError('Une erreur est survenue lors de la création du compte')
+        Sentry.captureException(err)
       } finally {
         setLoading(false)
       }
@@ -208,6 +213,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 export const useAuth = (): AuthContextType => {
   const context = useContext(UserContext)
   if (!context) {
+    Sentry.captureException(new Error('useUser must be used within a UserProvider'))
     throw new Error('useUser must be used within a UserProvider')
   }
 

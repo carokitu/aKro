@@ -3,6 +3,7 @@ import { useRef, useState } from 'react'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import BottomSheet, { BottomSheetView } from '@gorhom/bottom-sheet'
+import * as Sentry from '@sentry/react-native'
 
 import { usePost, useUser } from '../../../../hooks'
 import { type UserWithStats } from '../../../../models/custom'
@@ -33,7 +34,7 @@ export const ExpendedLikes = () => {
     })
 
     if (fetchError) {
-      console.error(fetchError)
+      Sentry.captureException(fetchError)
       return { error: fetchError }
     }
 

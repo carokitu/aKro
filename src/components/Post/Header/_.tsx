@@ -4,6 +4,7 @@ import { memo } from 'react'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import { router } from 'expo-router'
+import * as Sentry from '@sentry/react-native'
 
 import { type Post as TPost, type User } from '../../../../models'
 import { client } from '../../../../supabase'
@@ -22,6 +23,7 @@ export const deletePost = async (postId: string): Promise<{ error?: string; succ
 
     return { success: true }
   } catch (err) {
+    Sentry.captureException(err)
     return {
       error: err instanceof Error ? err.message : 'Unknown error',
       success: false,
@@ -45,6 +47,7 @@ export const reportPost = async ({
 
     return { success: true }
   } catch (err) {
+    Sentry.captureException(err)
     return {
       error: err instanceof Error ? err.message : 'Unknown error',
       success: false,
@@ -88,10 +91,7 @@ export const Header = memo(
         },
         async (index) => {
           if (index === 0) {
-            const { success } = await reportPost({ postId: item.id, userId: user.id })
-            if (success) {
-              console.log('Post signalé')
-            }
+            await reportPost({ postId: item.id, userId: user.id })
           }
         },
       )

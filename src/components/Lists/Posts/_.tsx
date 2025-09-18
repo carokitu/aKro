@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { type NativeScrollEvent, type NativeSyntheticEvent, StyleSheet } from 'react-native'
 
 import { FlashList, type FlashListProps } from '@shopify/flash-list'
+import * as Sentry from '@sentry/react-native'
 import { type AudioPlayer, createAudioPlayer } from 'expo-audio'
 
 import { PostProvider, useMute, usePost } from '../../../../hooks'
@@ -59,7 +60,7 @@ const List = ({
         sound.remove()
         setSound(null)
       } catch (err) {
-        console.error('Error stopping preview:', err)
+        Sentry.captureException(err)
       }
     }
   }, [sound])
@@ -71,7 +72,7 @@ const List = ({
         const data = await response.json()
 
         if (!data.preview) {
-          console.warn('No preview available for ISRC:', isrc)
+          Sentry.captureMessage((`No preview available for ISRC: ${isrc}`))
           return
         }
 
@@ -80,18 +81,19 @@ const List = ({
         }
 
         const newSound = createAudioPlayer({ uri: data.preview })
+
         try {
           newSound.loop = true
           if (!mute) {
             newSound.play()
           }
         } catch (err) {
-          console.error('Error configuring preview sound:', err)
+          Sentry.captureException(err)
         }
 
         setSound(newSound)
       } catch (err) {
-        console.error('Error playing Deezer preview:', err)
+        Sentry.captureException(err)
       }
     },
     [mute, sound, stopPreview],
@@ -107,7 +109,7 @@ const List = ({
             sound.play()
           }
         } catch (err) {
-          console.error('Erreur reprise son :', err)
+          Sentry.captureException(err)
         }
       }
 
@@ -135,7 +137,7 @@ const List = ({
           sound.play()
         }
       } catch (err) {
-        console.error('Error applying mute:', err)
+        Sentry.captureException(err)
       }
     }
 
@@ -300,7 +302,7 @@ const List = ({
           )
         }
       } catch (err) {
-        console.error('Failed to toggle like:', err)
+        Sentry.captureException(err)
       }
     },
     [user],

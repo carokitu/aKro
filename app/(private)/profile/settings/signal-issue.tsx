@@ -3,6 +3,7 @@ import { Platform, StyleSheet, View } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import Constants from 'expo-constants'
+import * as Sentry from '@sentry/react-native'
 
 import { useUser } from '../../../../hooks'
 import { NavBar } from '../../../../src'
@@ -16,7 +17,6 @@ const SignalIssue = () => {
 
   const reportBug = async () => {
     const deviceInfo = {
-      appVersion: Constants.manifest?.version,
       os: Platform.OS,
       version: Platform.Version,
     }
@@ -28,7 +28,7 @@ const SignalIssue = () => {
     })
 
     if (error) {
-      console.error('Erreur lors de l’envoi du rapport :', error)
+      Sentry.captureException(error)
     }
   }
 

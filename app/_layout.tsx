@@ -9,6 +9,13 @@ import { AuthProvider, useAuth } from '../hooks'
 import { SplashScreen } from '../src/components'
 import { theme } from '../src/theme'
 
+import * as Sentry from '@sentry/react-native'
+
+Sentry.init({
+  dsn: "https://de50821303794a821aeb4c5024299e93@o4510041038913536.ingest.de.sentry.io/4510041040027728",
+  sendDefaultPii: true,
+});
+
 const Layout = () => {
   const { loading: userLoading, user } = useAuth()
 
@@ -66,4 +73,4 @@ export const RootLayout = () => {
   )
 }
 
-export default RootLayout
+export default Sentry.wrap(RootLayout)

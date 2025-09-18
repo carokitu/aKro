@@ -1,5 +1,7 @@
 import React, { createContext, useContext, useState } from 'react'
 
+import * as Sentry from '@sentry/react-native'
+
 type MuteContextType = {
   mute: boolean
   setMute: (value: boolean) => void
@@ -21,6 +23,7 @@ export const MuteProvider = ({ children }: { children: React.ReactNode }) => {
 export const useMute = (): MuteContextType => {
   const context = useContext(MuteContext)
   if (!context) {
+    Sentry.captureException(new Error('useMute must be used within a MuteProvider'))
     throw new Error('useMute must be used within a MuteProvider')
   }
 

@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
+import * as Sentry from '@sentry/react-native'
+
 import { type DeezerTrack } from '../models'
 import { mergeUnique } from '../src/utils'
 import { useDebouncedValue } from './useDebouncedValue'
@@ -30,8 +32,10 @@ export const useDeezerSearch = (query: string) => {
       }
 
       setNextUrl(data.next ?? null)
-    } catch {
+    } catch (err) {
       setError('Erreur lors du chargement')
+      Sentry.captureException(err)
+
       if (!append) {
         setTracks([])
       }

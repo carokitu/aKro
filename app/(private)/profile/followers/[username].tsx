@@ -4,17 +4,18 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { useLocalSearchParams } from 'expo-router'
 
-import { useAuth } from '../../../../hooks'
+import { useUser } from '../../../../hooks'
 import { type UserWithStats } from '../../../../models/custom'
 import { NavBar } from '../../../../src/components'
 import { UserList } from '../../../../src/components/Lists'
 import { Error as ErrorScreen } from '../../../../src/system'
 import { theme } from '../../../../src/theme'
 import { client } from '../../../../supabase'
+import * as Sentry from '@sentry/react-native'
 
 const Followers = () => {
   const { username } = useLocalSearchParams()
-  const { user: currentUser } = useAuth()
+  const currentUser = useUser()
   const [nbFollowers, setNbFollowers] = useState(0)
   const [error, setError] = useState<Error | null>(null)
   const [followers, setFollowers] = useState<UserWithStats[]>([])
@@ -27,6 +28,7 @@ const Followers = () => {
 
       if (fetchError) {
         setError(fetchError)
+        Sentry.captureException(fetchError)
       }
 
       setNbFollowers(data as number)
@@ -38,10 +40,6 @@ const Followers = () => {
   }, [username])
 
   const fetchFollowers = async ({ limit, offset }: { limit: number; offset: number }) => {
-    if (!currentUser) {
-      return { error: new Error('Current user not found') }
-    }
-
     const { data, error: fetchError } = await client.rpc('get_user_followers_with_stats', {
       p_limit: limit,
       p_offset: offset,
@@ -50,6 +48,7 @@ const Followers = () => {
     })
 
     if (fetchError) {
+      Sentry.captureException(fetchError)
       return { error: fetchError }
     }
 
@@ -62,7 +61,7 @@ const Followers = () => {
     return { error: null }
   }
 
-  if (!currentUser || error) {
+  if (error) {
     return <ErrorScreen />
   }
 

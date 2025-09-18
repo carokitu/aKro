@@ -186,6 +186,7 @@ const List = ({
 
       if (err) {
         setError(err)
+        Sentry.captureException(err)
         setLoading(false)
         return
       } else {

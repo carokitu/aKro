@@ -10,6 +10,7 @@ import { NavBar } from '../../src'
 import { Button, H1, Text } from '../../src/system'
 import { theme } from '../../src/theme'
 import { client } from '../../supabase'
+import * as Sentry from '@sentry/react-native'
 
 const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!$%&*?@])[\d!$%&*?@A-Za-z]{8,}$/
 
@@ -55,6 +56,7 @@ const Password = () => {
       const { error: err } = await client.auth.signUp({ email, password })
 
       if (err) {
+        Sentry.captureMessage('Erreur lors de la création du compte. Compte existant ?')
         setError('Erreur lors de la création du compte.')
       }
     }

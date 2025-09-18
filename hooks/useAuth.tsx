@@ -212,6 +212,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useAuth = (): AuthContextType => {
   const context = useContext(UserContext)
+
   if (!context) {
     Sentry.captureException(new Error('useUser must be used within a UserProvider'))
     throw new Error('useUser must be used within a UserProvider')

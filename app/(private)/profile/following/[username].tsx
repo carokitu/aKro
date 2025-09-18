@@ -10,6 +10,7 @@ import { NavBar } from '../../../../src/components'
 import { UserList } from '../../../../src/components/Lists'
 import { theme } from '../../../../src/theme'
 import { client } from '../../../../supabase'
+import * as Sentry from '@sentry/react-native'
 
 const Followers = () => {
   const { username } = useLocalSearchParams()
@@ -29,6 +30,7 @@ const Followers = () => {
     })
 
     if (fetchError) {
+      Sentry.captureException(fetchError)
       return { error: fetchError }
     }
 

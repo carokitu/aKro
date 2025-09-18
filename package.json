@@ -10,6 +10,7 @@
     "@react-native-community/datetimepicker": "8.4.1",
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/native": "^7.1.6",
+    "@sentry/react-native": "^7.1.0",
     "@shopify/flash-list": "1.7.6",
     "@spotify/web-api-ts-sdk": "^1.2.0",
     "@supabase/supabase-js": "^2.53.0",

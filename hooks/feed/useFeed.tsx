@@ -1,5 +1,7 @@
 import React, { createContext, useCallback, useContext, useState } from 'react'
 
+import * as Sentry from '@sentry/react-native'
+
 type FeedContextType = {
   commentUpdates: Map<string, number>
   newPostKey: number
@@ -35,6 +37,7 @@ export const FeedProvider = ({ children }: { children: React.ReactNode }) => {
 export const useFeed = () => {
   const ctx = useContext(FeedContext)
   if (!ctx) {
+    Sentry.captureException(new Error('useFeed must be used within a FeedProvider'))
     throw new Error('useFeed must be used within a FeedProvider')
   }
 

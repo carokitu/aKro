@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import { router } from 'expo-router'
+import * as Sentry from '@sentry/react-native'
 
 import { type Rank } from '../../../models'
 import { client } from '../../../supabase'
@@ -23,12 +24,12 @@ export const Top = () => {
         })
 
         if (error) {
-          console.error(error)
+          Sentry.captureException(error)
         } else {
           setRanking(data)
         }
       } catch (error) {
-        console.error(error)
+        Sentry.captureException(error)
       }
     }
 

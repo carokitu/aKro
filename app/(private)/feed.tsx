@@ -6,6 +6,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { router } from 'expo-router'
+import * as Sentry from '@sentry/react-native'
 
 import { useFeed, useUser } from '../../hooks'
 import { type Post as TPost, type User } from '../../models'
@@ -67,6 +68,7 @@ const Feed = () => {
         p_user_id: user.id,
       })
 
+      Sentry.captureException(new Error('Test sur le feed'))
       return { data: data as TPost[], error }
     },
     [user],

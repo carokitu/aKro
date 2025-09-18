@@ -4,6 +4,7 @@ import { Keyboard, StyleSheet, TouchableWithoutFeedback, View } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import type * as ImagePicker from 'expo-image-picker'
+import * as Sentry from '@sentry/react-native'
 
 import { useAuth } from '../../../hooks'
 import { NavBar } from '../../../src'
@@ -32,6 +33,7 @@ const Avatar = () => {
       })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Une erreur est survenue lors de la création du compte.')
+      Sentry.captureException(err)
     }
   }
 

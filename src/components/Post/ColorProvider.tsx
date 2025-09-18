@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import { getColors as getColorsImage } from 'react-native-image-colors'
 
 import Colors from 'color'
+import * as Sentry from '@sentry/react-native'
 
 type ColorContextType = {
   color?: string
@@ -12,6 +13,7 @@ const ColorContext = createContext<ColorContextType | null>(null)
 export const useTrackColors = () => {
   const context = useContext(ColorContext)
   if (!context) {
+    Sentry.captureException(new Error('useTrackColors must be used within ColorProvider'))
     throw new Error('useTrackColors must be used within ColorProvider')
   }
 

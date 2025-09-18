@@ -1,5 +1,7 @@
 import React, { createContext, type ReactNode, useContext, useState } from 'react'
 
+import * as Sentry from '@sentry/react-native'
+
 type PostContextType = {
   expendedDescription: string | undefined
   expendedLikesPostId: string | undefined
@@ -30,6 +32,7 @@ export const PostProvider = ({ children }: { children: ReactNode }) => {
 export const usePost = () => {
   const context = useContext(PostContext)
   if (!context) {
+    Sentry.captureException(new Error('usePost must be used within a PostProvider'))
     throw new Error('usePost must be used within a PostProvider')
   }
 

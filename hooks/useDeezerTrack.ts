@@ -1,5 +1,7 @@
 import { useState } from 'react'
 
+import * as Sentry from '@sentry/react-native'
+
 import { client } from '../supabase'
 
 type DeezerArtist = {
@@ -93,7 +95,7 @@ const convertAndSaveTrack = async (deezerTrack: DeezerTrack) => {
   const { error } = await client.from('tracks').insert(track)
 
   if (error) {
-    console.log('error', error)
+    Sentry.captureException(error)
     return null
   }
 
@@ -131,6 +133,7 @@ export const useFetchOrSaveDeezerTrack = (trackId: number) => {
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Une erreur est survenue')
+        Sentry.captureException(err)
         return null
       } finally {
         setLoading(false)

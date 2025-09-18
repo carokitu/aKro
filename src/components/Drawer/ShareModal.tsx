@@ -12,6 +12,8 @@ import {
   View,
 } from 'react-native'
 
+import * as Sentry from '@sentry/react-native'
+
 import { useFeed, useMute, useUser } from '../../../hooks'
 import { useFetchOrSaveDeezerTrack } from '../../../hooks/useDeezerTrack'
 import { type DeezerTrack } from '../../../models'
@@ -37,7 +39,6 @@ const getTrackLinks = async (deezerUrl: string, isrc: string) => {
   }
 
   if (existing?.platform_links) {
-    console.log(`ℹ️ Platform links already present for ${isrc}`)
     return existing.platform_links
   }
 
@@ -46,7 +47,7 @@ const getTrackLinks = async (deezerUrl: string, isrc: string) => {
     const res = await fetch(odesliUrl)
 
     if (!res.ok) {
-      throw new Error(`Odesli API error: ${res.statusText}`)
+      Sentry.captureException(new Error(`Odesli API error: ${res.statusText}`))
     }
 
     const data = await res.json()
@@ -59,14 +60,12 @@ const getTrackLinks = async (deezerUrl: string, isrc: string) => {
     const { error } = await client.from('tracks').update({ platform_links: platformLinks }).eq('isrc', isrc)
 
     if (error) {
-      throw error
+      Sentry.captureException(error)
     }
 
-    console.log(`✅ Updated track ${isrc} with platform links`)
     return platformLinks
   } catch (err) {
-    console.error('❌ Error updating platform links:', err)
-    throw err
+    Sentry.captureException(err)
   }
 }
 
@@ -136,8 +135,9 @@ export const ShareModal = ({ onClose, track }: Props) => {
       }
 
       setIsSuccess(true)
-    } catch {
+    } catch (err) {
       setError('Une erreur est survenue lors de la publication')
+      Sentry.captureException(err)
     } finally {
       setIsSharing(false)
     }

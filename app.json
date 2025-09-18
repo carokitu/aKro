@@ -58,7 +58,6 @@
         {
           "android": {
             "permissions": [
-              "android.permission.CAMERA",
               "android.permission.READ_EXTERNAL_STORAGE"
             ]
           },
@@ -69,7 +68,15 @@
           "photosPermission": "akro souhaite accéder à vos photos"
         }
       ],
-      "expo-audio"
+      "expo-audio",
+      [
+        "@sentry/react-native/expo",
+        {
+          "url": "https://sentry.io/",
+          "project": "react-native",
+          "organization": "akro-q3"
+        }
+      ]
     ],
     "scheme": "akro",
     "slug": "aKro",

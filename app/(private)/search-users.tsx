@@ -4,8 +4,9 @@ import { Keyboard, Platform, StyleSheet, TextInput, TouchableWithoutFeedback, Vi
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { debounce } from 'lodash'
+import * as Sentry from '@sentry/react-native'
 
-import { useAuth } from '../../hooks'
+import { useAuth, useUser } from '../../hooks'
 import { type UserWithStats } from '../../models/custom'
 import { NavBar } from '../../src/components'
 import { UserList } from '../../src/components/Lists'
@@ -26,15 +27,11 @@ const EmptyList = () => (
 )
 
 const Users = ({ query }: UserListProps) => {
-  const { user: currentUser } = useAuth()
+  const currentUser  = useUser()
   const [users, setUsers] = useState<UserWithStats[]>([])
   const [loading, setLoading] = useState(false)
 
   const fetchUsers = useCallback(async () => {
-    if (!currentUser) {
-      return { error: new Error('Current user not found') }
-    }
-
     setLoading(true)
 
     const { data: usersData, error: usersError } = await client.rpc('search_users_with_stats', {
@@ -43,6 +40,7 @@ const Users = ({ query }: UserListProps) => {
     })
 
     if (usersError) {
+      Sentry.captureException(usersError)
       setLoading(false)
       return { error: usersError }
     }

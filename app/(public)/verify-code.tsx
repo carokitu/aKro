@@ -11,6 +11,8 @@ import { Button, H1, Text } from '../../src/system'
 import { theme } from '../../src/theme'
 import { client } from '../../supabase'
 
+import * as Sentry from '@sentry/react-native'
+
 const RESEND_DELAY = 30
 
 const VerifyCode = () => {
@@ -37,6 +39,7 @@ const VerifyCode = () => {
         setTimer(RESEND_DELAY)
       } catch {
         setError(`Erreur lors de l’envoi du code au ${phoneNumber}`)
+        Sentry.captureException(error)
       }
     } else {
       setError(`Numéro invalide : ${phoneNumber}`)

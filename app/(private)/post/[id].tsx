@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 
 import { FlashList } from '@shopify/flash-list'
 import { router, useLocalSearchParams } from 'expo-router'
+import * as Sentry from '@sentry/react-native'
 
 import { useFeed, useUser } from '../../../hooks'
 import { type Comment as TComment } from '../../../models'
@@ -67,7 +68,7 @@ const NewComment = ({
     setLoading(false)
 
     if (error) {
-      console.error('Erreur insertion commentaire:', error)
+      Sentry.captureException(error)
       return
     }
 
@@ -156,9 +157,9 @@ const Comment = ({ comment, currentUserId, postId }: { comment: TComment; curren
             comment_id: comment.id,
             user_id: currentUserId,
           })
-          console.log(error)
-          if (!error) {
-            console.log('Commentaire signalé')
+
+          if (error) {
+            Sentry.captureException(error)
           }
         }
       },
@@ -223,7 +224,7 @@ const ExpendedComments = () => {
     })
 
     if (fetchError) {
-      console.error(fetchError)
+      Sentry.captureException(fetchError)
       return { error: fetchError }
     }
 

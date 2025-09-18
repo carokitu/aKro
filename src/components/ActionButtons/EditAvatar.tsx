@@ -3,6 +3,7 @@ import { useCallback, useMemo, useState } from 'react'
 import { ActivityIndicator, Image, StyleSheet, TouchableOpacity, View } from 'react-native'
 
 import { type ImagePickerAsset, launchImageLibraryAsync, requestMediaLibraryPermissionsAsync } from 'expo-image-picker'
+import * as Sentry from '@sentry/react-native'
 
 import { Avatar, Label, Text } from '../../system'
 import { theme } from '../../theme'
@@ -58,6 +59,7 @@ export const EditAvatar = ({ avatarUrl: initialAvatarUrl, onUpdateAvatar, setUpl
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur inconnue lors du chargement.')
+      Sentry.captureException(err)
     } finally {
       setUploading(false)
     }

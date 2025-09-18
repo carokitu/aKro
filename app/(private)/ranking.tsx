@@ -16,6 +16,8 @@ import { theme } from '../../src/theme'
 import { mergeUnique } from '../../src/utils'
 import { client } from '../../supabase'
 
+import * as Sentry from '@sentry/react-native'
+
 const LIMIT = 30
 
 const List = () => {
@@ -52,13 +54,13 @@ const List = () => {
         })
 
         if (error) {
-          console.error(error)
+          Sentry.captureException(error)
         } else {
           setUsers(reset ? data : mergeUnique(users, data, 'user_id'))
           setOffset(reset ? 0 : offset + LIMIT)
         }
       } catch (error) {
-        console.error(error)
+        Sentry.captureException(error)
       }
     },
     [offset, period, users],

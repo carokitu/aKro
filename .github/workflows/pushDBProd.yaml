@@ -1,4 +1,4 @@
-name: Update Preview DB
+name: Update Prod DB
 
 on:
   workflow_dispatch:

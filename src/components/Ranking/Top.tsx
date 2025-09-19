@@ -55,7 +55,7 @@ export const Top = () => {
         ))}
       </View>
       <View style={styles.feedTitle}>
-        <Title size="large">Feed</Title>
+        <Title size="large">Feed Update</Title>
       </View>
     </View>
   )

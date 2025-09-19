@@ -8,6 +8,8 @@ import { type UserWithStats } from '../../../../models/custom'
 import { Error } from '../../../system'
 import { User } from './User'
 
+import * as Sentry from '@sentry/react-native'
+
 type UserListProps = Omit<FlashListProps<UserWithStats>, 'data' | 'renderItem'> & {
   currentUser: TUser
   fetch: ({ limit, offset }: { limit: number; offset: number }) => Promise<{ error: Error | null }>
@@ -30,7 +32,7 @@ export const UserList = ({
   const fetchUsers = useCallback(async () => {
     const { error: usersError } = await fetch({ limit: LIMIT, offset })
     if (usersError) {
-      // HANDLE ERROR
+      Sentry.captureException(usersError)
       return
     }
 

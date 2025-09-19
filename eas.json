@@ -4,7 +4,8 @@
       "developmentClient": true,
       "distribution": "internal",
       "env": {
-        "APP_VARIANT": "development"
+        "APP_VARIANT": "development",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
       },
       "android": {
         "image": "latest"
@@ -23,7 +24,8 @@
     "preview": {
       "distribution": "internal",
       "env": {
-        "APP_VARIANT": "preview"
+        "APP_VARIANT": "preview",
+        "SENTRY_ALLOW_FAILURE": "true"
       },
       "channel": "preview"
     },
